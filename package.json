@@ -1,0 +1,26 @@
+{
+  "name": "adgenxai",
+  "version": "1.0.0",
+  "description": "AI-powered advertising solution with webhook sensory cortex",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "dev": "netlify dev",
+    "deploy": "netlify deploy --prod"
+  },
+  "dependencies": {
+    "@netlify/functions": "^2.4.0",
+    "@netlify/blobs": "^7.0.0",
+    "zod": "^3.22.4",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/express": "^4.17.21",
+    "typescript": "^5.5.0"
+  },
+  "keywords": ["ai", "advertising", "webhook", "mcp", "sensory-cortex"],
+  "author": "brandonlacoste9-tech",
+  "license": "MIT"
+}
