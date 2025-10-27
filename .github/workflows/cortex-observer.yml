@@ -13,22 +13,21 @@ jobs:
   report:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch telemetry and health
+      - name: Fetch endpoints
         id: fetch
         run: |
-          set -euo pipefail
-          curl -sSL https://adgenxai.pro/.netlify/functions/webhook-telemetry > telemetry.json
-          curl -sSL https://adgenxai.pro/.netlify/functions/health > health.json
-          
-          echo "telemetry<<EOF" >> "$GITHUB_OUTPUT"
-          cat telemetry.json >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
-          
-          echo "health<<EOF" >> "$GITHUB_OUTPUT"
-          cat health.json >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+          curl -sSL https://adgenxai.pro/.netlify/functions/webhook-telemetry > t.json
+          curl -sSL https://adgenxai.pro/.netlify/functions/health > h.json
+          {
+            echo "telemetry<<EOF"
+            cat t.json
+            echo "EOF"
+            echo "health<<EOF"
+            cat h.json
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
-      - name: Post to tracking issue
+      - name: Post status
         uses: actions/github-script@v7
         env:
           TELEMETRY: ${{ steps.fetch.outputs.telemetry }}
@@ -43,10 +42,10 @@ jobs:
 
 **Timestamp:** ${now}
 
-### Metrics (Last 24h)
-- **Total events:** ${telemetry.stats?.totalEvents ?? 0}
-- **Processing mode:** ${telemetry.stats?.processing?.mode ?? 'unknown'}
-- **Status:** ${telemetry.stats?.processing?.enabled ? '✅ Active' : '⏸️ Observation only'}
+### Metrics
+- Total events: ${telemetry.stats?.totalEvents ?? 0}
+- Mode: ${telemetry.stats?.processing?.mode ?? 'unknown'}
+- Status: ${telemetry.stats?.processing?.enabled ? 'Active' : 'Observation only'}
 
 ### Health
 \`\`\`json
@@ -59,9 +58,9 @@ ${JSON.stringify(telemetry, null, 2)}
 \`\`\`
 
 ---
-*Automated observation — no actions taken*`;
+*Automated observation*`;
 
-            const { data: issues } = await github.rest.issues.listForRepo({
+            const {data: issues} = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               labels: 'cortex-status',
@@ -69,16 +68,12 @@ ${JSON.stringify(telemetry, null, 2)}
               per_page: 1
             });
 
-            if (!issues.length) {
-              core.warning('No cortex-status issue found');
-              return;
+            if (issues.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issues[0].number,
+                body
+              });
+              console.log('Posted to issue #' + issues[0].number);
             }
-
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issues[0].number,
-              body
-            });
-
-            core.info('✅ Posted to issue #' + issues[0].number);
