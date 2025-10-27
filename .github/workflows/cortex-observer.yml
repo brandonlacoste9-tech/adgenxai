@@ -10,13 +10,35 @@ jobs:
   report:
     runs-on: ubuntu-latest
     steps:
-      - run: curl -sSL https://adgenxai.pro/.netlify/functions/webhook-telemetry > t.json && curl -sSL https://adgenxai.pro/.netlify/functions/health > h.json
-      - uses: actions/github-script@v7
+      - name: Fetch endpoints
+        run: |
+          curl -sSfL https://adgenxai.pro/.netlify/functions/webhook-telemetry > t.json
+          curl -sSfL https://adgenxai.pro/.netlify/functions/health > h.json
+          echo "Telemetry size: $(wc -c < t.json) bytes"
+          echo "Health size: $(wc -c < h.json) bytes"
+          
+      - name: Validate JSON
+        run: |
+          jq empty < t.json && echo "✅ Telemetry is valid JSON"
+          jq empty < h.json && echo "✅ Health is valid JSON"
+          
+      - name: Post to issue
+        uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const t = JSON.parse(fs.readFileSync('t.json'));
-            const h = JSON.parse(fs.readFileSync('h.json'));
-            const b = '## 🧠 Cortex\n**Time:** ' + new Date().toISOString() + '\n### Health\n``````\n### Telemetry\n``````';
-            const r = await github.rest.issues.listForRepo({owner:context.repo.owner,repo:context.repo.repo,labels:'cortex-status',state:'open',per_page:1});
-            if(r.data.length) await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:r.data[0].number,body:b});
+            try {
+              const t = JSON.parse(fs.readFileSync('t.json', 'utf8'));
+              const h = JSON.parse(fs.readFileSync('h.json', 'utf8'));
+              const body = '## 🧠 Cortex Status\n**Time:** ' + new Date().toISOString() + '\n### Health\n``````\n### Telemetry\n``````';
+              const r = await github.rest.issues.listForRepo({owner:context.repo.owner,repo:context.repo.repo,labels:'cortex-status',state:'open',per_page:1});
+              if(r.data.length) {
+                await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:r.data[0].number,body:body});
+                console.log('✅ Posted to issue #' + r.data[0].number);
+              } else {
+                console.log('⚠️ No cortex-status issue found');
+              }
+            } catch(e) {
+              console.error('Error:', e.message);
+              throw e;
+            }
