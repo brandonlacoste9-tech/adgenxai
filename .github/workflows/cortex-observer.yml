@@ -1,79 +1,26 @@
 name: Cortex Observer
-
 on:
   schedule:
     - cron: '0 * * * *'
   workflow_dispatch: {}
-
 permissions:
   contents: read
   issues: write
-
 jobs:
   report:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch endpoints
-        id: fetch
+      - name: Fetch data
         run: |
           curl -sSL https://adgenxai.pro/.netlify/functions/webhook-telemetry > t.json
           curl -sSL https://adgenxai.pro/.netlify/functions/health > h.json
-          {
-            echo "telemetry<<EOF"
-            cat t.json
-            echo "EOF"
-            echo "health<<EOF"
-            cat h.json
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Post status
+      - name: Post comment
         uses: actions/github-script@v7
-        env:
-          TELEMETRY: ${{ steps.fetch.outputs.telemetry }}
-          HEALTH: ${{ steps.fetch.outputs.health }}
         with:
           script: |
-            const telemetry = JSON.parse(process.env.TELEMETRY || '{}');
-            const health = JSON.parse(process.env.HEALTH || '{}');
-            const now = new Date().toISOString();
-
-            const body = `## 🧠 Cortex Status Report
-
-**Timestamp:** ${now}
-
-### Metrics
-- Total events: ${telemetry.stats?.totalEvents ?? 0}
-- Mode: ${telemetry.stats?.processing?.mode ?? 'unknown'}
-- Status: ${telemetry.stats?.processing?.enabled ? 'Active' : 'Observation only'}
-
-### Health
-\`\`\`json
-${JSON.stringify(health, null, 2)}
-\`\`\`
-
-### Telemetry
-\`\`\`json
-${JSON.stringify(telemetry, null, 2)}
-\`\`\`
-
----
-*Automated observation*`;
-
-            const {data: issues} = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: 'cortex-status',
-              state: 'open',
-              per_page: 1
-            });
-
-            if (issues.length > 0) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issues[0].number,
-                body
-              });
-              console.log('Posted to issue #' + issues[0].number);
-            }
+            const fs = require('fs');
+            const t = JSON.parse(fs.readFileSync('t.json', 'utf8'));
+            const h = JSON.parse(fs.readFileSync('h.json', 'utf8'));
+            const body = `## 🧠 Cortex Status\n**Time:** ${new Date().toISOString()}\n### Health\n\`\`\`json\n${JSON.stringify(h,null,2)}\n\`\`\`\n### Telemetry\n\`\`\`json\n${JSON.stringify(t,null,2)}\n\`\`\``;
+            const {data:i} = await github.rest.issues.listForRepo({owner:context.repo.owner,repo:context.repo.repo,labels:'cortex-status',state:'open',per_page:1});
+            if(i.length) await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:i[0].number,body});
