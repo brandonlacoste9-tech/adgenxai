@@ -1,11 +1,14 @@
 name: Cortex Observer
+
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 * * * *'   # hourly, UTC
   workflow_dispatch: {}
+
 permissions:
   contents: read
   issues: write
+
 jobs:
   report:
     runs-on: ubuntu-latest
@@ -17,7 +20,7 @@ jobs:
           curl -sSfL https://adgenxai.pro/.netlify/functions/health > h.json
           echo "Telemetry size: $(wc -c < t.json) bytes"
           echo "Health size: $(wc -c < h.json) bytes"
-          
+
       - name: Validate JSON
         run: |
           jq empty < t.json && echo "✅ Telemetry is valid JSON"
@@ -31,6 +34,7 @@ jobs:
             try {
               const t = JSON.parse(fs.readFileSync('t.json', 'utf8'));
               const h = JSON.parse(fs.readFileSync('h.json', 'utf8'));
+
               const body = `## 🧠 Cortex Status
 **Time:** ${new Date().toISOString()}
 
@@ -42,26 +46,30 @@ ${JSON.stringify(h, null, 2)}
 ### Telemetry
 \`\`\`json
 ${JSON.stringify(t, null, 2)}
-\`\`\``;
-              const r = await github.rest.issues.listForRepo({
+\`\`\`
+
+*Automated observation — no actions taken*`;
+
+              const { data: issues } = await github.rest.issues.listForRepo({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 labels: 'cortex-status',
                 state: 'open',
                 per_page: 1
               });
-              if (r.data.length) {
+
+              if (issues.length) {
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  issue_number: r.data[0].number,
+                  issue_number: issues[0].number,
                   body
                 });
-                console.log('✅ Posted to issue #' + r.data[0].number);
+                console.log('✅ Posted to issue #' + issues[0].number);
               } else {
                 console.log('⚠️ No cortex-status issue found');
               }
             } catch (e) {
-              console.error('❌ Error in github-script step:', e);
+              console.error('❌ github-script error:', e);
               throw e;
             }
