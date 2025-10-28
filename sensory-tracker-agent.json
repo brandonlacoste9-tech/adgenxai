@@ -1,0 +1,45 @@
+{
+  "id": "sensory-tracker-agent",
+  "name": "Sensory Tracker — Cortex & Codex",
+  "description": "Runs sensory checks, manages operational alerts, posts PR comments, optionally triggers BeeHive.",
+  "version": "1.0.0",
+  "mode": "agent",
+  "triggers": [
+    { "type": "schedule", "cron": "0 * * * *", "description": "Hourly" },
+    { "type": "github:pr_comment", "pattern": "Sensory Tracker.*run", "description": "Wake by PR comment" },
+    { "type": "webhook", "path": "/agents/sensory/trigger", "method": "POST" }
+  ],
+  "runtime": {
+    "image": "ubuntu:22.04",
+    "shell": "/bin/bash",
+    "timeout_seconds": 1200,
+    "env": {
+      "CORTEX_BASE_URL": "${{ secrets.CORTEX_BASE_URL }}",
+      "CODEX_BASE_URL": "${{ secrets.CODEX_BASE_URL }}",
+      "NETLIFY_SITE": "${{ secrets.NETLIFY_SITE }}",
+      "GITHUB_TOKEN": "${{ secrets.GITHUB_TOKEN }}",
+      "BEEHIVE_AGENT_ENDPOINT": "${{ secrets.BEEHIVE_AGENT_ENDPOINT | default('') }}",
+      "BEEHIVE_AGENT_TOKEN": "${{ secrets.BEEHIVE_AGENT_TOKEN | default('') }}"
+    },
+    "files": {
+      "scripts/agent-sensory-tracker.sh": { "from_repo_path": "scripts/agent-sensory-tracker.sh" }
+    }
+  },
+  "behavior": {
+    "steps": [
+      { "id": "run_health", "type": "exec", "cmd": "chmod +x ./scripts/agent-sensory-tracker.sh && ./scripts/agent-sensory-tracker.sh", "capture_stdout_json_first_line": true },
+      { "id": "post_ops", "type": "exec", "cmd": "./scripts/agent-github-ops.sh", "when": "result.degraded_or_issue" }
+    ]
+  },
+  "post_actions": {
+    "on_degraded": [
+      { "type": "github_issue_update", "label": "operational/alert", "assignees": ["codex", "oncall"] },
+      { "type": "pr_comment", "tag": ["@codex", "@beehive-swarm", "@oncall"] }
+    ],
+    "on_healthy": [
+      { "type": "pr_comment", "tag": ["@codex", "@beehive-swarm", "@oncall"], "message": "Sensory Tracker: healthy — closing alert if present." },
+      { "type": "github_issue_close", "label": "operational/alert" }
+    ]
+  },
+  "safety": { "human_in_the_loop_for": ["any_remedial_action"], "max_auto_retries": 2, "audit_logging": true }
+}
