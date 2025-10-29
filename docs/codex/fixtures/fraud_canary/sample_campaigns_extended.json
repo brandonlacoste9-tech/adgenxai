@@ -1,0 +1,33 @@
+[
+  {
+    "id": "adg-001",
+    "name": "Adgenxai clean campaign",
+    "creative_items": [
+      { "id":"c1","text":"Summer sale 2026 - buy now", "image":"sample1.jpg" },
+      { "id":"c2","text":"Limited time only", "image":"sample2.jpg" }
+    ],
+    "expected": {
+      "max_allowed_score": 0.2
+    }
+  },
+  {
+    "id": "adg-002",
+    "name": "Adgenxai suspicious campaign",
+    "creative_items": [
+      { "id":"c1","text":"Click here to get rich quick", "image":"sample3.jpg" }
+    ],
+    "expected": {
+      "min_sus_score": 0.8
+    }
+  },
+  {
+    "id": "beeh-001",
+    "name": "Beehive campaign example",
+    "creative_items": [
+      { "id":"b1","text":"Ritual savings — join now", "image":"bee1.jpg" }
+    ],
+    "expected": {
+      "max_allowed_score": 0.35
+    }
+  }
+]
