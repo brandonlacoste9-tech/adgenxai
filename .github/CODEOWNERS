@@ -4,3 +4,9 @@ netlify/** @brandonlacoste9-tech
 netlify.toml @brandonlacoste9-tech
 package*.json @brandonlacoste9-tech
 scripts/** @brandonlacoste9-tech
+
+# Codex playbooks and fraud detection systems
+/docs/codex/ @analytics-team @ops-team @brandonlacoste9-tech
+/supabase/functions/fraud-detection* @analytics-team @ops-team
+/scripts/run-fraud-canary.js @analytics-team @ops-team
+/scripts/format-fraud-report.js @analytics-team
