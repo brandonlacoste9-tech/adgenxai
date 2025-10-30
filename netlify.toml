@@ -1,15 +1,30 @@
+# netlify.toml - NETLIFY DEPLOYMENT CONFIGURATION FOR ADGENXAI
 [build]
   command = "npm run build"
-  functions = "netlify/functions"
-  publish = "dist"
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "18"
+  NPM_VERSION = "9"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
 
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
 
-[functions]
-  node_bundler = "esbuild"
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Cache-Control = "public, max-age=31536000, immutable"
