@@ -1,6 +1,23 @@
 // netlify/functions/webhook.ts - Main webhook routing to your AI Sensory Cortex on Netlify
 import { Handler } from '@netlify/functions';
 
+interface RequestData {
+  type?: string;
+  payload?: Record<string, any>;
+  hero_variant?: string;
+  timestamp?: string;
+  [key: string]: any;
+}
+
+interface CortexResponse {
+  status?: string;
+  processing_id?: string;
+  message?: string;
+  hero_variant?: string;
+  timestamp?: string;
+  [key: string]: any;
+}
+
 export const handler: Handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -22,13 +39,13 @@ export const handler: Handler = async (event, context) => {
   }
 
   try {
-    const requestData = JSON.parse(event.body || '{}');
-    const { type, payload, hero_variant, timestamp } = requestData;
+    const requestData: RequestData = event.body ? JSON.parse(event.body) : {};
+    const { type, payload = {}, hero_variant, timestamp } = requestData;
     const processingId = `adgenxai_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     // Route to your AI Sensory Cortex (also on Netlify)
     const cortexUrl = process.env.NEXT_PUBLIC_SENSORY_CORTEX_URL || process.env.SENSORY_CORTEX_URL;
-    let cortexResponse = {
+    let cortexResponse: CortexResponse = {
       status: 'legendary_success',
       processing_id: processingId,
       message: 'AI Sensory Cortex processing at legendary speed',
@@ -59,7 +76,7 @@ export const handler: Handler = async (event, context) => {
         });
 
         if (response.ok) {
-          const cortexData = await response.json();
+          const cortexData = (await response.json()) as CortexResponse;
           cortexResponse = { ...cortexResponse, ...cortexData };
           console.log('🧠 AI Sensory Cortex Response:', cortexData);
         }
@@ -73,7 +90,7 @@ export const handler: Handler = async (event, context) => {
       headers,
       body: JSON.stringify({
         success: true,
-        message: `🎉 LEGENDARY! Your AI Sensory Cortex ${type} completed successfully!`,
+        message: `🎉 LEGENDARY! Your AI Sensory Cortex ${type || 'request'} completed successfully!`,
         processing_id: processingId,
         cortex_response: cortexResponse,
         timestamp: new Date().toISOString()
