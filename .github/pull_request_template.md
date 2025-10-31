@@ -1,11 +1,19 @@
-### Summary
-<!-- What changed and why -->
+## Summary
+<!-- What does this change and why? -->
 
-### Checklist
-- [ ] ESLint is clean (no errors)
-- [ ] No new CodeQL alerts at warning/error
-- [ ] Tests updated/added for behavior changes
-- [ ] Docs touched if APIs/config changed
+## Checklist
+- [ ] ESLint clean
+- [ ] TS strict passes
+- [ ] Tests added/updated
+- [ ] Docs updated (link)
+- [ ] No secrets committed
+- [ ] Scoped label applied (PR-3 | PR-1 | PR-5)
+
+## Risk & Rollback
+- Risk level: Low / Medium / High
+- Rollback plan: Revert PR; feature flag `AI_PROVIDER` / disable route
+
+---
 
 ### Handoff
 @copilot
@@ -14,5 +22,5 @@ Please propose/apply safe fixes for any remaining ESLint/CodeQL findings. If cha
 
 Include:
 - Diff summary
-- Links to alerts you’re fixing
+- Links to alerts you're fixing
 - Any assumptions (env vars, RLS, rate limits)

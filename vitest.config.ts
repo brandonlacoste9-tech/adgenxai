@@ -26,8 +26,10 @@ export default defineConfig({
     jsxImportSource: "react",
   },
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./app"),
-    },
+    alias: [
+      { find: '@/components', replacement: path.resolve(__dirname, './app/components') },
+      { find: '@/lib', replacement: path.resolve(__dirname, './lib') },
+      { find: '@', replacement: path.resolve(__dirname, './app') },
+    ],
   },
 });
