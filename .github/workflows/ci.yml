@@ -1,29 +1,19 @@
 name: CI
 on:
   pull_request:
-    branches: [main]
   push:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
-  typecheck:
+  build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
-          cache: 'npm'
-      - run: npm ci --prefer-offline
-      - run: npm run typecheck || echo "typecheck not configured"
-  
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: 'npm'
-      - run: npm ci --prefer-offline
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint --if-present
+      - run: npm test -- --reporter=default
       - run: npm run build

@@ -1,0 +1,179 @@
+name: CI/CD + Security + Provenance
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*.*.*' ]   # release tags publish & deploy
+  pull_request:
+    branches: [ main ]
+
+# Prevent duplicate runs on the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write   # upload SARIF (ESLint, CodeQL)
+  id-token: write          # OIDC to AWS (no long-lived keys)
+
+env:
+  NODE_VERSION: '20'
+  # --- ECS defaults (override in repo/environments if helpful)
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: adgenxai/app
+  CONTAINER_NAME: adgenxai
+  ECS_CLUSTER: adgenxai-cluster
+  ECS_SERVICE: adgenxai-service
+
+jobs:
+  ## ---------- Lint, Test, Build (baseline green) ----------
+  ci:
+    name: Lint • Test • Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint (console)
+        run: npm run lint --if-present
+
+      - name: ESLint SARIF
+        run: npx eslint . -f @microsoft/eslint-formatter-sarif -o eslint.sarif || true
+
+      - name: Upload ESLint SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: eslint.sarif
+
+      - name: Test
+        run: npm test -- --reporter=default
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: |
+            .next
+            dist
+            build
+          if-no-files-found: ignore
+
+  ## ---------- CodeQL (security + quality) ----------
+  codeql:
+    name: CodeQL (JS/TS)
+    needs: [ci]
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    uses: github/codeql-action/.github/workflows/codeql.yml@v3
+    with:
+      languages: javascript-typescript
+      queries: +security-and-quality
+
+  ## ---------- DevSkim (lightweight SAST) ----------
+  devskim:
+    name: DevSkim
+    needs: [ci]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: DevSkim scan
+        uses: microsoft/DevSkim-Action@v1
+        with:
+          directory-to-scan: .
+          should-prune-rules: true
+      - name: Upload DevSkim SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: devskim-results.sarif
+
+  ## ---------- SLSA v3 provenance for built artifacts ----------
+  slsa-provenance:
+    name: SLSA provenance (generic)
+    needs: [ci]
+    permissions:
+      id-token: write
+      contents: write
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.0.0
+    with:
+      base64-subject: false
+      upload-assets: true
+      # Point to artifact from the 'ci' job:
+      artifact_path: web-dist
+
+  ## ---------- Optional: Publish to npm on tags ----------
+  publish-npm:
+    name: Publish package (tags only)
+    needs: [ci, codeql]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  ## ---------- Build image & Deploy to Amazon ECS ----------
+  deploy-ecs:
+    name: Build image → ECR → ECS deploy (main & tags)
+    needs: [ci, codeql]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build image
+        run: |
+          IMAGE_URI=${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+          docker build -t "$IMAGE_URI" .
+
+      - name: Push image
+        run: docker push "$IMAGE_URI"
+
+      - name: Render task definition
+        id: render
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: .github/ecs/task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ env.IMAGE_URI }}
+
+      - name: Deploy ECS service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.render.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
