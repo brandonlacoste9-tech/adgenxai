@@ -3,23 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AdGenXAI - AI-powered advertising solutions for modern businesses">
-    <meta name="keywords" content="AI, advertising, marketing, automation, AdGenXAI">
-    <title>AdGenXAI - AI-Powered Advertising Solutions</title>
+    <meta name="description" content="BEE-SHIP - Autonomous Social Media Publishing Platform">
+    <meta name="keywords" content="Instagram API, YouTube API, TikTok API, social media automation, content publishing">
+    <title>BEE-SHIP - Autonomous Social Publishing Platform | AdGenXAI</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <!-- Header & Navigation -->
     <header>
         <nav class="container">
-            <a href="index.html" class="logo">AdGen<span>XAI</span></a>
+            <a href="index.html" class="logo">BEE-<span>SHIP</span></a>
             <button class="mobile-menu-toggle" aria-label="Toggle menu">☰</button>
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="services.html">Services</a></li>
-                <li><a href="blog.html">Blog</a></li>
-                <li><a href="contact.html">Contact</a></li>
+                <li><a href="demo.html">Try Demo</a></li>
+                <li><a href="https://github.com/brandonlacoste9-tech/adgenxai" target="_blank">Documentation</a></li>
+                <li><a href="#api">API</a></li>
             </ul>
         </nav>
     </header>
@@ -27,96 +26,157 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <h1>Transform Your Advertising with AI</h1>
-            <p>AdGenXAI delivers cutting-edge AI-powered advertising solutions that drive results and maximize your ROI</p>
-            <a href="contact.html" class="cta-button">Get Started Today</a>
+            <h1>🐝 BEE-SHIP<br/>Autonomous Social Publishing</h1>
+            <p>Serverless APIs to publish content to Instagram, YouTube, and TikTok</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="demo.html" class="cta-button">Try Interactive Demo</a>
+                <a href="#api" class="cta-button" style="background: var(--secondary-color);">View API Docs</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Platforms Section -->
+    <section class="features">
+        <div class="container">
+            <h2>Supported Platforms</h2>
+            <p>Post content programmatically to multiple social media platforms</p>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="card-icon">📸</div>
+                    <h3>Instagram</h3>
+                    <p>Post images with captions using Instagram Graph API. Supports Instagram Business accounts.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="card-icon">🎥</div>
+                    <h3>YouTube</h3>
+                    <p>Upload videos with titles, descriptions, tags, and privacy settings via YouTube Data API v3.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="card-icon">🎵</div>
+                    <h3>TikTok</h3>
+                    <p>Coming soon! TikTok video publishing integration currently in development.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Endpoints Section -->
+    <section id="api">
+        <div class="container">
+            <h2>API Endpoints</h2>
+            <p>Serverless functions powered by Netlify, ready to use</p>
+            <div class="cards">
+                <div class="card">
+                    <h3>POST /post-to-instagram</h3>
+                    <p><strong>Status:</strong> ✅ Production Ready</p>
+                    <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; font-size: 0.85rem; overflow-x: auto;">
+{
+  "imageUrl": "https://example.com/image.jpg",
+  "caption": "Your caption here"
+}</pre>
+                    <p>Publishes an image to your Instagram Business account.</p>
+                </div>
+                <div class="card">
+                    <h3>POST /post-to-youtube</h3>
+                    <p><strong>Status:</strong> ✅ Production Ready</p>
+                    <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; font-size: 0.85rem; overflow-x: auto;">
+{
+  "videoBase64": "base64_video_data",
+  "title": "Video title",
+  "privacyStatus": "public"
+}</pre>
+                    <p>Uploads a video to your YouTube channel.</p>
+                </div>
+                <div class="card">
+                    <h3>POST /post-to-tiktok</h3>
+                    <p><strong>Status:</strong> ⚠️ In Development</p>
+                    <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; font-size: 0.85rem; overflow-x: auto;">
+{
+  "videoUrl": "https://example.com/video.mp4",
+  "title": "Video title"
+}</pre>
+                    <p>TikTok publishing coming soon.</p>
+                </div>
+            </div>
+            <div class="text-center mt-2">
+                <a href="demo.html" class="cta-button">Try the Demo</a>
+            </div>
         </div>
     </section>
 
     <!-- Features Section -->
     <section class="features">
         <div class="container">
-            <h2>Why Choose AdGenXAI?</h2>
-            <p>Our AI-powered platform offers unparalleled capabilities to transform your advertising strategy</p>
+            <h2>Why BEE-SHIP?</h2>
             <div class="feature-list">
                 <div class="feature-item">
-                    <div class="card-icon">🎯</div>
-                    <h3>Precision Targeting</h3>
-                    <p>Reach your ideal audience with AI-driven targeting that maximizes engagement and conversions</p>
-                </div>
-                <div class="feature-item">
-                    <div class="card-icon">📊</div>
-                    <h3>Real-Time Analytics</h3>
-                    <p>Get instant insights into campaign performance with comprehensive analytics dashboards</p>
-                </div>
-                <div class="feature-item">
                     <div class="card-icon">⚡</div>
-                    <h3>Automated Optimization</h3>
-                    <p>Let AI automatically optimize your campaigns for maximum performance and efficiency</p>
+                    <h3>Serverless</h3>
+                    <p>No servers to manage. Functions scale automatically with demand.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="card-icon">🔒</div>
+                    <h3>Secure</h3>
+                    <p>Environment variables keep your API credentials safe. HTTPS everywhere.</p>
                 </div>
                 <div class="feature-item">
                     <div class="card-icon">🚀</div>
-                    <h3>Scale Rapidly</h3>
-                    <p>Grow your advertising efforts seamlessly without compromising quality or performance</p>
+                    <h3>Fast</h3>
+                    <p>Edge-optimized functions deliver millisecond response times globally.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="card-icon">📚</div>
+                    <h3>Well Documented</h3>
+                    <p>Complete API documentation, TypeScript client library, and examples included.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Services Preview Section -->
+    <!-- Quick Start Section -->
     <section>
         <div class="container">
-            <h2>Our Core Services</h2>
-            <p>Comprehensive AI-powered advertising solutions tailored to your business needs</p>
+            <h2>Quick Start</h2>
             <div class="cards">
                 <div class="card">
-                    <div class="card-icon">🤖</div>
-                    <h3>AI Content Generation</h3>
-                    <p>Create compelling ad copy and visuals automatically with our advanced AI models. Generate hundreds of variations in minutes, not days.</p>
+                    <h3>1. Add Credentials</h3>
+                    <p>Set your Instagram, YouTube, or TikTok API credentials as environment variables in Netlify.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">📈</div>
-                    <h3>Campaign Management</h3>
-                    <p>Streamline your advertising campaigns across multiple platforms with intelligent automation and unified reporting.</p>
+                    <h3>2. Call the API</h3>
+                    <p>Make POST requests to the serverless functions with your content data.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">🎨</div>
-                    <h3>Creative Optimization</h3>
-                    <p>Test and optimize creative elements automatically to find the perfect combination that resonates with your audience.</p>
+                    <h3>3. Content Goes Live</h3>
+                    <p>Your content is automatically published to the platform of your choice.</p>
                 </div>
             </div>
             <div class="text-center mt-2">
-                <a href="services.html" class="cta-button">Explore All Services</a>
+                <a href="https://github.com/brandonlacoste9-tech/adgenxai#readme" target="_blank" class="cta-button">Read Full Documentation</a>
             </div>
         </div>
     </section>
 
-    <!-- Statistics Section -->
+    <!-- Example Code Section -->
     <section class="features">
         <div class="container">
-            <h2>Proven Results</h2>
-            <p>Our AI-powered solutions deliver measurable impact for businesses of all sizes</p>
-            <div class="feature-list">
-                <div class="feature-item">
-                    <h3 style="color: var(--primary-color); font-size: 2.5rem; margin-bottom: 0.25rem;">85%</h3>
-                    <p><strong>Increase in ROI</strong></p>
-                    <p>Average improvement in return on ad spend</p>
-                </div>
-                <div class="feature-item">
-                    <h3 style="color: var(--secondary-color); font-size: 2.5rem; margin-bottom: 0.25rem;">3x</h3>
-                    <p><strong>Faster Campaign Creation</strong></p>
-                    <p>Reduce time to market for new campaigns</p>
-                </div>
-                <div class="feature-item">
-                    <h3 style="color: var(--accent-color); font-size: 2.5rem; margin-bottom: 0.25rem;">60%</h3>
-                    <p><strong>Cost Reduction</strong></p>
-                    <p>Lower advertising costs through optimization</p>
-                </div>
-                <div class="feature-item">
-                    <h3 style="color: var(--primary-color); font-size: 2.5rem; margin-bottom: 0.25rem;">500+</h3>
-                    <p><strong>Happy Clients</strong></p>
-                    <p>Businesses trust AdGenXAI</p>
-                </div>
+            <h2>Example Usage</h2>
+            <pre style="background: #2d3748; color: #fff; padding: 1.5rem; border-radius: 8px; overflow-x: auto; max-width: 700px; margin: 0 auto;">
+// Post to Instagram
+const response = await fetch('/.netlify/functions/post-to-instagram', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    imageUrl: 'https://example.com/image.jpg',
+    caption: 'Check out this amazing content! 🚀'
+  })
+});
+
+const result = await response.json();
+console.log('Posted:', result.publishedId);
+</pre>
+            <div class="text-center mt-2">
+                <a href="demo.html" class="cta-button">Try It Now</a>
             </div>
         </div>
     </section>
@@ -124,9 +184,9 @@
     <!-- CTA Section -->
     <section>
         <div class="container text-center">
-            <h2>Ready to Transform Your Advertising?</h2>
-            <p>Join hundreds of businesses already using AdGenXAI to revolutionize their advertising strategy</p>
-            <a href="contact.html" class="cta-button mt-2">Start Your Free Trial</a>
+            <h2>Ready to Automate Your Social Publishing?</h2>
+            <p>Start using BEE-SHIP serverless APIs today</p>
+            <a href="demo.html" class="cta-button mt-2">Try Interactive Demo</a>
         </div>
     </section>
 
@@ -135,40 +195,38 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3>AdGenXAI</h3>
-                    <p>AI-powered advertising solutions for modern businesses</p>
+                    <h3>BEE-SHIP</h3>
+                    <p>Autonomous social media publishing platform powered by serverless APIs</p>
                 </div>
                 <div class="footer-section">
                     <h3>Quick Links</h3>
                     <ul>
                         <li><a href="index.html">Home</a></li>
-                        <li><a href="about.html">About</a></li>
-                        <li><a href="services.html">Services</a></li>
-                        <li><a href="blog.html">Blog</a></li>
-                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="demo.html">Try Demo</a></li>
+                        <li><a href="#api">API Endpoints</a></li>
+                        <li><a href="https://github.com/brandonlacoste9-tech/adgenxai" target="_blank">Documentation</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h3>Services</h3>
+                    <h3>Resources</h3>
                     <ul>
-                        <li><a href="services.html">AI Content Generation</a></li>
-                        <li><a href="services.html">Campaign Management</a></li>
-                        <li><a href="services.html">Creative Optimization</a></li>
-                        <li><a href="services.html">Analytics & Reporting</a></li>
+                        <li><a href="https://github.com/brandonlacoste9-tech/adgenxai/blob/main/BEE_SHIP_QUICKSTART.md" target="_blank">Quick Start Guide</a></li>
+                        <li><a href="https://github.com/brandonlacoste9-tech/adgenxai/blob/main/BEE_SHIP_API_DOCS.md" target="_blank">API Documentation</a></li>
+                        <li><a href="https://github.com/brandonlacoste9-tech/adgenxai/blob/main/BEE_SHIP_LOCAL_TESTING.md" target="_blank">Local Testing</a></li>
+                        <li><a href="https://github.com/brandonlacoste9-tech/adgenxai/blob/main/BEE_SHIP_NETLIFY_AGENTS.md" target="_blank">AI Agents Guide</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h3>Connect</h3>
                     <ul>
-                        <li><a href="#">Twitter</a></li>
-                        <li><a href="#">LinkedIn</a></li>
-                        <li><a href="#">Facebook</a></li>
-                        <li><a href="#">Instagram</a></li>
+                        <li><a href="https://github.com/brandonlacoste9-tech/adgenxai" target="_blank">GitHub</a></li>
+                        <li><a href="https://app.netlify.com/sites/adgenxai" target="_blank">Netlify Dashboard</a></li>
+                        <li><a href="https://app.netlify.com/sites/adgenxai/functions" target="_blank">Function Logs</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 AdGenXAI. All rights reserved.</p>
+                <p>&copy; 2025 AdGenXAI BEE-SHIP. Built with Netlify Functions | Powered by AI 🤖</p>
             </div>
         </div>
     </footer>
