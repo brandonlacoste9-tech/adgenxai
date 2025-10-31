@@ -213,6 +213,15 @@ __marimo__/
 dist/
 node_modules/
 
+# Next.js build output
+.next/
+out/
+
+# Security scanning results
+*.sarif
+eslint.sarif
+devskim-results.sarif
+
 # OS
 .DS_Store
 Thumbs.db

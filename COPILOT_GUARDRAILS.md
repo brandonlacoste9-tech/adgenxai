@@ -1,0 +1,6 @@
+- Keep PRs < 400 net LOC; propose stacked PRs when larger.
+- Never commit secrets; use `process.env` and redact logs.
+- Update tests/docs when behavior changes.
+- Maintain TypeScript strictness; no `any` unless justified inline.
+- Announce planned edits (file list + strategy) before applying.
+- Link PRs to the Phase-2 project and apply one of: PR-3 Providers, PR-1 Supabase, PR-5 Auth.
