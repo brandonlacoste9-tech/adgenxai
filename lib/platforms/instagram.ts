@@ -25,13 +25,13 @@ export async function publishImage(
     }
   );
 
-  const createData = await createRes.json();
+  const createData = (await createRes.json()) as { id?: string };
   if (!createData.id) {
-    throw new Error(`Failed to create Instagram media: ${ JSON.stringify(createData)}`);
+    throw new Error(`Failed to create Instagram media: ${JSON.stringify(createData)}`);
   }
 
   const publishRes = await fetch(
-    `https://graph.facebook.com/v17.0/${ accountId}/media_publish`,
+    `https://graph.facebook.com/v17.0/${accountId}/media_publish`,
     {
       method: "POST",
       body: new URLSearchParams({
@@ -41,9 +41,9 @@ export async function publishImage(
     }
   );
 
-  const publishData = await publishRes.json();
+  const publishData = (await publishRes.json()) as { id?: string };
   if (!publishData.id) {
-    throw new Error(`Failed to publish Instagram media: ${ JSON.stringify(publishData)}`);
+    throw new Error(`Failed to publish Instagram media: ${JSON.stringify(publishData)}`);
   }
 
   return { containerId: createData.id, publishedId: publishData.id };
