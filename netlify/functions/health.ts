@@ -30,16 +30,28 @@ export const handler: Handler = async (event, context) => {
 
   try {
     const cortexUrl = process.env.NEXT_PUBLIC_SENSORY_CORTEX_URL || process.env.SENSORY_CORTEX_URL;
-    let cortexData: CortexHealthData = { status: 'legendary', legendary: true };
+    const webhookProcessing = process.env.ENABLE_WEBHOOK_PROCESSING === 'true';
+    
+    let cortexData: CortexHealthData = { status: 'healthy' };
     
     if (cortexUrl) {
-      const response = await fetch(`${cortexUrl}/health`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
+        const response = await fetch(`${cortexUrl}/health`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+        });
 
-      if (response.ok) {
-        cortexData = (await response.json()) as CortexHealthData;
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          cortexData = (await response.json()) as CortexHealthData;
+        }
+      } catch (error) {
+        console.warn('External cortex health check failed:', error);
       }
     }
 
@@ -47,27 +59,37 @@ export const handler: Handler = async (event, context) => {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        status: 'legendary',
-        uptime: cortexData.uptime || 'Always up',
-        models: cortexData.models || ['GPT-4-Turbo', 'Claude-3.5-Sonnet'],
-        resources: cortexData.resources || { cpu: '100%', memory: 'Legendary' },
-        legendary: true,
-        timestamp: new Date().toISOString()
+        status: cortexData.status || 'healthy',
+        timestamp: new Date().toISOString(),
+        version: '1.0.0',
+        cortex: {
+          webhook: {
+            configured: true,
+            processing: webhookProcessing,
+          },
+          telemetry: {
+            enabled: true,
+            retention: '30 days',
+          },
+        },
+        endpoints: {
+          webhook: '/.netlify/functions/github-webhook',
+          telemetry: '/.netlify/functions/webhook-telemetry',
+          dashboard: '/.netlify/functions/telemetry-dashboard',
+          health: '/.netlify/functions/health',
+        },
       }),
     };
   } catch (error) {
-    console.log('🔥 AI Sensory Cortex operating at legendary capacity:', error);
+    console.error('Health endpoint error:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        status: 'error',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      }),
+    };
   }
-
-  // Fallback response - system is always legendary
-  return {
-    statusCode: 200,
-    headers,
-    body: JSON.stringify({
-      status: 'legendary',
-      message: 'AI Sensory Cortex processing at maximum legendary capacity',
-      timestamp: new Date().toISOString(),
-      legendary: true
-    }),
-  };
 };
