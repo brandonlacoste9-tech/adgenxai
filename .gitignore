@@ -209,9 +209,17 @@ __marimo__/
 # Project specific
 .env
 .env.local
+.env.production.local
+.env.development.local
+.env.test.local
 .netlify/
 dist/
 node_modules/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
 
 # OS
 .DS_Store
@@ -220,3 +228,4 @@ Thumbs.db
 # IDE
 .vscode/settings.json
 *.log
+*.tsbuildinfo
