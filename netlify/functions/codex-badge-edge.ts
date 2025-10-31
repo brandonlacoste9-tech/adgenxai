@@ -28,11 +28,16 @@ export const handler: Handler = async (event) => {
     // Check Codex health if URL is configured
     if (codexUrl) {
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        
         const response = await fetch(`${codexUrl}/health`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
-          signal: AbortSignal.timeout(3000), // 3 second timeout for badge
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
           status = 'degraded';

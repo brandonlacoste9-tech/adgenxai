@@ -36,11 +36,16 @@ export const handler: Handler = async (event, context) => {
     
     if (cortexUrl) {
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
         const response = await fetch(`${cortexUrl}/health`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
-          signal: AbortSignal.timeout(5000),
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           cortexData = (await response.json()) as CortexHealthData;

@@ -27,22 +27,32 @@ export const handler: Handler = async (event) => {
     
     try {
       const baseUrl = process.env.URL || process.env.DEPLOY_PRIME_URL || 'http://localhost:8888';
+      const healthController = new AbortController();
+      const healthTimeoutId = setTimeout(() => healthController.abort(), 3000);
+      
       const healthResponse = await fetch(`${baseUrl}/.netlify/functions/health`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-        signal: AbortSignal.timeout(3000),
+        signal: healthController.signal,
       });
 
+      clearTimeout(healthTimeoutId);
+      
       if (!healthResponse.ok) {
         status = 'degraded';
       }
 
       // Check telemetry to see if processing is enabled
+      const telemetryController = new AbortController();
+      const telemetryTimeoutId = setTimeout(() => telemetryController.abort(), 3000);
+      
       const telemetryResponse = await fetch(`${baseUrl}/.netlify/functions/webhook-telemetry`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-        signal: AbortSignal.timeout(3000),
+        signal: telemetryController.signal,
       });
+
+      clearTimeout(telemetryTimeoutId);
 
       if (telemetryResponse.ok) {
         const telemetryData = await telemetryResponse.json();
