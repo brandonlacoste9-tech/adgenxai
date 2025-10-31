@@ -51,19 +51,25 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
       });
     }
 
-    // Check if user is already a member
-    const { data: existingMember } = await supabaseAdmin
-      .from('team_members')
-      .select('id')
-      .eq('team_id', teamId)
-      .eq('user_id', email) // Assuming email lookup
-      .single();
+    // Check if invitee already exists in auth system
+    const { data: existingUser } = await supabaseAdmin.auth.admin.listUsers();
+    const inviteeUser = existingUser?.users?.find((u) => u.email === email);
 
-    if (existingMember) {
-      return res.status(400).json({
-        error: 'Already a member',
-        message: 'This user is already a member of the team',
-      });
+    // If user exists, check if they're already a member
+    if (inviteeUser) {
+      const { data: existingMember } = await supabaseAdmin
+        .from('team_members')
+        .select('id')
+        .eq('team_id', teamId)
+        .eq('user_id', inviteeUser.id)
+        .single();
+
+      if (existingMember) {
+        return res.status(400).json({
+          error: 'Already a member',
+          message: 'This user is already a member of the team',
+        });
+      }
     }
 
     // Create invite

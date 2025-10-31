@@ -176,10 +176,10 @@ CREATE POLICY "Admins can manage team members"
   ON public.team_members FOR ALL
   USING (
     EXISTS (
-      SELECT 1 FROM public.team_members
-      WHERE team_members.team_id = team_members.team_id
-      AND team_members.user_id = auth.uid()
-      AND team_members.role = 'admin'
+      SELECT 1 FROM public.team_members tm
+      WHERE tm.team_id = team_members.team_id
+      AND tm.user_id = auth.uid()
+      AND tm.role = 'admin'
     )
   );
 

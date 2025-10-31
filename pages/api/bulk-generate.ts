@@ -17,6 +17,10 @@ import { promises as fs } from 'fs';
  * product,audience,tone
  * "AI Marketing Platform","Small businesses","professional"
  * "Fitness App","Gym enthusiasts","exciting"
+ *
+ * Note: Formidable is used for file uploads. In serverless environments,
+ * ensure file size limits are configured (default: 10MB in Netlify).
+ * Consider implementing streaming for larger files.
  */
 
 export const config = {
