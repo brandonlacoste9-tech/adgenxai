@@ -490,3 +490,35 @@ footer {
 .mt-2 {
     margin-top: var(--spacing-md);
 }
+
+/* List Styles */
+.card ul,
+.service-list {
+    margin-top: var(--spacing-sm);
+    color: var(--text-light);
+    text-align: left;
+}
+
+.card ul li,
+.service-list li {
+    margin-bottom: 0.25rem;
+}
+
+/* Pricing Styles */
+.pricing-amount {
+    font-size: 2rem;
+    color: var(--primary-color);
+    font-weight: bold;
+    margin: var(--spacing-sm) 0;
+}
+
+.pricing-period {
+    font-size: var(--font-size-base);
+    color: var(--text-light);
+}
+
+.pricing-list {
+    margin-top: var(--spacing-sm);
+    color: var(--text-light);
+    text-align: left;
+}

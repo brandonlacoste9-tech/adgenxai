@@ -68,6 +68,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Initialize scroll animations
+    initScrollAnimations();
 });
 
 // Email validation helper
@@ -77,22 +80,21 @@ function isValidEmail(email) {
 }
 
 // Add animation on scroll
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
+function initScrollAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
 
-const observer = new IntersectionObserver(function(entries) {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, observerOptions);
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
 
-// Observe cards and sections for animation
-document.addEventListener('DOMContentLoaded', function() {
     const animatedElements = document.querySelectorAll('.card, .feature-item, .blog-post');
     animatedElements.forEach(el => {
         el.style.opacity = '0';
@@ -100,4 +102,4 @@ document.addEventListener('DOMContentLoaded', function() {
         el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         observer.observe(el);
     });
-});
+}
