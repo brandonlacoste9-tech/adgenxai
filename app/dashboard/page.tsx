@@ -30,7 +30,8 @@ export default function DashboardPage() {
       try {
         const response = await fetch("/api/dashboard/kpis");
         if (!response.ok) {
-          throw new Error("Failed to fetch KPIs");
+          const errorText = await response.text();
+          throw new Error(`Failed to fetch KPIs (${response.status}): ${errorText}`);
         }
         const data = await response.json();
         setKpis(data);

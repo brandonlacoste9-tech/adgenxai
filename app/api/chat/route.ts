@@ -31,7 +31,9 @@ export async function POST(request: NextRequest) {
     const stream = new ReadableStream({
       async start(controller) {
         try {
+          let hasData = false;
           for await (const chunk of chatProvider.streamChat({ messages, model })) {
+            hasData = true;
             const data = `data: ${JSON.stringify({ content: chunk })}\n\n`;
             controller.enqueue(encoder.encode(data));
           }
@@ -40,6 +42,7 @@ export async function POST(request: NextRequest) {
           controller.close();
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : "Unknown error";
+          console.error("Streaming error:", errorMessage);
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ error: errorMessage })}\n\n`)
           );
@@ -47,7 +50,8 @@ export async function POST(request: NextRequest) {
         }
       },
       cancel() {
-        // Handle client disconnect
+        // Handle client disconnect - cleanup if needed
+        console.log("Client disconnected from stream");
       },
     });
 

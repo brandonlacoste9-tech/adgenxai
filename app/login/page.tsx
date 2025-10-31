@@ -56,7 +56,9 @@ export default function LoginPage() {
   };
 
   const handleDemoLogin = () => {
-    // For demo purposes, set a mock auth cookie and redirect
+    // For demo purposes only - NOT SECURE for production
+    // In production, authentication should be handled server-side through Supabase Auth
+    // This bypasses authentication and should only be used for testing
     document.cookie = "sb-auth-token=demo-token; path=/; max-age=3600";
     router.push(redirectTo);
   };

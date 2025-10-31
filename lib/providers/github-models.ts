@@ -69,6 +69,8 @@ export function createGitHubProvider(token: string): ChatProvider {
 
     async countTokens(text: string) {
       // Rough estimation: ~4 characters per token for English text
+      // Note: This is a simplification. For production use, consider using
+      // tiktoken or similar libraries for more accurate token counting.
       const tokenCount = Math.ceil(text.length / 4);
       return { prompt: tokenCount, completion: 0 };
     },
