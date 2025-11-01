@@ -1,4 +1,4 @@
-// File: C:\Users\north\OneDrive\Documents\GitHub\AdGenXAI-temp\app\page.tsx
+// File: /home/runner/work/adgenxai/adgenxai/app/page.tsx
 import * as entry from '../../../app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
