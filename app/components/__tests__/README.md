@@ -5,12 +5,28 @@ This directory contains tests for the AdGenXAI Aurora UI components using Vitest
 ## Test Coverage
 
 ### Interactive Components
-- **TopBar.test.tsx** - Tests navigation, theme toggle, and command palette trigger
-- **CommandPalette.test.tsx** - Tests keyboard navigation, command execution, and dialog behavior
-- **ShareButton.test.tsx** - Tests native share API and clipboard fallback
+- **TopBar.test.tsx** (7 tests) - Tests navigation, theme toggle, and command palette trigger
+- **CommandPalette.test.tsx** (10 tests) - Tests keyboard navigation, command execution, and dialog behavior
+- **ShareButton.test.tsx** (5 tests) - Tests native share API and clipboard fallback
 
 ### Content Components
-- **FeatureRail.test.tsx** - Tests feature card rendering and content
+- **FeatureRail.test.tsx** (6 tests) - Tests feature card rendering and content
+
+### Accessibility Testing
+- **a11y.smoke.test.tsx** (9 tests) - Smoke tests for:
+  - TopBar: accessible names for interactive controls, keyboard navigation
+  - MobileCreateDock: button labels, focus handling, keyboard accessibility
+  - ShareButton: aria-label, title attributes, keyboard access
+  - Focus visible styles and Tailwind class verification
+
+### Streaming & Advanced Features (Scaffolded)
+- **PromptCard.stream.test.tsx** (4 tests, all `it.skip()`) - Scaffolded tests for:
+  - SSE streaming from `/api/chat?stream=1` with incremental token rendering
+  - AbortController support for cancelling streams
+  - Fallback behavior when streaming unavailable
+  - Error handling for stream failures
+
+  **Status**: Skipped by default. Unskip when PromptCard streaming component is implemented.
 
 ## Running Tests
 
@@ -75,8 +91,54 @@ expect(button).toHaveAttribute("aria-label");
 expect(dialog).toHaveAttribute("aria-modal", "true");
 ```
 
+## Enabling Streaming Tests
+
+When you implement the PromptCard streaming feature:
+
+1. Create `app/components/PromptCard.tsx` with:
+   - `<div data-testid="answer-stream" aria-live="polite" />` for live tokens
+   - `<button data-testid="abort-stream" />` for cancellation
+   - `fetch('/api/chat?stream=1', { signal: abortController.signal })`
+
+2. Change `it.skip` to `it` in `PromptCard.stream.test.tsx`
+
+3. Run `npm test` to verify streaming works
+
+Example minimal implementation:
+```tsx
+export default function PromptCard() {
+  const [stream, setStream] = useState('');
+  const abortRef = useRef(new AbortController());
+
+  async function startStream() {
+    const res = await fetch('/api/chat?stream=1', {
+      signal: abortRef.current.signal,
+    });
+    const reader = res.body?.getReader();
+    // Parse SSE and append to state...
+  }
+
+  return (
+    <>
+      <div data-testid="answer-stream" aria-live="polite">{stream}</div>
+      <button data-testid="abort-stream" onClick={() => abortRef.current.abort()}>
+        Abort
+      </button>
+    </>
+  );
+}
+```
+
 ## Coverage
 
 Coverage reports are generated in the `./coverage` directory when running `npm run test:ci`.
 
 View the HTML report: `open coverage/index.html`
+
+## Test Results Summary
+
+Current status: **37/41 tests passing** (4 streaming tests skipped, ready to unskip)
+- 6 test files
+- All core functionality covered
+- Full a11y smoke tests passing
+- CI workflow on every push
