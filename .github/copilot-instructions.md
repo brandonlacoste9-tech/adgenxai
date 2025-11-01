@@ -99,7 +99,8 @@ npm run deploy       # Deploy to Netlify production
 ### Code Style
 - Use 2-space indentation (configured in project)
 - Import order: React → External packages → Internal modules → Types
-- Use path alias `@/` for imports from `app/` directory
+- Use path alias `@/` for imports from `app/` directory only (e.g., `@/components/TopBar`)
+- For `lib/` directory, use relative imports (e.g., `../../lib/platforms/instagram`)
 - Validate all external inputs with Zod schemas
 - Log all webhook events and important operations
 - Handle errors gracefully with try/catch and meaningful error messages
@@ -145,9 +146,10 @@ Set environment variables in Netlify dashboard: Settings → Build & deploy → 
 
 ### Social Media Posting
 ```typescript
-import { postToInstagram } from '@/lib/platforms/instagram';
+// From Netlify functions (use relative paths for lib/)
+import { publishImage } from '../../lib/platforms/instagram';
 
-const result = await postToInstagram({
+const result = await publishImage({
   imageUrl: "https://example.com/image.jpg",
   caption: "My caption"
 });
@@ -193,9 +195,11 @@ const validated = schema.parse(data);
 ## Known Issues
 
 1. **Missing Theme File**: `app/components/TopBar.tsx` imports from `@/lib/theme` which doesn't exist
+   - The path alias `@/` points to `app/`, so this would expect `app/lib/theme.ts`
+   - However, the `lib/` directory is at the root level, not in `app/`
    - This causes TypeScript errors and test failures
    - Tests in `TopBar.test.tsx` and `a11y.smoke.test.tsx` are currently failing
-   - When working on theme-related features, this file needs to be created
+   - Solution: Either create `app/lib/theme.ts` or move theme to root `lib/` and update import to use relative path
 
 2. **Security Vulnerabilities**: Run `npm audit` to see current vulnerabilities
    - 6 moderate severity vulnerabilities exist
