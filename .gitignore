@@ -212,6 +212,8 @@ __marimo__/
 .netlify/
 dist/
 node_modules/
+.next/
+out/
 
 # OS
 .DS_Store
