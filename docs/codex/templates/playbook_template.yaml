@@ -1,0 +1,24 @@
+# Playbook template
+id: "{{ playbook_id }}"
+name: "{{ human_name }}"
+description: |
+  Short description of purpose and scope.
+
+triggers:
+  - event: "pull_request"
+  - event: "schedule"
+  - cron: "0 3 * * *"
+
+steps:
+  - id: run_canary
+    type: script
+    script: "node scripts/run-fraud-canary.js --fixtures {{ fixtures }} --out {{ out }} --dry-run"
+
+  - id: analyze
+    type: script
+    script: "node scripts/format-fraud-report.js --input {{ out }} --output {{ report }}"
+
+notifications:
+  - type: slack
+    channel: "#codex-fraud-canary"
+    on: ["schedule", "failure"]

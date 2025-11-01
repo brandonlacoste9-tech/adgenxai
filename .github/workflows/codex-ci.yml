@@ -1,0 +1,36 @@
+name: Codex CI
+
+on:
+  pull_request:
+    paths:
+      - 'docs/codex/**'
+      - 'scripts/**'
+      - '.github/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Node setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install
+        run: npm ci
+      - name: YAML lint
+        uses: ibiqlik/action-yamllint@v2
+        with:
+          yamllint_args: -c .yamllint.yml
+      - name: Validate fixtures
+        run: |
+          node scripts/validate-fixtures.js docs/codex/*/fixtures/*.json
+      - name: Generate sample report (dry)
+        run: |
+          DRYRUN=1 node scripts/run-fraud-canary-all.sh || true
+          node scripts/generate-sample-report.js reports/adgenxai-sample.json docs/codex/samples/sample_fraud_report.md || true
+      - name: Upload sample report
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-sample-report-${{ github.run_id }}
+          path: docs/codex/samples/sample_fraud_report.md
