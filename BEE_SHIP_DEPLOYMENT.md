@@ -139,6 +139,14 @@ INSTAGRAM_ACCOUNT_ID=<instagram-business-id>
 FB_ACCESS_TOKEN=<long-lived-token>
 ```
 
+> 🛡️ **Service account ritual**: Seed the Supabase service role key via the Netlify CLI so it never touches your git history.
+
+```bash
+echo "sk-svcacct-..." | npm run secrets:supabase -- --stdin
+```
+
+The helper script pipes the key directly into `netlify env:set SUPABASE_SERVICE_ROLE_KEY` and confirms the sync. Rotate or replace the key by rerunning the same command with the new value.
+
 ---
 
 ### 3. Create Supabase Storage Bucket

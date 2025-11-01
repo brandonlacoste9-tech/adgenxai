@@ -4,7 +4,7 @@
   publish = "out"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "18"
   NPM_VERSION = "10"
 
 [functions]
@@ -32,3 +32,4 @@
   for = "/public/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
