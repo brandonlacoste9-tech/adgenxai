@@ -3,6 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
+// Configuration
+const API_ENDPOINTS = {
+  health: '/.netlify/functions/health',
+  telemetry: '/.netlify/functions/webhook-telemetry'
+} as const;
+
+const REFRESH_INTERVAL_MS = 3600000; // 1 hour in milliseconds
+
 interface HealthData {
   status: string;
   uptime?: string;
@@ -40,7 +48,7 @@ export default function StatusPage() {
       setError(null);
 
       // Fetch health data
-      const healthRes = await fetch('/.netlify/functions/health');
+      const healthRes = await fetch(API_ENDPOINTS.health);
       if (healthRes.ok) {
         const healthData = await healthRes.json();
         setHealth(healthData);
@@ -49,7 +57,7 @@ export default function StatusPage() {
       }
 
       // Fetch telemetry data
-      const telemetryRes = await fetch('/.netlify/functions/webhook-telemetry');
+      const telemetryRes = await fetch(API_ENDPOINTS.telemetry);
       if (telemetryRes.ok) {
         const telemetryData = await telemetryRes.json();
         setTelemetry(telemetryData);
@@ -68,8 +76,8 @@ export default function StatusPage() {
 
   useEffect(() => {
     fetchData();
-    // Auto-refresh every hour (3600000ms)
-    const interval = setInterval(fetchData, 3600000);
+    // Auto-refresh at configured interval
+    const interval = setInterval(fetchData, REFRESH_INTERVAL_MS);
     return () => clearInterval(interval);
   }, []);
 
