@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #F7FAFF;
+  --text: rgba(0,0,0,0.86);
+  --card: #ffffff;
+  --border: rgba(0,0,0,0.08);
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Respect Reduced Motion toggle */
+:root[data-reduce-motion="1"] * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Reduce motion: turns off any future animations you add */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
