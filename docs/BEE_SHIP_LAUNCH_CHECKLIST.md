@@ -67,10 +67,11 @@ Double-click: SHIP_BEE_SWARM_NOW.bat
 - [ ] `INSTAGRAM_ACCOUNT_ID` = 17841xxxxxxxxx
 - [ ] `FB_ACCESS_TOKEN` = EAABxxx... (long-lived page token)
 
-**TikTok** (Optional):
+**TikTok** (Ready for use):
 - [ ] `TIKTOK_CLIENT_KEY` = xxx
 - [ ] `TIKTOK_CLIENT_SECRET` = xxx
 - [ ] `TIKTOK_ACCESS_TOKEN` = xxx
+- [ ] `TIKTOK_OPEN_ID` = xxx (optional)
 
 **YouTube** (Optional):
 - [ ] `YOUTUBE_CLIENT_ID` = xxx.apps.googleusercontent.com
@@ -198,8 +199,8 @@ git push
 ## NEXT PHASE (Future)
 
 After successful launch:
-- [ ] Implement TikTok publishing
-- [ ] Implement YouTube publishing
+- [x] Implement TikTok publishing ✅ Complete
+- [ ] Implement YouTube publishing (stub ready)
 - [ ] Add scheduler (cron jobs)
 - [ ] Build analytics dashboard
 - [ ] Add A/B testing

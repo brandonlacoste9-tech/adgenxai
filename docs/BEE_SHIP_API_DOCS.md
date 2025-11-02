@@ -19,7 +19,7 @@ BEE-SHIP provides serverless functions for publishing content to social media pl
 
 - **Instagram**: Post images with captions
 - **YouTube**: Upload videos with metadata
-- **TikTok**: Post videos (coming soon)
+- **TikTok**: Post videos with metadata
 
 All functions are deployed as Netlify serverless functions accessible at:
 ```
@@ -67,13 +67,19 @@ YOUTUBE_REFRESH_TOKEN=your_oauth_refresh_token
 3. Create OAuth 2.0 credentials
 4. Use OAuth Playground to get refresh token with `https://www.googleapis.com/auth/youtube.upload` scope
 
-#### TikTok (Optional - not yet implemented)
+#### TikTok
 ```env
 TIKTOK_CLIENT_KEY=your_tiktok_client_key
 TIKTOK_CLIENT_SECRET=your_tiktok_client_secret
 TIKTOK_ACCESS_TOKEN=your_tiktok_access_token
 TIKTOK_OPEN_ID=your_tiktok_open_id
 ```
+
+**How to get credentials:**
+1. Create an app at [TikTok for Developers](https://developers.tiktok.com)
+2. Add Content Posting API product
+3. Complete OAuth 2.0 flow to get access token with `video.upload` and `video.publish` scopes
+4. Get your Open ID from the OAuth response
 
 ---
 
@@ -183,23 +189,51 @@ Publish a video to TikTok.
 POST /.netlify/functions/post-to-tiktok
 ```
 
-**Status:** ⚠️ Not yet implemented
-
 **Request Body:**
 ```json
 {
   "videoUrl": "https://example.com/video.mp4",
-  "title": "Amazing content!"
+  "title": "Amazing content!",
+  "description": "Check out this amazing video!",
+  "privacyLevel": "PUBLIC_TO_EVERYONE",
+  "disableComment": false,
+  "disableDuet": false,
+  "disableStitch": false
 }
 ```
 
-**Response (501):**
+**Parameters:**
+- `videoUrl` (required): Publicly accessible URL to the video file
+- `title` (required): Video title (max 150 characters)
+- `description` (optional): Video description
+- `privacyLevel` (optional): "SELF_ONLY", "MUTUAL_FOLLOW_FRIENDS", "FOLLOWER_OF_POSTER", or "PUBLIC_TO_EVERYONE" (default)
+- `disableComment` (optional): Disable comments (default: false)
+- `disableDuet` (optional): Disable duets (default: false)
+- `disableStitch` (optional): Disable stitching (default: false)
+
+**Response (Success - 200):**
 ```json
 {
-  "error": "TikTok publishing not yet implemented",
-  "details": "The TikTok Content Posting API integration needs to be completed"
+  "success": true,
+  "platform": "tiktok",
+  "shareId": "7234567890123456789",
+  "message": "Successfully published to TikTok"
 }
 ```
+
+**Response (Error - 400/500):**
+```json
+{
+  "error": "Missing required fields: videoUrl and title"
+}
+```
+
+**Notes:**
+- Maximum file size: ~50MB
+- Supported formats: MP4 (recommended)
+- Video must be publicly accessible
+- Processing may take several minutes
+- TikTok uses a multi-step upload process (initialize, upload, publish)
 
 ---
 
@@ -249,6 +283,30 @@ async function uploadToYouTube(videoFile, title, options = {}) {
   return await response.json();
 }
 
+// Post to TikTok
+async function postToTikTok(videoUrl, title, options = {}) {
+  const response = await fetch('/.netlify/functions/post-to-tiktok', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      videoUrl,
+      title,
+      description: options.description || '',
+      privacyLevel: options.privacyLevel || 'PUBLIC_TO_EVERYONE',
+      disableComment: options.disableComment || false,
+      disableDuet: options.disableDuet || false,
+      disableStitch: options.disableStitch || false
+    })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error);
+  }
+
+  return await response.json();
+}
+
 // Helper: Convert File to base64
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -280,6 +338,17 @@ const ytResult = await postToYouTube(videoFile, 'Video Title', {
   tags: ['tag1', 'tag2'],
   privacyStatus: 'public'
 });
+
+// TikTok
+const ttResult = await postToTikTok(
+  'https://example.com/video.mp4',
+  'Amazing Video Title',
+  {
+    description: 'Check this out!',
+    privacyLevel: 'PUBLIC_TO_EVERYONE',
+    disableDuet: false
+  }
+);
 ```
 
 ---
@@ -322,6 +391,18 @@ curl -X POST https://yourdomain.com/.netlify/functions/post-to-youtube \
   }"
 ```
 
+**TikTok:**
+```bash
+curl -X POST https://yourdomain.com/.netlify/functions/post-to-tiktok \
+  -H "Content-Type: application/json" \
+  -d '{
+    "videoUrl": "https://example.com/video.mp4",
+    "title": "Test TikTok Post",
+    "description": "Testing TikTok API",
+    "privacyLevel": "SELF_ONLY"
+  }'
+```
+
 ### 3. Using Postman
 
 1. Create a new POST request
@@ -352,6 +433,16 @@ curl -X POST https://yourdomain.com/.netlify/functions/post-to-youtube \
 #### "Failed to upload to YouTube: Invalid credentials"
 - **Cause**: Refresh token expired or invalid
 - **Solution**: Generate a new refresh token using OAuth Playground
+
+#### "TikTok credentials not configured"
+- **Solution**: Add all four TikTok environment variables (CLIENT_KEY, CLIENT_SECRET, ACCESS_TOKEN, OPEN_ID)
+- Ensure access token has `video.upload` and `video.publish` scopes
+
+#### "TikTok init failed" or "TikTok upload failed"
+- **Cause**: Video URL is not publicly accessible or video format not supported
+- **Solution**: Ensure video URL is publicly accessible HTTPS URL
+- Use MP4 format for best compatibility
+- Check video file size is under 50MB
 
 #### Function timeout
 - **Cause**: Large video files take too long to upload
@@ -397,7 +488,9 @@ Check Netlify function logs for detailed error messages:
 - 1 video upload = 1,600 units
 
 ### TikTok
-- TBD (not yet implemented)
+- 1,000 API calls per day per app
+- Rate limits may vary based on your TikTok developer account level
+- Video upload counts as multiple API calls (init + upload + publish)
 
 ---
 
