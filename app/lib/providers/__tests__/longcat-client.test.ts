@@ -116,7 +116,7 @@ describe('LongCatClient', () => {
     });
 
     it('should handle API errors', async () => {
-      (fetch as any).mockResolvedValueOnce({
+      (fetch as any).mockResolvedValue({
         ok: false,
         status: 400,
         json: () => Promise.resolve({ message: 'Invalid prompt' }),

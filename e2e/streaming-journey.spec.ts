@@ -36,7 +36,7 @@ test.describe("Streaming User Journey", () => {
     page,
   }) => {
     // Find the prompt textarea
-    const textarea = page.getByPlaceholderText(/type your idea/i);
+    const textarea = page.getByPlaceholder(/type your idea/i);
     await expect(textarea).toBeVisible();
 
     // Type a test prompt
@@ -61,7 +61,7 @@ test.describe("Streaming User Journey", () => {
 
   test("user can abort a streaming response", async ({ page }) => {
     // Type a prompt
-    const textarea = page.getByPlaceholderText(/type your idea/i);
+    const textarea = page.getByPlaceholder(/type your idea/i);
     await textarea.fill("Write a very long story about...");
 
     // Start generation
@@ -106,7 +106,7 @@ test.describe("Streaming User Journey", () => {
     });
 
     // Type prompt and generate
-    const textarea = page.getByPlaceholderText(/type your idea/i);
+    const textarea = page.getByPlaceholder(/type your idea/i);
     await textarea.fill("Test error handling");
 
     const generateBtn = page.getByRole("button", { name: /generate/i });
@@ -134,7 +134,7 @@ test.describe("Streaming User Journey", () => {
     // Should be clickable with Enter
     await page.keyboard.press("Enter");
     // Input a prompt first
-    const textarea = page.getByPlaceholderText(/type your idea/i);
+    const textarea = page.getByPlaceholder(/type your idea/i);
     await textarea.fill("Test");
     await generateBtn.click();
 
@@ -156,7 +156,7 @@ test.describe("Streaming User Journey", () => {
   });
 
   test("multiple prompts can be generated in sequence", async ({ page }) => {
-    const textarea = page.getByPlaceholderText(/type your idea/i);
+    const textarea = page.getByPlaceholder(/type your idea/i);
     const generateBtn = page.getByRole("button", { name: /generate/i });
     const answerArea = page.getByTestId("answer-stream");
 
