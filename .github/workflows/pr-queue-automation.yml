@@ -1,0 +1,246 @@
+name: PR Queue Automation
+
+on:
+  schedule:
+    # Run daily at 9 AM UTC
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+
+jobs:
+  analyze-pr-queue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Analyze PR Queue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            
+            // Fetch all open PRs
+            const { data: prs } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              per_page: 100
+            });
+            
+            console.log(`Found ${prs.length} open PRs`);
+            
+            // Categorize PRs
+            const critical = [];
+            const high = [];
+            const medium = [];
+            const low = [];
+            
+            for (const pr of prs) {
+              const labels = pr.labels.map(l => l.name);
+              const age = Math.floor((Date.now() - new Date(pr.created_at)) / (1000 * 60 * 60 * 24));
+              
+              // Check if mergeable
+              const { data: prDetail } = await github.rest.pulls.get({
+                owner,
+                repo,
+                pull_number: pr.number
+              });
+              
+              const priority = {
+                number: pr.number,
+                title: pr.title,
+                age,
+                mergeable: prDetail.mergeable,
+                draft: pr.draft,
+                labels
+              };
+              
+              // Categorize based on labels and age
+              if (labels.includes('priority:critical') || labels.includes('bug') && age > 7) {
+                critical.push(priority);
+              } else if (labels.includes('priority:high') || labels.includes('enhancement') && age > 14) {
+                high.push(priority);
+              } else if (pr.draft || labels.includes('documentation')) {
+                low.push(priority);
+              } else {
+                medium.push(priority);
+              }
+            }
+            
+            // Create summary comment
+            let summary = `## 📊 PR Queue Analysis - ${new Date().toISOString().split('T')[0]}\n\n`;
+            summary += `**Total Open PRs**: ${prs.length}\n\n`;
+            
+            if (critical.length > 0) {
+              summary += `### 🔥 Critical (${critical.length})\n`;
+              critical.forEach(pr => {
+                summary += `- #${pr.number}: ${pr.title} (${pr.age} days old)${pr.mergeable === false ? ' ⚠️ HAS CONFLICTS' : ''}\n`;
+              });
+              summary += '\n';
+            }
+            
+            if (high.length > 0) {
+              summary += `### 🚀 High Priority (${high.length})\n`;
+              high.forEach(pr => {
+                summary += `- #${pr.number}: ${pr.title} (${pr.age} days old)${pr.mergeable === false ? ' ⚠️ HAS CONFLICTS' : ''}\n`;
+              });
+              summary += '\n';
+            }
+            
+            if (medium.length > 0) {
+              summary += `### 📦 Medium Priority (${medium.length})\n`;
+              medium.slice(0, 5).forEach(pr => {
+                summary += `- #${pr.number}: ${pr.title} (${pr.age} days old)\n`;
+              });
+              if (medium.length > 5) {
+                summary += `- ...and ${medium.length - 5} more\n`;
+              }
+              summary += '\n';
+            }
+            
+            if (low.length > 0) {
+              summary += `### 🧹 Low Priority (${low.length})\n`;
+              summary += `- ${low.length} draft PRs and documentation updates\n\n`;
+            }
+            
+            summary += `\n📋 See [PR_MERGE_STRATEGY.md](docs/PR_MERGE_STRATEGY.md) for detailed merge plan\n`;
+            
+            // Find or create tracking issue
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              labels: 'pr-queue-tracking',
+              state: 'open'
+            });
+            
+            if (issues.length > 0) {
+              // Update existing issue
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: issues[0].number,
+                body: summary
+              });
+            } else {
+              // Create new tracking issue
+              await github.rest.issues.create({
+                owner,
+                repo,
+                title: '📊 PR Queue Status Tracking',
+                body: summary,
+                labels: ['pr-queue-tracking', 'automation']
+              });
+            }
+            
+            console.log('PR queue analysis complete');
+
+      - name: Label PRs with conflicts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            
+            const { data: prs } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              per_page: 100
+            });
+            
+            for (const pr of prs) {
+              const { data: prDetail } = await github.rest.pulls.get({
+                owner,
+                repo,
+                pull_number: pr.number
+              });
+              
+              if (prDetail.mergeable === false) {
+                // Add conflict label
+                await github.rest.issues.addLabels({
+                  owner,
+                  repo,
+                  issue_number: pr.number,
+                  labels: ['merge-conflict']
+                });
+                
+                // Comment on PR
+                const { data: comments } = await github.rest.issues.listComments({
+                  owner,
+                  repo,
+                  issue_number: pr.number
+                });
+                
+                const hasConflictComment = comments.some(c => 
+                  c.body.includes('merge conflict detected')
+                );
+                
+                if (!hasConflictComment) {
+                  await github.rest.issues.createComment({
+                    owner,
+                    repo,
+                    issue_number: pr.number,
+                    body: '⚠️ **Merge conflict detected**\n\nPlease rebase your branch:\n```bash\ngit fetch origin\ngit rebase origin/main\ngit push --force-with-lease\n```'
+                  });
+                }
+              } else {
+                // Remove conflict label if resolved
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner,
+                    repo,
+                    issue_number: pr.number,
+                    name: 'merge-conflict'
+                  });
+                } catch (e) {
+                  // Label might not exist
+                }
+              }
+            }
+
+      - name: Check for stale PRs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const staleDays = 30;
+            
+            const { data: prs } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              per_page: 100
+            });
+            
+            const now = Date.now();
+            
+            for (const pr of prs) {
+              const age = Math.floor((now - new Date(pr.updated_at)) / (1000 * 60 * 60 * 24));
+              
+              if (age > staleDays && !pr.draft) {
+                const labels = pr.labels.map(l => l.name);
+                
+                if (!labels.includes('stale')) {
+                  await github.rest.issues.addLabels({
+                    owner,
+                    repo,
+                    issue_number: pr.number,
+                    labels: ['stale']
+                  });
+                  
+                  await github.rest.issues.createComment({
+                    owner,
+                    repo,
+                    issue_number: pr.number,
+                    body: `⏰ This PR has been inactive for ${age} days. Please update or close if no longer needed.`
+                  });
+                }
+              }
+            }
