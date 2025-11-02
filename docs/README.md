@@ -39,6 +39,7 @@ This directory contains all documentation for the AdgenXAI project.
 
 - **[BEE_SHIP_README.md](./BEE_SHIP_README.md)** - Project README
 - **[BEE_SHIP_README_COMPLETE.md](./BEE_SHIP_README_COMPLETE.md)** - Complete project README
+- **[CAMPAIGN_ORCHESTRATION_ENGINE.md](./CAMPAIGN_ORCHESTRATION_ENGINE.md)** - 🚀 Campaign Orchestration Engine documentation
 
 ## 🚀 Getting Started
 

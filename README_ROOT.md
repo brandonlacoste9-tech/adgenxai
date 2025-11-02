@@ -131,6 +131,60 @@ The Fusion suite includes complete VS Code integration:
 
 ---
 
+## 🎯 Campaign Orchestration Engine
+
+**Revolutionary one-call campaign creation across 11+ AI models and platforms**
+
+The AdGenXAI Campaign Orchestration Engine unifies multiple AI capabilities into a seamless workflow:
+
+### Core Capabilities
+
+1. **🤖 Unified AI Integration (11+ Models)**
+   - Gemini 2.5 Pro for content generation
+   - Multi-platform publishing (Instagram, YouTube, TikTok)
+   - BeeHive Studio for persona-driven creativity
+   - Real-time analytics and optimization
+
+2. **🎨 BeeHive Studio - Interactive Demo**
+   - SwarmFeed: Real-time creative collaboration
+   - PersonaBoard: 6 unique creative personas
+   - Live metrics and swarm intelligence
+   - Mythic UI with aurora effects
+
+3. **💰 Cost Optimization (80-90% Savings)**
+   - Efficient AI model usage
+   - Serverless architecture
+   - Smart resource allocation
+   - Pay-per-use model
+
+4. **⚡ One-Click Complete Campaigns**
+   - Single API call for full campaign
+   - Automatic content generation
+   - Multi-platform deployment
+   - Real-time performance tracking
+
+### Quick Start
+
+```bash
+# Explore BeeHive Studio Demo
+cd beeswarm
+npm install
+npm run dev
+# Opens at http://localhost:5173
+
+# Deploy full platform
+npm run build
+npm run deploy
+```
+
+### Documentation
+
+- [Campaign Orchestration Guide](./docs/CAMPAIGN_ORCHESTRATION_ENGINE.md)
+- [BeeHive Studio README](./beeswarm/README.md)
+- [API Documentation](./docs/BEE_SHIP_API_DOCS.md)
+
+---
+
 ## Architecture Highlights
 
 ### AdgenxAI Fusion v2.0.0 Features
