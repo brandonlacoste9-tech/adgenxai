@@ -87,7 +87,7 @@ All functions are available at: `https://adgenxai.pro/.netlify/functions/`
 |----------|--------|---------|
 | `/post-to-instagram` | POST | Publish image to Instagram |
 | `/post-to-youtube` | POST | Upload video to YouTube |
-| `/post-to-tiktok` | POST | Publish to TikTok (not implemented) |
+| `/post-to-tiktok` | POST | Publish video to TikTok |
 
 ---
 

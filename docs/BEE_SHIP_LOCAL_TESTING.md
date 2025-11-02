@@ -99,13 +99,14 @@ curl -X POST http://localhost:8888/.netlify/functions/post-to-youtube \
   }"
 ```
 
-**Test TikTok (will return not implemented):**
+**Test TikTok:**
 ```bash
 curl -X POST http://localhost:8888/.netlify/functions/post-to-tiktok \
   -H "Content-Type: application/json" \
   -d '{
     "videoUrl": "https://example.com/video.mp4",
-    "title": "Test TikTok Post"
+    "title": "Test TikTok Post",
+    "description": "Testing TikTok integration"
   }'
 ```
 

@@ -12,7 +12,7 @@ BEE-SHIP is an autonomous social media publishing platform that allows you to pr
 
 - **Instagram** - Images with captions
 - **YouTube** - Video uploads with metadata
-- **TikTok** - Videos (coming soon)
+- **TikTok** - Videos with metadata ✅
 
 All powered by serverless Netlify Functions that scale automatically! 🚀
 
@@ -135,7 +135,7 @@ All functions are available at: `https://adgenxai.pro/.netlify/functions/`
 |----------|--------|---------|
 | `/post-to-instagram` | ✅ Ready | Post images to Instagram |
 | `/post-to-youtube` | ✅ Ready | Upload videos to YouTube |
-| `/post-to-tiktok` | ⚠️ Stub | Post to TikTok (not yet implemented) |
+| `/post-to-tiktok` | ✅ Ready | Post videos to TikTok |
 
 **See full API docs:** [BEE_SHIP_API_DOCS.md](BEE_SHIP_API_DOCS.md)
 

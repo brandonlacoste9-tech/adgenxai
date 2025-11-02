@@ -83,9 +83,22 @@ export type TikTokConfig = {
 export async function publishVideo(
   config: TikTokConfig,
   videoUrl: string,
-  title: string
-): Promise<{ shareId: string }> {
-  throw new Error("TikTok publishing not implemented. Add TikTok Content Posting API flow.");
+  title: string,
+  options?: {
+    description?: string;
+    privacyLevel?: "SELF_ONLY" | "MUTUAL_FOLLOW_FRIENDS" | "FOLLOWER_OF_POSTER" | "PUBLIC_TO_EVERYONE";
+  }
+): Promise<{ shareId: string; shareUrl?: string }> {
+  // Download video, initialize upload, upload file, and publish
+  const videoResponse = await fetch(videoUrl);
+  const videoBuffer = Buffer.from(await videoResponse.arrayBuffer());
+  const uploadInfo = await initializeVideoUpload(config);
+  await uploadVideoFile(uploadInfo.uploadUrl, videoBuffer);
+  return await publishUploadedVideo(config, uploadInfo.publishId, {
+    title,
+    description: options?.description,
+    privacyLevel: options?.privacyLevel,
+  });
 }
 ```
 
@@ -237,7 +250,14 @@ export const handler = async (event: any) => {
       } else if (p === "youtube") {
         results.youtube = { note: "YouTube publishing requires video buffer" };
       } else if (p === "tiktok") {
-        results.tiktok = { note: "TikTok stub - not implemented" };
+        const TT_CLIENT_KEY = process.env.TIKTOK_CLIENT_KEY!;
+        const TT_CLIENT_SECRET = process.env.TIKTOK_CLIENT_SECRET!;
+        const TT_ACCESS_TOKEN = process.env.TIKTOK_ACCESS_TOKEN!;
+        results.tiktok = await publishVideo(
+          { clientKey: TT_CLIENT_KEY, clientSecret: TT_CLIENT_SECRET, accessToken: TT_ACCESS_TOKEN },
+          assetUrl,
+          creative.headline || "Video Post"
+        );
       }
     }
 

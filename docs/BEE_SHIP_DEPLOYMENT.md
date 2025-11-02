@@ -94,14 +94,43 @@ export type TikTokConfig = {
   clientKey: string;
   clientSecret: string;
   accessToken: string;
+  openId?: string;
 };
 
+// Complete video publishing workflow (URL-based)
 export async function publishVideo(
   config: TikTokConfig,
   videoUrl: string,
-  title: string
-): Promise<{ shareId: string }> {
-  throw new Error("TikTok publishing not implemented. Add TikTok Content Posting API flow.");
+  title: string,
+  options?: {
+    description?: string;
+    privacyLevel?: "SELF_ONLY" | "MUTUAL_FOLLOW_FRIENDS" | "FOLLOWER_OF_POSTER" | "PUBLIC_TO_EVERYONE";
+    disableComment?: boolean;
+    disableDuet?: boolean;
+    disableStitch?: boolean;
+  }
+): Promise<{ shareId: string; shareUrl?: string }> {
+  // Step 1: Download video from URL
+  const videoResponse = await fetch(videoUrl);
+  const videoBuffer = Buffer.from(await videoResponse.arrayBuffer());
+  
+  // Step 2: Initialize upload
+  const uploadInfo = await initializeVideoUpload(config);
+  
+  // Step 3: Upload video file
+  await uploadVideoFile(uploadInfo.uploadUrl, videoBuffer);
+  
+  // Step 4: Publish video
+  const result = await publishUploadedVideo(config, uploadInfo.publishId, {
+    title,
+    description: options?.description,
+    privacyLevel: options?.privacyLevel,
+    disableComment: options?.disableComment,
+    disableDuet: options?.disableDuet,
+    disableStitch: options?.disableStitch,
+  });
+  
+  return result;
 }
 ```
 
