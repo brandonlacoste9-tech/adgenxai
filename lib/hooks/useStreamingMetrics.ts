@@ -11,6 +11,24 @@ export interface StreamingMetric {
 export function useStreamingMetrics() {
   const metricsRef = useRef<StreamingMetric[]>([]);
 
+  /**
+   * Records a streaming metric.
+   * 
+   * All additional properties (e.g., model, latency, tokensGenerated, etc.) should be included in the `metadata` field.
+   * Example:
+   *   recordMetric({
+   *     type: 'generation',
+   *     duration: 1234,
+   *     success: true,
+   *     metadata: {
+   *       model: 'gpt-4',
+   *       latency: 1200,
+   *       tokensGenerated: 512,
+   *       wasAborted: false,
+   *       status: 'success'
+   *     }
+   *   });
+   */
   const recordMetric = useCallback((metric: Omit<StreamingMetric, 'timestamp'>) => {
     const fullMetric: StreamingMetric = {
       ...metric,
