@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { CAMPAIGN_DEFAULTS, AI_MODELS } from "@/lib/campaign-config";
 
 interface CampaignResult {
   campaign_id: string;
@@ -66,8 +67,8 @@ export default function CampaignOrchestrationDemo() {
         body: JSON.stringify({
           product,
           campaign_type: campaignType,
-          platforms: ['instagram', 'tiktok', 'youtube'],
-          duration_seconds: 60
+          platforms: [...CAMPAIGN_DEFAULTS.PLATFORMS],
+          duration_seconds: CAMPAIGN_DEFAULTS.DURATION_SECONDS
         })
       });
 
@@ -176,12 +177,9 @@ export default function CampaignOrchestrationDemo() {
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#7C4DFF] border-t-transparent mb-4"></div>
               <h3 className="text-xl font-semibold text-[#071022] mb-2">AI Models Working...</h3>
               <div className="space-y-2 text-sm text-[#071022]/70">
-                <div>🧠 Kimi-linear: Generating ad copy...</div>
-                <div>🔮 Hunyuan 3D: Creating 3D product model...</div>
-                <div>🌍 WorldGrow: Building environment scene...</div>
-                <div>🎬 LongCat-Video: Producing video content...</div>
-                <div>✂️ Ditto: Editing and optimizing...</div>
-                <div>🖼️ Nitro-E: Generating thumbnail variants...</div>
+                {AI_MODELS.map((model) => (
+                  <div key={model.name}>{model.emoji} {model.name}: {model.description}</div>
+                ))}
               </div>
             </div>
           </motion.div>

@@ -1,5 +1,6 @@
 import { Handler } from '@netlify/functions';
 import CampaignOrchestrator, { CampaignRequest, CampaignResult } from '../../lib/campaign-orchestrator';
+import { CAMPAIGN_DEFAULTS } from '../../lib/campaign-config';
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -22,7 +23,18 @@ export const handler: Handler = async (event, context) => {
   }
 
   try {
-    const campaignRequest: CampaignRequest = JSON.parse(event.body || '{}');
+    const body = event.body || '{}';
+    let campaignRequest: CampaignRequest;
+    
+    try {
+      campaignRequest = JSON.parse(body);
+    } catch (parseError) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Invalid JSON in request body' })
+      };
+    }
     
     if (!campaignRequest.product) {
       return {
@@ -35,11 +47,11 @@ export const handler: Handler = async (event, context) => {
     }
 
     const request: CampaignRequest = {
-      campaign_type: 'product_launch',
-      duration_seconds: 60,
-      aspect_ratios: ['16:9', '9:16', '1:1'],
-      platforms: ['instagram', 'tiktok', 'youtube'],
-      ...campaignRequest
+      duration_seconds: CAMPAIGN_DEFAULTS.DURATION_SECONDS,
+      aspect_ratios: [...CAMPAIGN_DEFAULTS.ASPECT_RATIOS],
+      platforms: [...CAMPAIGN_DEFAULTS.PLATFORMS],
+      ...campaignRequest,
+      campaign_type: campaignRequest.campaign_type || CAMPAIGN_DEFAULTS.CAMPAIGN_TYPE
     };
 
     const orchestrator = new CampaignOrchestrator();
