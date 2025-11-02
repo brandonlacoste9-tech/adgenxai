@@ -184,12 +184,12 @@ export function usePersonaBoard(options: UsePersonaBoardOptions = {}) {
       
       // Try to load persisted selection first
       const persistedId = loadPersistedSelection();
-      if (persistedId && personas.find(p => p.id === persistedId)) {
+      if (persistedId && personas.find((p: Persona) => p.id === persistedId)) {
         initialPersonaId = persistedId;
       }
 
       // Select the initial persona
-      const initialPersona = personas.find(p => p.id === initialPersonaId);
+      const initialPersona = personas.find((p: Persona) => p.id === initialPersonaId);
       if (initialPersona) {
         selectPersona(initialPersona);
       }
