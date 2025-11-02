@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "secrets:supabase": "node scripts/seed-supabase-key.js",
     "deploy": "netlify deploy --prod",
     "test": "vitest run --reporter=dot",
     "test:watch": "vitest",

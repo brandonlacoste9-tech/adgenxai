@@ -30,12 +30,15 @@ Local → GitHub → Netlify → LIVE (2-3 min)
 BEE_API_URL=https://www.adgenxai.pro/api
 BEE_API_KEY=your_key
 SUPABASE_URL=https://xxx.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=eyJxxx
+SUPABASE_SERVICE_ROLE_KEY=sk-svcacct-xxx
 INSTAGRAM_ACCOUNT_ID=17841xxx
 FB_ACCESS_TOKEN=EAABxxx
 ```
 
 **Set at**: `netlify.com/sites/YOUR_SITE/settings/env`
+
+> Ritual: `echo "sk-svcacct-..." | npm run secrets:supabase -- --stdin`
+
 
 ---
 
