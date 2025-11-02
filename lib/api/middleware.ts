@@ -27,7 +27,7 @@ export function checkMethod(
  * Extract request ID from headers or generate one
  */
 export function getRequestId(event: HandlerEvent): string {
-  return event.headers['x-request-id'] || `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return event.headers['x-request-id'] || `req_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 }
 
 /**

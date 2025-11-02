@@ -51,11 +51,11 @@ export const handler: Handler = async (event, context) => {
 
     // Note: This function expects a videoUrl from the validation schema
     // but the platform function expects a Buffer. We'll need to download the video
-    // For now, we'll return a helpful error
+    // For now, we'll return a helpful error indicating incomplete implementation
     return errorResponse(
       "YouTube video upload requires implementation",
-      HttpStatus.SERVICE_UNAVAILABLE,
-      ErrorCode.SERVICE_UNAVAILABLE,
+      HttpStatus.NOT_IMPLEMENTED,
+      ErrorCode.NOT_IMPLEMENTED,
       {
         message: "Video download and buffer conversion needs to be implemented",
         videoUrl,

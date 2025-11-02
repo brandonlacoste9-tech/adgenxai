@@ -251,6 +251,7 @@ All API responses follow a consistent format:
 | `METHOD_NOT_ALLOWED` | 405 | HTTP method not allowed |
 | `RATE_LIMIT_EXCEEDED` | 429 | Rate limit exceeded |
 | `INTERNAL_ERROR` | 500 | Internal server error |
+| `NOT_IMPLEMENTED` | 501 | Feature not yet implemented |
 | `SERVICE_UNAVAILABLE` | 503 | Service temporarily unavailable |
 | `EXTERNAL_API_ERROR` | 500 | External API call failed |
 | `INVALID_CREDENTIALS` | 401 | Invalid platform credentials |

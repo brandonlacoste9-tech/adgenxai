@@ -65,7 +65,12 @@ export const schemas = {
     title: z.string().min(1, 'Title is required').max(150, 'Title too long'),
     description: z.string().max(2200, 'Description too long').optional(),
     privacyLevel: z
-      .enum(['PUBLIC_TO_EVERYONE', 'MUTUAL_FOLLOW_FRIENDS', 'FOLLOWER_OF_CREATOR', 'SELF_ONLY'])
+      .enum([
+        'PUBLIC_TO_EVERYONE',      // Video visible to all TikTok users
+        'MUTUAL_FOLLOW_FRIENDS',   // Visible to users who follow each other
+        'FOLLOWER_OF_CREATOR',     // Visible only to your followers
+        'SELF_ONLY'                // Visible only to you (private)
+      ])
       .optional(),
   }),
 
