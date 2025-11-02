@@ -16,7 +16,8 @@
   },
   "include": [
     "netlify/functions/**/*",
-    "packages/**/*"
+    "packages/**/*",
+    "types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules",
