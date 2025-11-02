@@ -38,7 +38,7 @@ class SoraClient {
    */
   async generateVideo(request: SoraGenerationRequest): Promise<SoraJob> {
     // Generate a unique job ID
-    const jobId = `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `job_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
     
     // Create the job
     const job: SoraJob = {
