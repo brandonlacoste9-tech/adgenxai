@@ -7,7 +7,8 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "dev": "netlify dev",
-    "deploy": "netlify deploy --prod"
+    "deploy": "netlify deploy --prod",
+    "test": "npm run build && node --test dist/netlify/functions/**/*.test.js"
   },
   "dependencies": {
     "@netlify/functions": "^2.4.0",
