@@ -228,8 +228,9 @@ describe("TikTok Platform Integration", () => {
         shareUrl: "https://tiktok.com/@user/video/789",
       });
 
-      // Verify all steps were called
-      expect(global.fetch).toHaveBeenCalledTimes(4);
+      // Verify all steps were called: download + init + upload + publish
+      const expectedCalls = 4;
+      expect(global.fetch).toHaveBeenCalledTimes(expectedCalls);
     });
 
     it("should handle video download failures", async () => {
