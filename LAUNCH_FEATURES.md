@@ -13,6 +13,7 @@ This document outlines the most important features that are included in the init
 5. [Analytics & Monitoring](#analytics--monitoring)
 6. [Developer Features](#developer-features)
 7. [Security & Reliability](#security--reliability)
+8. [Additional Features](#additional-features)
 
 ---
 
@@ -525,7 +526,7 @@ To explore these features:
 4. **API**: Review endpoints at `/api/*` directories
 5. **Deploy**: Use BEE-SHIP scripts for one-click deployment
 
-For detailed setup instructions, see [INTEGRATION_QUICKSTART.md](docs/INTEGRATION_QUICKSTART.md).
+For detailed setup instructions, see [INTEGRATION_QUICKSTART.md](./docs/INTEGRATION_QUICKSTART.md).
 
 ---
 
