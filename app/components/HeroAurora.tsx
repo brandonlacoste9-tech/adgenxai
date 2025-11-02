@@ -18,10 +18,10 @@ export default function HeroAurora() {
           <h1 className="text-5xl md:text-6xl font-extrabold leading-[1.05]
                          text-transparent bg-clip-text
                          bg-gradient-to-r from-[#35E3FF] via-[#7C4DFF] to-[#FFD76A]">
-            The Aurora Engine for Growth
+            Agent-First Platform for AI-Powered Content Creation
           </h1>
           <p className="mt-4 text-black/70 text-lg">
-            Generate ads and reels, refine with personas, and publish everywhere—automatically.
+            Where Agents Learn, Remember, and Improve. Built on the BeeHive Codex ritual system with specialized agent swarms, context engineering, and human oversight.
           </p>
 
         {/* Primary actions */}

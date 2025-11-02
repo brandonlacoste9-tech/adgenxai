@@ -3,8 +3,8 @@
 export default function ShareButton() {
   async function share() {
     const url = location.href;
-    const title = "AdGenXAI — The Aurora Engine for Growth";
-    const text = "Generate ads & reels, refine with personas, publish everywhere.";
+    const title = "AdGenXAI — Agent-First Platform for AI-Powered Content Creation";
+    const text = "Where Agents Learn, Remember, and Improve. Built on BeeHive Codex rituals.";
 
     if (navigator.share) {
       try {
