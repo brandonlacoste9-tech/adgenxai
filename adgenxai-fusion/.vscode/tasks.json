@@ -1,0 +1,61 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Install Environment",
+      "type": "shell",
+      "command": "bash install.sh",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Local Server",
+      "type": "shell",
+      "command": "python app.py",
+      "presentation": { "reveal": "always" }
+    },
+    {
+      "label": "Rehearse (local)",
+      "type": "shell",
+      "command": "make rehearse CONTEXT=dev",
+      "presentation": { "reveal": "always" }
+    },
+    {
+      "label": "Docker Rehearsal",
+      "type": "shell",
+      "command": "make docker-rehearse",
+      "presentation": { "reveal": "always" }
+    },
+    {
+      "label": "Reset / Cleanup",
+      "type": "shell",
+      "command": "make reset",
+      "group": "clean",
+      "presentation": { "reveal": "always" }
+    },
+    {
+      "label": "Run Endpoint Tests",
+      "type": "shell",
+      "command": "./test_fusion_endpoints.sh",
+      "presentation": { "reveal": "always" }
+    },
+    {
+      "label": "Bump Version",
+      "type": "shell",
+      "command": "bash bump_version.sh ${input:newVersion}",
+      "presentation": { "reveal": "always" }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "newVersion",
+      "type": "promptString",
+      "description": "Enter the new version (e.g., 2.1.0)",
+      "default": "2.1.0"
+    }
+  ]
+}

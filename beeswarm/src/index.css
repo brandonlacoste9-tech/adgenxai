@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --hive-dark: #0b0c10;
+  --hive-panel: #13151a;
+  --aurora-gold: #fccb00;
+  --plasma-blue: #1a8cff;
+}
+
+body {
+  background-color: var(--hive-dark);
+  color: var(--aurora-gold);
+  font-family: 'Inter', sans-serif;
+}

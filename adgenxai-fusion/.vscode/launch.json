@@ -1,0 +1,52 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "AdgenxAI Fusion: Run Server",
+      "type": "python",
+      "request": "launch",
+      "program": "app.py",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env",
+      "env": {
+        "CONTEXT": "dev",
+        "PORT": "8000",
+        "NOTIFY": "true"
+      },
+      "justMyCode": false
+    },
+    {
+      "name": "AdgenxAI Fusion: Rehearse (local)",
+      "type": "python",
+      "request": "launch",
+      "program": "rehearse.sh",
+      "args": ["dev"],
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "name": "AdgenxAI Fusion: Docker Rehearsal",
+      "type": "python",
+      "request": "launch",
+      "program": "make",
+      "args": ["docker-rehearse"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "AdgenxAI Fusion: Cleanup / Reset",
+      "type": "python",
+      "request": "launch",
+      "program": "make",
+      "args": ["reset"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "AdgenxAI Fusion: Run Tests",
+      "type": "python",
+      "request": "launch",
+      "program": "test_fusion_endpoints.sh",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+# Sample Creative Asset for BeeHive Testing
+# This would normally be a binary image file
+# For demonstration: A-bright-cinematic.jpg placeholder
+
+SAMPLE_ASSET=true
+FILENAME="A-bright-cinematic.jpg"
+TYPE="cinematic_hero"
+DIMENSIONS="1920x1080"
+GENERATED_DATE="2025-11-02"
+DESCRIPTION="Bright cinematic hero image for BeeHive Studio expansion"
+MYTHIC_ENERGY_LEVEL="9000"
+
+# In a real scenario, this would be your actual image file
+# Usage: ./hive.sh push A-bright-cinematic.jpg

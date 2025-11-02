@@ -1,0 +1,39 @@
+{
+  "name": "adgenxai-fusion",
+  "version": "2.0.0",
+  "description": "AdgenxAI Fusion v2 - Voice-Enabled Gemini Orchestration Platform",
+  "main": "app.py",
+  "scripts": {
+    "start": "python app.py",
+    "rehearse": "bash rehearse.sh",
+    "test": "bash test_fusion_endpoints.sh",
+    "docker:build": "docker build -t adgenxai-fusion:latest .",
+    "docker:run": "docker run -p 8000:8000 adgenxai-fusion:latest",
+    "docker:rehearse": "docker compose up --build rehearsal",
+    "dev": "python app.py",
+    "clean": "rm -rf logs/*.log __pycache__ .pytest_cache",
+    "banner": "bash fusion_banner.sh"
+  },
+  "keywords": [
+    "ai",
+    "gemini",
+    "voice",
+    "orchestration",
+    "fastapi",
+    "fusion"
+  ],
+  "author": "AdgenxAI Labs",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "python": ">=3.9.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/adgenxai-fusion.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/adgenxai-fusion/issues"
+  },
+  "homepage": "https://github.com/your-org/adgenxai-fusion#readme"
+}

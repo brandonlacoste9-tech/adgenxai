@@ -1,0 +1,60 @@
+# AdgenxAI Fusion v2 - VS Code REST Client Tests
+# Use with the REST Client extension in VS Code
+
+@baseUrl = http://127.0.0.1:8000
+@contentType = application/json
+
+### Health Check
+GET {{baseUrl}}/health
+
+### Main Dashboard
+GET {{baseUrl}}/
+
+### Chat Endpoint - Basic Test
+POST {{baseUrl}}/chat
+Content-Type: {{contentType}}
+
+{
+  "prompt": "Hello from VS Code REST Client!",
+  "session_id": "vscode_test_session"
+}
+
+### Chat Endpoint - Complex Prompt
+POST {{baseUrl}}/chat
+Content-Type: {{contentType}}
+
+{
+  "prompt": "Explain the concept of neuromorphic AI and how it relates to the BeeHive Codex system in AdgenxAI.",
+  "session_id": "complex_test"
+}
+
+### Streaming Endpoint
+POST {{baseUrl}}/stream
+Content-Type: {{contentType}}
+
+{
+  "prompt": "Generate a streaming response about voice-enabled AI orchestration."
+}
+
+### Rehearsal Trigger
+GET {{baseUrl}}/rehearsal
+
+### Export Logs
+GET {{baseUrl}}/logs/export
+
+### Error Test - Invalid JSON
+POST {{baseUrl}}/chat
+Content-Type: {{contentType}}
+
+{
+  "invalid_field": "test"
+}
+
+### Performance Test - Long Prompt
+POST {{baseUrl}}/chat
+Content-Type: {{contentType}}
+
+{
+  "prompt": "Generate a comprehensive analysis of modern AI orchestration platforms, including their architecture, benefits, challenges, and future trends. Include specific examples of how voice-enabled interfaces enhance user experience in enterprise AI applications. Discuss the role of streaming responses in real-time AI interactions.",
+  "session_id": "performance_test"
+}

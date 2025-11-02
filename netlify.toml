@@ -16,6 +16,16 @@
   to = "/.netlify/functions/:splat"
   status = 200
 
+[[redirects]]
+  from = "/cookbook"
+  to = "/.netlify/functions/gemini-cookbook?path=dashboard"
+  status = 200
+
+[[redirects]]
+  from = "/cookbook/*"
+  to = "/.netlify/functions/gemini-cookbook?path=:splat"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]

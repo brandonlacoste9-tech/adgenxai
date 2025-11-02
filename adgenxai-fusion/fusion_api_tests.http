@@ -1,0 +1,89 @@
+# AdgenxAI Fusion v2 - JetBrains HTTP Client Tests
+# Use with IntelliJ IDEA, PyCharm, or other JetBrains IDEs
+
+### Health Check
+GET http://127.0.0.1:8000/health
+Accept: application/json
+
+###
+
+### Main Dashboard
+GET http://127.0.0.1:8000/
+Accept: text/html
+
+###
+
+### Chat Endpoint - Basic Test
+POST http://127.0.0.1:8000/chat
+Content-Type: application/json
+
+{
+  "prompt": "Hello from JetBrains HTTP Client!",
+  "session_id": "jetbrains_test_session"
+}
+
+###
+
+### Chat Endpoint - BeeHive Codex Test
+POST http://127.0.0.1:8000/chat
+Content-Type: application/json
+
+{
+  "prompt": "Execute the BeeHive Codex ritual for Agent-First development pattern analysis.",
+  "session_id": "beehive_test"
+}
+
+###
+
+### Streaming Endpoint
+POST http://127.0.0.1:8000/stream
+Content-Type: application/json
+
+{
+  "prompt": "Stream a detailed explanation of neuromorphic AI orchestration."
+}
+
+###
+
+### Rehearsal Endpoint
+GET http://127.0.0.1:8000/rehearsal
+Accept: application/json
+
+###
+
+### Log Export
+GET http://127.0.0.1:8000/logs/export
+Accept: application/json
+
+###
+
+### Load Test - Multiple Sessions
+POST http://127.0.0.1:8000/chat
+Content-Type: application/json
+
+{
+  "prompt": "Session 1 test",
+  "session_id": "load_test_1"
+}
+
+###
+
+POST http://127.0.0.1:8000/chat
+Content-Type: application/json
+
+{
+  "prompt": "Session 2 test",
+  "session_id": "load_test_2"
+}
+
+###
+
+POST http://127.0.0.1:8000/chat
+Content-Type: application/json
+
+{
+  "prompt": "Session 3 test",
+  "session_id": "load_test_3"
+}
+
+###

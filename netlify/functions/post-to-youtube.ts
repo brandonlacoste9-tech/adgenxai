@@ -2,14 +2,22 @@
 // Netlify function to upload videos to YouTube
 
 import { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
-import { publishVideo } from "../../lib/platforms/youtube";
+import { publishVideo, publishVideoFromUrl, publishShort } from "../../lib/platforms/youtube";
 
 interface PostRequest {
-  videoBase64: string; // Base64 encoded video file
+  // Video source (one of these required)
+  videoBase64?: string; // Base64 encoded video file
+  videoUrl?: string;    // URL to video file
+  
+  // Metadata
   title: string;
   description?: string;
   tags?: string[];
   privacyStatus?: "public" | "private" | "unlisted";
+  thumbnailUrl?: string;
+  
+  // Content type
+  contentType?: "video" | "short";
 }
 
 export const handler: Handler = async (
@@ -27,14 +35,32 @@ export const handler: Handler = async (
   try {
     // Parse request body
     const body: PostRequest = JSON.parse(event.body || "{}");
-    const { videoBase64, title, description, tags, privacyStatus } = body;
+    const { 
+      videoBase64, 
+      videoUrl, 
+      title, 
+      description, 
+      tags, 
+      privacyStatus,
+      thumbnailUrl,
+      contentType = "video"
+    } = body;
 
     // Validate inputs
-    if (!videoBase64 || !title) {
+    if (!title) {
       return {
         statusCode: 400,
         body: JSON.stringify({
-          error: "Missing required fields: videoBase64 and title",
+          error: "Missing required field: title",
+        }),
+      };
+    }
+
+    if (!videoBase64 && !videoUrl) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          error: "Either videoBase64 or videoUrl must be provided",
         }),
       };
     }
@@ -53,20 +79,31 @@ export const handler: Handler = async (
       };
     }
 
-    // Convert base64 to Buffer
-    const videoBuffer = Buffer.from(videoBase64, "base64");
+    const config = { clientId, clientSecret, refreshToken };
+    const metadata = {
+      title,
+      description: description || "",
+      tags: tags || [],
+      privacyStatus: privacyStatus || "public",
+      thumbnailUrl,
+    };
 
-    // Publish to YouTube
-    const result = await publishVideo(
-      { clientId, clientSecret, refreshToken },
-      videoBuffer,
-      {
-        title,
-        description: description || "",
-        tags: tags || [],
-        privacyStatus: privacyStatus || "public",
-      }
-    );
+    let result;
+
+    // Handle different upload types
+    if (contentType === "short" && videoUrl) {
+      // YouTube Short from URL
+      result = await publishShort(config, videoUrl, metadata);
+    } else if (videoUrl) {
+      // Regular video from URL
+      result = await publishVideoFromUrl(config, videoUrl, metadata);
+    } else if (videoBase64) {
+      // Video from base64 (legacy support)
+      const videoBuffer = Buffer.from(videoBase64, "base64");
+      result = await publishVideo(config, videoBuffer, metadata);
+    } else {
+      throw new Error("Invalid upload configuration");
+    }
 
     return {
       statusCode: 200,
@@ -74,9 +111,11 @@ export const handler: Handler = async (
       body: JSON.stringify({
         success: true,
         platform: "youtube",
+        contentType,
         videoId: result.videoId,
         videoUrl: `https://www.youtube.com/watch?v=${result.videoId}`,
-        message: "Successfully uploaded to YouTube",
+        shortUrl: contentType === "short" ? `https://www.youtube.com/shorts/${result.videoId}` : undefined,
+        message: `Successfully uploaded ${contentType} to YouTube`,
       }),
     };
   } catch (error: any) {

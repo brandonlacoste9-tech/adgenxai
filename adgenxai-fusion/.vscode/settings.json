@@ -1,0 +1,34 @@
+{
+  "python.defaultInterpreterPath": "./venv/bin/python",
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.formatting.provider": "black",
+  "python.terminal.activateEnvironment": true,
+  "files.associations": {
+    "*.rest": "http",
+    "*.http": "http"
+  },
+  "terminal.integrated.shellIntegration.enabled": true,
+  "terminal.integrated.profiles.linux": {
+    "fusion": {
+      "path": "/bin/bash",
+      "args": ["-c", "bash fusion_banner.sh && exec bash"]
+    }
+  },
+  "terminal.integrated.defaultProfile.linux": "fusion",
+  "rest-client.environmentVariables": {
+    "local": {
+      "baseUrl": "http://127.0.0.1:8000",
+      "apiKey": "test-key"
+    },
+    "docker": {
+      "baseUrl": "http://localhost:8000",
+      "apiKey": "test-key"
+    }
+  },
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  }
+}

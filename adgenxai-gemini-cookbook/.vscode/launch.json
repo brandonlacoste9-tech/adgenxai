@@ -1,0 +1,47 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "🌐 Gemini Fusion Dashboard",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/app.py",
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "args": []
+    },
+    {
+      "name": "🚀 Command Menu Launcher",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "📝 Text Generation Demo",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/quickstart/text_generation.py",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "🎨 Multimodal Demo",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/quickstart/multimodal_input.py",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "🔧 Function Calling Demo",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/tools/function_calling.py",
+      "console": "integratedTerminal"
+    }
+  ]
+}
