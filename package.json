@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
+    "secrets:supabase": "node scripts/seed-supabase-key.js",
     "dev": "netlify dev",
     "deploy": "netlify deploy --prod"
   },
