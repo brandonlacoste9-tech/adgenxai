@@ -22,7 +22,8 @@ export const handler: Handler = async () => {
         webhook: '/.netlify/functions/github-webhook',
         telemetry: '/.netlify/functions/webhook-telemetry',
         dashboard: '/.netlify/functions/telemetry-dashboard',
-        health: '/.netlify/functions/health'
+        health: '/.netlify/functions/health',
+        chatkitGuide: '/.netlify/functions/chatkit-guide'
       }
     })
   };
