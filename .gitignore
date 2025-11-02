@@ -220,3 +220,7 @@ Thumbs.db
 # IDE
 .vscode/settings.json
 *.log
+
+# Allow Next.js app libraries
+!app/lib/
+!app/lib/**/*.ts
