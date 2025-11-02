@@ -1,0 +1,158 @@
+name: Codex Fraud Canary
+
+on:
+  workflow_dispatch:
+    inputs:
+      use_prod:
+        description: 'Enable production API calls (USE_PROD_API=true)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+  schedule:
+    - cron: '0 3 * * *'                  # nightly 03:00 UTC
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'supabase/functions/fraud-detection*'
+      - 'docs/codex/**'
+
+concurrency:
+  group: codex-fraud-canary-${{ github.ref_name || 'global' }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+  pull-requests: write
+
+env:
+  NODE_VERSION: 20
+  REPORT_DIR: reports
+  CREATED_LOG: created-issues.jsonl
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set DRYRUN and USE_PROD_API
+        id: flags
+        run: |
+          # Default: PRs are dry-run; schedule/workflow_dispatch can opt into prod
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "DRYRUN=1" >> $GITHUB_ENV
+            echo "USE_PROD_API=false" >> $GITHUB_ENV
+          else
+            echo "DRYRUN=0" >> $GITHUB_ENV
+            # Respect workflow_dispatch input
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.use_prod }}" = "true" ]; then
+              echo "USE_PROD_API=true" >> $GITHUB_ENV
+            else
+              echo "USE_PROD_API=false" >> $GITHUB_ENV
+            fi
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+        env:
+          CI: true
+
+      - name: Run Fraud Canary (safe)
+        id: run_canary
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || '' }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY || '' }}
+          USE_PROD_API: ${{ env.USE_PROD_API }}
+          DRYRUN: ${{ env.DRYRUN }}
+        run: |
+          mkdir -p $REPORT_DIR
+          
+          # Enforce dry-run on PRs
+          if [ "${DRYRUN}" = "1" ]; then
+            echo "🔒 DRYRUN mode: will not write production data"
+          fi
+
+          # Block prod calls on PRs from forks
+          if [ "${DRYRUN}" = "0" ] && [ "${USE_PROD_API}" = "true" ] && [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "❌ ERROR: attempting prod run on a pull_request. Aborting."
+            exit 1
+          fi
+
+          # Run canary with explicit flags
+          node scripts/run-fraud-canary.js \
+            --supabase-url "${SUPABASE_URL}" \
+            --supabase-key "${SUPABASE_KEY}" \
+            --pr "${{ github.event.number || '' }}" \
+            --fixtures "docs/codex/fixtures/fraud_canary/sample_campaigns.json" \
+            $( [ "${DRYRUN}" = "1" ] && echo "--dry-run" || echo "" )
+
+      - name: Format report
+        if: always()
+        run: node scripts/format-fraud-report.js --input fraud_summary.json --output ${{ env.REPORT_DIR }}/fraud-report.md
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-fraud-report-${{ github.run_id }}
+          path: ${{ env.REPORT_DIR }}
+          retention-days: 30
+
+  postprocess:
+    needs: canary
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Checkout (base only, safe for pull_request_target pattern)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref || github.ref }}
+
+      - name: Download report
+        uses: actions/download-artifact@v4
+        with:
+          name: codex-fraud-report-${{ github.run_id }}
+          path: ./artifact
+
+      - name: Post PR comment (if PR)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('./artifact/fraud-report.md', 'utf8');
+            const issue_number = context.payload.pull_request.number;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number,
+              body: `## 🐝 Codex Fraud Canary Report\n\n${report}\n\n*This is an automated dry-run report. Review findings before merge.*`
+            });
+
+      - name: Slack notification (scheduled runs only)
+        if: github.event_name == 'schedule' && secrets.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          SUMMARY=$(head -c 500 ./artifact/fraud-report.md || echo "Report unavailable")
+          PAYLOAD="{\"text\":\"🐝 Codex Fraud Canary completed (run ${{ github.run_number }})\n\nSummary: ${SUMMARY}\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>\"}"
+          curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" "${SLACK_WEBHOOK_URL}"
