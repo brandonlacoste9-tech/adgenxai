@@ -213,8 +213,13 @@ SORA_API_URL=https://api.openai.com/v1/videos
 
 **Dependencies:**
 ```bash
-# Python dependencies (for agent runners)
-pip install crewai mcp-client openai
+# Python dependencies (for agent runners - optional advanced feature)
+# Note: AdGenXAI core is TypeScript/Node.js. Python agents are optional
+# for advanced multi-agent orchestration if using CrewAI framework.
+pip install crewai>=0.11.0 mcp-client>=1.0.0 openai>=1.0.0
+
+# Alternative: Use Netlify Agent Runners (JavaScript-based)
+# See: docs/AGENT_ORCHESTRATION.md for JS implementation
 ```
 
 **Constraints:**
