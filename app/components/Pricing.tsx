@@ -2,8 +2,8 @@ type Plan = { name: string; price: string; blurb: string; cta: string; popular?:
 
 const PLANS: Plan[] = [
   { name: "Starter", price: "$9/mo", blurb: "For getting started", cta: "Start Free", features: ["100 renders/mo", "3 personas", "Watermarked exports"] },
-  { name: "Creator", price: "$29/mo", blurb: "For daily creators", cta: "Upgrade", popular: true, features: ["1,000 renders/mo", "20 personas", "No watermark", "Priority queue"] },
-  { name: "Studio", price: "$99/mo", blurb: "For small teams", cta: "Contact Sales", features: ["Unlimited renders*", "Unlimited personas", "Brand kits", "SAML/SSO"] },
+  { name: "Creator", price: "$19/mo", blurb: "For daily creators", cta: "Upgrade", popular: true, features: ["1,000 renders/mo", "20 personas", "No watermark", "Priority queue"] },
+  { name: "Studio", price: "$49/mo", blurb: "For small teams", cta: "Contact Sales", features: ["Unlimited renders*", "Unlimited personas", "Brand kits", "SAML/SSO"] },
 ];
 
 export default function Pricing() {
