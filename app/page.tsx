@@ -8,6 +8,7 @@ import MobileCreateDock from "@/components/MobileCreateDock";
 
 import HeroAurora from "@/components/HeroAurora";
 import AgentFirstShowcase from "@/components/AgentFirstShowcase";
+import CampaignOrchestrationDemo from "@/components/CampaignOrchestrationDemo";
 import FeatureRail from "@/components/FeatureRail";
 import PersonaPreview from "@/components/PersonaPreview";
 import Pricing from "@/components/Pricing";
@@ -40,6 +41,10 @@ export default function Page() {
 
       <HeroAurora />
       <AgentFirstShowcase />
+      
+      {/* 🎯 NEW: Campaign Orchestration Demo - The Core Magic */}
+      <CampaignOrchestrationDemo />
+      
       <FeatureRail />
       <SocialProofStrip />
       <PersonaPreview />
