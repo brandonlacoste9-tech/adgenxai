@@ -1,0 +1,141 @@
+openapi: 3.0.3
+info:
+  title: AdGenXAI API
+  description: |
+    AI-powered advertising platform API with webhook sensory cortex architecture.
+    
+    ## Overview
+    AdGenXAI provides APIs for:
+    - AI-powered content generation
+    - Multi-platform publishing (Instagram, TikTok, YouTube)
+    - Health monitoring and status checks
+    - Webhook event processing
+    
+    ## Authentication
+    API endpoints require authentication via API keys or platform-specific credentials.
+    Contact support for API key provisioning.
+    
+    ## Rate Limiting
+    - Default: 100 requests per minute per API key
+    - Burst: 20 requests per second
+    - Rate limit headers included in responses
+    
+  version: 1.0.0
+  contact:
+    name: AdGenXAI Support
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://adgenxai.netlify.app/api
+    description: Production server
+  - url: http://localhost:8888/api
+    description: Local development server
+
+tags:
+  - name: Health
+    description: Health check and status endpoints
+  - name: Publishing
+    description: Content publishing to social platforms
+  - name: Webhooks
+    description: Webhook event processing
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Returns the health status of the AI Sensory Cortex
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  uptime:
+                    type: string
+                  models:
+                    type: array
+                    items:
+                      type: string
+                  timestamp:
+                    type: string
+
+  /status:
+    get:
+      summary: API status dashboard
+      description: Returns detailed status of all API services and platform integrations
+      tags:
+        - Health
+      responses:
+        '200':
+          description: API status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+
+  /post-to-instagram:
+    post:
+      summary: Publish image to Instagram
+      description: Publishes an image with caption to Instagram
+      tags:
+        - Publishing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - imageUrl
+                - caption
+              properties:
+                imageUrl:
+                  type: string
+                  format: uri
+                caption:
+                  type: string
+      responses:
+        '200':
+          description: Successfully published
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+
+  /webhook:
+    post:
+      summary: Process webhook event
+      description: Main webhook endpoint for AI Sensory Cortex event processing
+      tags:
+        - Webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook processed
+          content:
+            application/json:
+              schema:
+                type: object
