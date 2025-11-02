@@ -14,7 +14,7 @@ export async function publishImage(
   const { accountId, accessToken } = config;
 
   const createRes = await fetch(
-    `https://graph.facebook.com/v17.0/${ accountId}/media`,
+    `https://graph.facebook.com/v17.0/${accountId}/media`,
     {
       method: "POST",
       body: new URLSearchParams({
@@ -24,6 +24,13 @@ export async function publishImage(
       }),
     }
   );
+
+  if (!createRes.ok) {
+    const errorBody = await createRes.text();
+    throw new Error(
+      `Failed to create Instagram media (status ${createRes.status}): ${errorBody}`
+    );
+  }
 
   const createData = (await createRes.json()) as { id?: string };
   if (!createData.id) {
@@ -40,6 +47,13 @@ export async function publishImage(
       }),
     }
   );
+
+  if (!publishRes.ok) {
+    const errorBody = await publishRes.text();
+    throw new Error(
+      `Failed to publish Instagram media (status ${publishRes.status}): ${errorBody}`
+    );
+  }
 
   const publishData = (await publishRes.json()) as { id?: string };
   if (!publishData.id) {

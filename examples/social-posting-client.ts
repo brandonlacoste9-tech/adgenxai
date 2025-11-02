@@ -6,12 +6,18 @@
  */
 export async function postToInstagram(
   imageUrl: string,
-  caption: string
+  caption: string,
+  authToken: string
 ): Promise<{ containerId: string; publishedId: string }> {
+  if (!authToken) {
+    throw new Error("authToken is required to post to Instagram");
+  }
+
   const response = await fetch("/.netlify/functions/post-to-instagram", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${authToken}`,
     },
     body: JSON.stringify({
       imageUrl,
@@ -37,12 +43,17 @@ export async function postToInstagram(
 export async function postToYouTube(
   videoFile: File,
   title: string,
+  authToken: string,
   options?: {
     description?: string;
     tags?: string[];
     privacyStatus?: "public" | "private" | "unlisted";
   }
 ): Promise<{ videoId: string; videoUrl: string }> {
+  if (!authToken) {
+    throw new Error("authToken is required to upload to YouTube");
+  }
+
   // Convert file to base64
   const videoBase64 = await fileToBase64(videoFile);
 
@@ -50,6 +61,7 @@ export async function postToYouTube(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${authToken}`,
     },
     body: JSON.stringify({
       videoBase64,
@@ -77,12 +89,18 @@ export async function postToYouTube(
  */
 export async function postToTikTok(
   videoUrl: string,
-  title: string
+  title: string,
+  authToken: string
 ): Promise<{ shareId: string }> {
+  if (!authToken) {
+    throw new Error("authToken is required to post to TikTok");
+  }
+
   const response = await fetch("/.netlify/functions/post-to-tiktok", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${authToken}`,
     },
     body: JSON.stringify({
       videoUrl,
@@ -123,7 +141,8 @@ function fileToBase64(file: File): Promise<string> {
 try {
   const result = await postToInstagram(
     "https://example.com/my-image.jpg",
-    "Check out this amazing content! 🚀 #adgenxai"
+    "Check out this amazing content! 🚀 #adgenxai",
+    sessionStorage.getItem("adgenxai.jwt")!
   );
   console.log("Posted to Instagram:", result.publishedId);
 } catch (error) {
@@ -136,6 +155,7 @@ try {
   const result = await postToYouTube(
     videoFile,
     "My Awesome Video Title",
+    sessionStorage.getItem("adgenxai.jwt")!,
     {
       description: "This is an amazing video created with AdGenXAI",
       tags: ["adgenxai", "automation", "ai"],
@@ -151,7 +171,8 @@ try {
 try {
   const result = await postToTikTok(
     "https://example.com/my-video.mp4",
-    "Amazing content!"
+    "Amazing content!",
+    sessionStorage.getItem("adgenxai.jwt")!
   );
   console.log("Posted to TikTok:", result.shareId);
 } catch (error) {

@@ -43,8 +43,23 @@ export async function publishVideo(
       },
       media: { body: fs.createReadStream(filepath) },
     });
-    return { videoId: res.data.id! };
+    if (!res.data.id) {
+      throw new Error("YouTube API response did not include a video ID");
+    }
+    return { videoId: res.data.id };
   } finally {
-    try { await fs.promises.unlink(filepath); } catch (e) { }
+    try {
+      await fs.promises.unlink(filepath);
+    } catch (error) {
+      // Log to stderr but do not interrupt request lifecycle
+      console.warn(
+        JSON.stringify({
+          level: "warn",
+          message: "Failed to cleanup temporary YouTube upload file",
+          filepath,
+          error: error instanceof Error ? error.message : String(error),
+        })
+      );
+    }
   }
 }

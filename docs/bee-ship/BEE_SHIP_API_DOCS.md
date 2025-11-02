@@ -73,7 +73,28 @@ TIKTOK_CLIENT_KEY=your_tiktok_client_key
 TIKTOK_CLIENT_SECRET=your_tiktok_client_secret
 TIKTOK_ACCESS_TOKEN=your_tiktok_access_token
 TIKTOK_OPEN_ID=your_tiktok_open_id
+POSTING_JWT_SECRET=your_shared_secret_for_jwt_validation
 ```
+
+#### JWT Authentication
+
+Every publishing function requires a signed JSON Web Token (JWT) in the
+`Authorization` header:
+
+```http
+Authorization: Bearer <token>
+```
+
+Tokens must be signed with the shared `POSTING_JWT_SECRET` using HS256 and
+should include:
+
+- `sub`: Identifier for the user/agent invoking the function.
+- `scope`: Either a space-delimited string or array of scopes. Each endpoint
+  validates that the caller has the appropriate `social:<platform>:write`
+  scope.
+- `exp`: Optional expiration timestamp (recommended for security).
+
+Tokens without the required scope return `403 Forbidden`.
 
 ---
 
@@ -87,6 +108,9 @@ Publish an image to Instagram.
 ```
 POST /.netlify/functions/post-to-instagram
 ```
+
+**Authentication:**
+- `Authorization: Bearer <JWT with social:instagram:write scope>`
 
 **Request Body:**
 ```json
@@ -119,6 +143,9 @@ POST /.netlify/functions/post-to-instagram
 }
 ```
 
+**Rate Limits:** Default 10 requests/minute/user. Override with
+`INSTAGRAM_RATE_LIMIT_PER_MINUTE`.
+
 ---
 
 ### 2. POST /post-to-youtube
@@ -129,6 +156,9 @@ Upload a video to YouTube.
 ```
 POST /.netlify/functions/post-to-youtube
 ```
+
+**Authentication:**
+- `Authorization: Bearer <JWT with social:youtube:write scope>`
 
 **Request Body:**
 ```json
@@ -159,6 +189,9 @@ POST /.netlify/functions/post-to-youtube
 }
 ```
 
+**Rate Limits:** Default 6 uploads/minute/user. Override with
+`YOUTUBE_RATE_LIMIT_PER_MINUTE`.
+
 **Response (Error - 400/500):**
 ```json
 {
@@ -185,6 +218,9 @@ POST /.netlify/functions/post-to-tiktok
 
 **Status:** ⚠️ Not yet implemented
 
+**Authentication:**
+- `Authorization: Bearer <JWT with social:tiktok:write scope>`
+
 **Request Body:**
 ```json
 {
@@ -201,6 +237,9 @@ POST /.netlify/functions/post-to-tiktok
 }
 ```
 
+**Rate Limits:** Default 5 requests/minute/user. Override with
+`TIKTOK_RATE_LIMIT_PER_MINUTE`.
+
 ---
 
 ## Frontend Integration
@@ -209,10 +248,13 @@ POST /.netlify/functions/post-to-tiktok
 
 ```javascript
 // Post to Instagram
-async function postToInstagram(imageUrl, caption) {
+async function postToInstagram(imageUrl, caption, token) {
   const response = await fetch('/.netlify/functions/post-to-instagram', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
     body: JSON.stringify({ imageUrl, caption })
   });
 
@@ -225,13 +267,16 @@ async function postToInstagram(imageUrl, caption) {
 }
 
 // Upload to YouTube
-async function uploadToYouTube(videoFile, title, options = {}) {
+async function uploadToYouTube(videoFile, title, token, options = {}) {
   // Convert file to base64
   const videoBase64 = await fileToBase64(videoFile);
 
   const response = await fetch('/.netlify/functions/post-to-youtube', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
     body: JSON.stringify({
       videoBase64,
       title,
@@ -267,15 +312,18 @@ Import the pre-built client from `examples/social-posting-client.ts`:
 ```typescript
 import { postToInstagram, postToYouTube, postToTikTok } from './examples/social-posting-client';
 
+const token = sessionStorage.getItem('adgenxai.jwt');
+
 // Instagram
 const igResult = await postToInstagram(
   'https://example.com/image.jpg',
-  'My caption 🚀'
+  'My caption 🚀',
+  token
 );
 
 // YouTube
 const videoFile = document.querySelector('input[type="file"]').files[0];
-const ytResult = await postToYouTube(videoFile, 'Video Title', {
+const ytResult = await postToYouTube(videoFile, 'Video Title', token, {
   description: 'Video description',
   tags: ['tag1', 'tag2'],
   privacyStatus: 'public'
@@ -300,8 +348,10 @@ The demo provides a UI to test all three platforms.
 
 **Instagram:**
 ```bash
+TOKEN="your.jwt.token" # Supply a valid signed token
 curl -X POST https://yourdomain.com/.netlify/functions/post-to-instagram \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
   -d '{
     "imageUrl": "https://picsum.photos/1080",
     "caption": "Test post from cURL!"
@@ -312,9 +362,11 @@ curl -X POST https://yourdomain.com/.netlify/functions/post-to-instagram \
 ```bash
 # First, convert your video to base64
 VIDEO_BASE64=$(base64 -i video.mp4)
+TOKEN="your.jwt.token"
 
 curl -X POST https://yourdomain.com/.netlify/functions/post-to-youtube \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
   -d "{
     \"videoBase64\": \"$VIDEO_BASE64\",
     \"title\": \"Test Upload\",
