@@ -20,3 +20,9 @@ coverage
 # Config
 package-lock.json
 tsconfig.tsbuildinfo
+
+# Existing workflows (not part of this PR)
+.github/workflows/cortex-observer.yml
+.github/workflows/observer-v2.yml
+.github/workflows/phase2.yml
+.github/workflows/ci.yml
