@@ -85,6 +85,15 @@ Object.defineProperty(global, "localStorage", {
   dispatchEvent: vi.fn(),
 });
 
+// IntersectionObserver for lazy loading components
+(global.window as any).IntersectionObserver = class IntersectionObserver {
+  constructor(public callback: Function, public options?: any) {}
+  observe() { return null; }
+  unobserve() { return null; }
+  disconnect() { return null; }
+  takeRecords() { return []; }
+};
+
 // Mock fetch by default; individual tests can override
 if (!global.fetch) {
   global.fetch = vi.fn();

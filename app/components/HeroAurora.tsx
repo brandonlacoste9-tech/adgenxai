@@ -1,14 +1,36 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 export default function HeroAurora() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    // Check for reduced motion preference
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
+  }, []);
+
   return (
     <section className="relative overflow-hidden bg-white">
-      {/* Aurora backdrop */}
+      {/* Aurora backdrop with reduced motion support */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 -left-24 h-[80vh] w-[90vw] rounded-full blur-3xl
-                        bg-[radial-gradient(60%_60%_at_40%_40%,rgba(53,227,255,.28),transparent)]" />
-        <div className="absolute -top-12 right-0 h-[70vh] w-[80vw] rounded-full blur-3xl
-                        bg-[radial-gradient(60%_60%_at_60%_40%,rgba(124,77,255,.24),transparent)]" />
-        <div className="absolute bottom-[-15%] left-1/2 -translate-x-1/2 h-[60vh] w-[90vw] rounded-full blur-3xl
-                        bg-[radial-gradient(60%_60%_at_50%_50%,rgba(255,215,106,.22),transparent)]" />
+        <div className={`absolute -top-24 -left-24 h-[80vh] w-[90vw] rounded-full blur-3xl
+                        bg-[radial-gradient(60%_60%_at_40%_40%,rgba(53,227,255,.28),transparent)]
+                        ${!prefersReducedMotion ? 'animate-pulse' : ''}`} 
+                        style={{animationDuration: '8s'}} />
+        <div className={`absolute -top-12 right-0 h-[70vh] w-[80vw] rounded-full blur-3xl
+                        bg-[radial-gradient(60%_60%_at_60%_40%,rgba(124,77,255,.24),transparent)]
+                        ${!prefersReducedMotion ? 'animate-pulse' : ''}`}
+                        style={{animationDuration: '10s', animationDelay: '2s'}} />
+        <div className={`absolute bottom-[-15%] left-1/2 -translate-x-1/2 h-[60vh] w-[90vw] rounded-full blur-3xl
+                        bg-[radial-gradient(60%_60%_at_50%_50%,rgba(255,215,106,.22),transparent)]
+                        ${!prefersReducedMotion ? 'animate-pulse' : ''}`}
+                        style={{animationDuration: '12s', animationDelay: '4s'}} />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-6 pt-20 pb-12 md:pt-28">
@@ -29,14 +51,20 @@ export default function HeroAurora() {
             <a
               href="#create"
               className="rounded-xl bg-[#35E3FF] text-[#071022] font-semibold px-6 py-3
-                         hover:bg-[#29c7e1] transition-colors
-                         shadow-[0_8px_40px_rgba(53,227,255,.35)]"
+                         hover:bg-[#29c7e1] hover:scale-105 active:scale-95
+                         transition-all duration-200
+                         shadow-[0_8px_40px_rgba(53,227,255,.35)]
+                         hover:shadow-[0_12px_50px_rgba(53,227,255,.45)]"
+              aria-label="Start creating ads and reels"
             >
               Start Creating
             </a>
             <a
               href="#features"
-              className="rounded-xl border border-black/10 bg-black/5 px-6 py-3 text-black/80 hover:bg-black/[.07] transition-colors"
+              className="rounded-xl border border-black/10 bg-black/5 px-6 py-3 text-black/80 
+                         hover:bg-black/[.07] hover:border-black/20 hover:scale-105 active:scale-95
+                         transition-all duration-200"
+              aria-label="Explore AdGenXAI features"
             >
               Explore Features
             </a>
@@ -49,7 +77,9 @@ export default function HeroAurora() {
             src="/hero-aurora-studio@1792x1024.svg"
             alt="AdGenXAI studio with aurora backdrop and creator widgets"
             className="w-full rounded-2xl border border-black/10
-                       shadow-[0_10px_60px_rgba(124,77,255,.2)]"
+                       shadow-[0_10px_60px_rgba(124,77,255,.2)]
+                       hover:shadow-[0_15px_70px_rgba(124,77,255,.3)]
+                       transition-shadow duration-300"
             loading="eager"
           />
         </div>
@@ -59,10 +89,17 @@ export default function HeroAurora() {
           <span className="px-2 py-1 rounded-full border border-black/10 bg-white/60">Export</span>
           <div className="flex gap-2">
             {["TikTok","Instagram","YouTube","X"].map(name => (
-              <span key={name} className="rounded-xl border border-black/10 bg-white/70 px-3 py-1 hover:shadow
-                                          hover:shadow-[0_0_24px_rgba(124,77,255,.20)] transition-all">
+              <button
+                key={name} 
+                className="rounded-xl border border-black/10 bg-white/70 px-3 py-1 
+                           hover:shadow hover:shadow-[0_0_24px_rgba(124,77,255,.20)] 
+                           hover:scale-105 active:scale-95
+                           transition-all duration-200 cursor-pointer"
+                onClick={() => console.log(`Export to ${name}`)}
+                aria-label={`Export to ${name}`}
+              >
                 {name}
-              </span>
+              </button>
             ))}
           </div>
         </div>
