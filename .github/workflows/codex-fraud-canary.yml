@@ -1,0 +1,47 @@
+name: Codex Fraud Canary
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  schedule:
+    - cron: "0 3 * * *"
+
+jobs:
+  fraud_canary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install
+        run: npm ci
+      - name: Run Fraud Canary
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          FRAUD_API_KEY: ${{ secrets.FRAUD_API_KEY }}
+        run: |
+          node scripts/run-fraud-canary.js \
+            --supabase-url "$SUPABASE_URL" \
+            --supabase-key "$FRAUD_API_KEY" \
+            --pr "${{ github.event.number || '' }}" \
+            --fixtures "docs/codex/fixtures/fraud_canary/sample_campaigns.json"
+      - name: Generate Fraud Report
+        if: always()
+        run: |
+          node scripts/format-fraud-report.js --input fraud_summary.json --output reports/fraud-report.md
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fraud-report
+          path: reports/fraud-report.md
+      - name: Post PR Comment
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.number }}
+          body: |
+            $(cat reports/fraud-report.md)

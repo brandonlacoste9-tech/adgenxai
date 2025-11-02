@@ -1,0 +1,7 @@
+# Ownership for critical subsystems
+/src/lib/fraud-detection* @analytics-team
+/supabase/functions/fraud-detection* @analytics-team
+/src/lib/attribution* @data-team
+/supabase/functions/performance-prediction* @ml-team
+/src/components/AnalyticsDashboard* @frontend-team
+/docs/codex/* @brandonlacoste9-tech

@@ -1,0 +1,26 @@
+{
+  "campaigns": [
+    {
+      "id": "cmp-demo-001",
+      "name": "Demo Prospecting Burst",
+      "budget": 1250,
+      "geos": ["US", "CA"],
+      "channels": ["meta", "tiktok"],
+      "targeting": {
+        "interests": ["sustainability", "d2c"],
+        "age_range": [24, 45]
+      }
+    },
+    {
+      "id": "cmp-demo-002",
+      "name": "Retention Loyalty Push",
+      "budget": 800,
+      "geos": ["US"],
+      "channels": ["google_search"],
+      "targeting": {
+        "keywords": ["brand", "coupon"],
+        "audiences": ["purchasers_90d"]
+      }
+    }
+  ]
+}

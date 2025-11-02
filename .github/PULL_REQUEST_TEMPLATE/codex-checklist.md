@@ -1,0 +1,4 @@
+- [ ] Add `// codex:critical <path>` comments to files touching critical paths (if appropriate)
+- [ ] Added CODEOWNERS if new sensitive areas
+- [ ] Added tests (attribution/ML/fraud) or added canary in docs/codex/fixtures/
+- [ ] CI green: Codex Canary (fraud), Attribution QA, UI Snapshot (if frontend change)

@@ -1,0 +1,45 @@
+playbook: fraud_canary
+name: "Fraud Canary - Codex Playbook"
+description: >
+  Run deterministic fraud checks for a PR or nightly job. Calls
+  Supabase fraud API, runs internal engine, compares to baseline,
+  emits summary, and files PR comment or issue when thresholds exceed.
+version: 1
+triggers:
+  - type: pull_request
+    conditions:
+      - changed_files_match: ["src/**", "supabase/functions/fraud-detection*"]
+  - type: schedule
+    cron: "0 3 * * *"   # nightly 03:00 UTC
+inputs:
+  - FRAUD_API_KEY (secret)
+  - SUPABASE_URL (secret)
+  - PR_NUMBER (int)
+  - CAMPAIGN_FIXTURES:
+      default: "docs/codex/fixtures/fraud_canary/sample_campaigns.json"
+env:
+  - NODE_ENV: "ci"
+  - CODEx_REASONING_LEVEL: "medium"
+steps:
+  - name: checkout
+    run: actions/checkout
+  - name: install
+    run: |
+      npm ci
+  - name: run-fraud-canary
+    run: |
+      node scripts/run-fraud-canary.js \
+        --supabase-url "${SUPABASE_URL}" \
+        --supabase-key "${FRAUD_API_KEY}" \
+        --pr "${PR_NUMBER}" \
+        --fixtures "${CAMPAIGN_FIXTURES}"
+    capture: fraud_summary.json
+  - name: generate-report
+    run: |
+      node scripts/format-fraud-report.js --input fraud_summary.json --output reports/fraud-report.md
+  - name: publish-report
+    run: |
+      ./scripts/publish-pr-comment-or-issue.sh reports/fraud-report.md
+outputs:
+  - report_path: reports/fraud-report.md
+  - severity: "low|medium|high|critical"
