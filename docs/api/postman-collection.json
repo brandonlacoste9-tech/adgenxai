@@ -1,0 +1,222 @@
+{
+  "info": {
+    "name": "AdGenXAI API",
+    "description": "Collection for testing AdGenXAI API endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://adgenxai.netlify.app/api",
+      "type": "string"
+    },
+    {
+      "key": "localUrl",
+      "value": "http://localhost:8888/api",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health & Status",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Check the health status of the AI Sensory Cortex"
+          },
+          "response": []
+        },
+        {
+          "name": "API Status Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["status"]
+            },
+            "description": "Get detailed status of all API services and platform integrations"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Content Publishing",
+      "item": [
+        {
+          "name": "Post to Instagram",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"imageUrl\": \"https://example.com/image.jpg\",\n  \"caption\": \"Check out this amazing AI-generated ad! #AdGenXAI\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/post-to-instagram",
+              "host": ["{{baseUrl}}"],
+              "path": ["post-to-instagram"]
+            },
+            "description": "Publish an image with caption to Instagram"
+          },
+          "response": []
+        },
+        {
+          "name": "Post to TikTok",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"videoUrl\": \"https://example.com/video.mp4\",\n  \"title\": \"Amazing AI-Generated Content\",\n  \"description\": \"Created with AdGenXAI\",\n  \"privacyLevel\": \"PUBLIC_TO_EVERYONE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/post-to-tiktok",
+              "host": ["{{baseUrl}}"],
+              "path": ["post-to-tiktok"]
+            },
+            "description": "Publish a video to TikTok"
+          },
+          "response": []
+        },
+        {
+          "name": "Post to YouTube",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"videoUrl\": \"https://example.com/video.mp4\",\n  \"title\": \"AI-Generated Ad Campaign\",\n  \"description\": \"Powered by AdGenXAI\",\n  \"privacyStatus\": \"public\",\n  \"tags\": [\"ai\", \"advertising\", \"automation\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/post-to-youtube",
+              "host": ["{{baseUrl}}"],
+              "path": ["post-to-youtube"]
+            },
+            "description": "Publish a video to YouTube"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Webhooks",
+      "item": [
+        {
+          "name": "Process Webhook Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"legendary_ad_generation\",\n  \"payload\": {\n    \"prompt\": \"Create a stunning product ad\",\n    \"style\": \"modern\"\n  },\n  \"hero_variant\": \"aurora\",\n  \"timestamp\": \"2024-11-02T00:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook"]
+            },
+            "description": "Process a webhook event through the AI Sensory Cortex"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Error Examples",
+      "item": [
+        {
+          "name": "Validation Error - Missing Fields",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"imageUrl\": \"https://example.com/image.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/post-to-instagram",
+              "host": ["{{baseUrl}}"],
+              "path": ["post-to-instagram"]
+            },
+            "description": "Example of validation error when required fields are missing"
+          },
+          "response": []
+        },
+        {
+          "name": "Validation Error - Invalid URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"imageUrl\": \"not-a-valid-url\",\n  \"caption\": \"Test caption\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/post-to-instagram",
+              "host": ["{{baseUrl}}"],
+              "path": ["post-to-instagram"]
+            },
+            "description": "Example of validation error when URL is invalid"
+          },
+          "response": []
+        },
+        {
+          "name": "Method Not Allowed",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/post-to-instagram",
+              "host": ["{{baseUrl}}"],
+              "path": ["post-to-instagram"]
+            },
+            "description": "Example of method not allowed error"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
