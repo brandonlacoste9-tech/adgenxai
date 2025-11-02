@@ -1,5 +1,7 @@
-// netlify/functions/webhook.ts - Main webhook routing to your AI Sensory Cortex on Netlify
+// netlify/functions/webhook.ts - Main webhook routing with comprehensive monitoring
 import { Handler } from '@netlify/functions';
+import { withMonitoring, trackColdStart, trackExternalAPI } from '../../lib/monitoring/netlify-functions';
+import { trackBusinessMetric } from '../../lib/monitoring/analytics';
 
 interface RequestData {
   type?: string;
@@ -18,7 +20,9 @@ interface CortexResponse {
   [key: string]: any;
 }
 
-export const handler: Handler = async (event, context) => {
+const webhookHandler: Handler = async (event, context) => {
+  trackColdStart('webhook');
+  
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -43,6 +47,9 @@ export const handler: Handler = async (event, context) => {
     const { type, payload = {}, hero_variant, timestamp } = requestData;
     const processingId = `adgenxai_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
+    // Track webhook request
+    trackBusinessMetric('webhook_request', 1, { type, processingId });
+
     // Route to your AI Sensory Cortex (also on Netlify)
     const cortexUrl = process.env.NEXT_PUBLIC_SENSORY_CORTEX_URL || process.env.SENSORY_CORTEX_URL;
     let cortexResponse: CortexResponse = {
@@ -59,29 +66,41 @@ export const handler: Handler = async (event, context) => {
                         type === 'enterprise_demo_request' ? '/api/enterprise-demo' :
                         '/api/process-generation';
 
-        const response = await fetch(`${cortexUrl}${endpoint}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-AdGenXAI-Platform': 'netlify-web',
-            'X-Processing-ID': processingId
-          },
-          body: JSON.stringify({
-            processing_id: processingId,
-            type,
-            hero_variant,
-            timestamp,
-            ...payload
-          })
-        });
+        const cortexData = await trackExternalAPI(
+          'sensory-cortex',
+          `${cortexUrl}${endpoint}`,
+          async () => {
+            const response = await fetch(`${cortexUrl}${endpoint}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-AdGenXAI-Platform': 'netlify-web',
+                'X-Processing-ID': processingId
+              },
+              body: JSON.stringify({
+                processing_id: processingId,
+                type,
+                hero_variant,
+                timestamp,
+                ...payload
+              })
+            });
 
-        if (response.ok) {
-          const cortexData = (await response.json()) as CortexResponse;
-          cortexResponse = { ...cortexResponse, ...cortexData };
-          console.log('🧠 AI Sensory Cortex Response:', cortexData);
-        }
+            if (response.ok) {
+              return await response.json();
+            }
+            throw new Error(`Cortex responded with status ${response.status}`);
+          }
+        );
+
+        cortexResponse = { ...cortexResponse, ...cortexData };
+        console.log('🧠 AI Sensory Cortex Response:', cortexData);
+        
+        // Track successful processing
+        trackBusinessMetric('cortex_success', 1, { type, processingId });
       } catch (error) {
         console.log('🔥 AI Sensory Cortex operating independently:', error);
+        trackBusinessMetric('cortex_fallback', 1, { type, processingId });
       }
     }
 
@@ -99,6 +118,10 @@ export const handler: Handler = async (event, context) => {
 
   } catch (error) {
     console.error('Webhook error:', error);
+    
+    // Track error
+    trackBusinessMetric('webhook_error', 1);
+    
     return {
       statusCode: 500,
       headers,
@@ -110,3 +133,5 @@ export const handler: Handler = async (event, context) => {
     };
   }
 };
+
+export const handler = withMonitoring(webhookHandler, 'webhook');

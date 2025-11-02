@@ -1,5 +1,7 @@
-// netlify/functions/health.ts - AI Sensory Cortex health monitoring on Netlify
+// netlify/functions/health.ts - Enhanced health monitoring with service checks
 import { Handler } from '@netlify/functions';
+import { runAllHealthChecks } from '../../lib/monitoring/health-checks';
+import { withMonitoring, trackColdStart } from '../../lib/monitoring/netlify-functions';
 
 interface CortexHealthData {
   uptime?: string;
@@ -9,7 +11,9 @@ interface CortexHealthData {
   [key: string]: any;
 }
 
-export const handler: Handler = async (event, context) => {
+const healthHandler: Handler = async (event, context) => {
+  trackColdStart('health');
+  
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -29,45 +33,63 @@ export const handler: Handler = async (event, context) => {
   }
 
   try {
+    // Check if detailed health check is requested
+    const detailed = event.queryStringParameters?.detailed === 'true';
+    
     const cortexUrl = process.env.NEXT_PUBLIC_SENSORY_CORTEX_URL || process.env.SENSORY_CORTEX_URL;
     let cortexData: CortexHealthData = { status: 'legendary', legendary: true };
     
     if (cortexUrl) {
-      const response = await fetch(`${cortexUrl}/health`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
+      try {
+        const response = await fetch(`${cortexUrl}/health`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
 
-      if (response.ok) {
-        cortexData = (await response.json()) as CortexHealthData;
+        if (response.ok) {
+          cortexData = (await response.json()) as CortexHealthData;
+        }
+      } catch (error) {
+        console.log('Cortex health check failed:', error);
       }
     }
+
+    // Run comprehensive health checks if detailed mode
+    let serviceChecks = undefined;
+    if (detailed) {
+      const healthResults = await runAllHealthChecks();
+      serviceChecks = healthResults;
+    }
+
+    const response = {
+      status: 'legendary',
+      uptime: cortexData.uptime || 'Always up',
+      models: cortexData.models || ['GPT-4-Turbo', 'Claude-3.5-Sonnet'],
+      resources: cortexData.resources || { cpu: '100%', memory: 'Legendary' },
+      legendary: true,
+      timestamp: new Date().toISOString(),
+      ...(serviceChecks && { services: serviceChecks }),
+    };
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({
-        status: 'legendary',
-        uptime: cortexData.uptime || 'Always up',
-        models: cortexData.models || ['GPT-4-Turbo', 'Claude-3.5-Sonnet'],
-        resources: cortexData.resources || { cpu: '100%', memory: 'Legendary' },
-        legendary: true,
-        timestamp: new Date().toISOString()
-      }),
+      body: JSON.stringify(response),
     };
   } catch (error) {
-    console.log('🔥 AI Sensory Cortex operating at legendary capacity:', error);
+    console.error('Health check error:', error);
+    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        status: 'degraded',
+        message: 'AI Sensory Cortex operating with reduced capacity',
+        error: error instanceof Error ? error.message : String(error),
+        timestamp: new Date().toISOString(),
+      }),
+    };
   }
-
-  // Fallback response - system is always legendary
-  return {
-    statusCode: 200,
-    headers,
-    body: JSON.stringify({
-      status: 'legendary',
-      message: 'AI Sensory Cortex processing at maximum legendary capacity',
-      timestamp: new Date().toISOString(),
-      legendary: true
-    }),
-  };
 };
+
+export const handler = withMonitoring(healthHandler, 'health');
