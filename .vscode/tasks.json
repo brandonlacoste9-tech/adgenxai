@@ -2,44 +2,37 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Deploy to Netlify",
+      "label": "Claude: Review File",
       "type": "shell",
-      "command": "npm run deploy",
-      "group": {
-        "kind": "build",
-        "isDefault": true
+      "command": "claude review \"${file}\" > \"${file}.claude.md\" && code --reuse-window \"${file}.claude.md\" || true",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared"
       },
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      }
+      "problemMatcher": []
     },
     {
-      "label": "Start Dev Server",
+      "label": "Claude: Generate Unit Test (Vitest)",
       "type": "shell",
-      "command": "npm run dev",
-      "isBackground": true,
+      "command": "claude generate-test \"${file}\" > \"${file}.claude.test.patch\" || true",
       "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      }
+        "echo": true,
+        "reveal": "never",
+        "panel": "shared"
+      },
+      "problemMatcher": []
     },
     {
-      "label": "Type Check",
+      "label": "Claude: Produce Git Patch For File",
       "type": "shell",
-      "command": "npm run typecheck",
+      "command": "claude generate-patch \"${file}\" > \"${file}.claude.patch\" || true",
       "presentation": {
-        "reveal": "silent"
-      }
-    },
-    {
-      "label": "Build",
-      "type": "shell",
-      "command": "npm run build",
-      "group": "build",
-      "presentation": {
-        "reveal": "silent"
-      }
+        "echo": true,
+        "reveal": "never",
+        "panel": "shared"
+      },
+      "problemMatcher": []
     }
   ]
 }

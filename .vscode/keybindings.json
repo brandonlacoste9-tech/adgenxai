@@ -1,0 +1,17 @@
+[
+  {
+    "key": "ctrl+alt+c",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Claude: Review File"
+  },
+  {
+    "key": "ctrl+alt+t",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Claude: Generate Unit Test (Vitest)"
+  },
+  {
+    "key": "ctrl+alt+p",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Claude: Produce Git Patch For File"
+  }
+]
