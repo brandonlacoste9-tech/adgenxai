@@ -15,12 +15,16 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Test function
+# Note: test_command is expected to be a trusted shell command string only.
+# This function is designed for internal validation scripts and should not
+# be exposed to user input.
 test_check() {
     local test_name=$1
     local test_command=$2
     
     echo -n "  Testing: $test_name... "
     
+    # Execute trusted command - only use with predefined test commands
     if eval "$test_command" > /dev/null 2>&1; then
         echo -e "${GREEN}✓ PASS${NC}"
         ((PASS_COUNT++))

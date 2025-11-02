@@ -269,9 +269,9 @@ npm run deploy
 
 ## 📞 Support & Contacts
 
-**Technical Lead:** Brandon LaCoste  
-**Repository:** brandonlacoste9-tech/adgenxai  
+**Project Repository:** [Your Organization]/adgenxai  
 **Branch:** copilot/implement-cost-optimization-strategy  
+**Documentation:** See docs/ directory for complete guides
 
 ### Resources
 - [Cost Optimization Strategy](./COST_OPTIMIZATION_STRATEGY.md)

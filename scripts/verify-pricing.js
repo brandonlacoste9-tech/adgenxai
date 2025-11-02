@@ -1,4 +1,15 @@
-// Quick verification script for pricing optimization
+/**
+ * Pricing Optimization Verification Script
+ * 
+ * This script validates that the cost optimization pricing changes
+ * have been correctly applied to the Pricing component.
+ * 
+ * It checks for:
+ * - New optimized prices ($19 Creator, $49 Studio)
+ * - Removal of old prices ($29 Creator, $99 Studio)
+ * - Maintenance of Starter tier pricing ($9)
+ */
+
 const fs = require('fs');
 const path = require('path');
 
