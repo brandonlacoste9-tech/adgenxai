@@ -1,12 +1,18 @@
 // netlify/functions/post-to-tiktok.ts
-// Netlify function to publish videos to TikTok (stub - requires implementation)
+// Netlify function to publish videos to TikTok
 
 import { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
-import { publishVideo } from "../../lib/platforms/tiktok";
+import { publishVideo, TikTokVideoMetadata } from "../../lib/platforms/tiktok";
 
 interface PostRequest {
   videoUrl: string;
   title: string;
+  description?: string;
+  privacy_level?: "PUBLIC_TO_EVERYONE" | "MUTUAL_FOLLOW_FRIENDS" | "FOLLOWER_OF_CREATOR" | "SELF_ONLY";
+  disable_duet?: boolean;
+  disable_comment?: boolean;
+  disable_stitch?: boolean;
+  video_cover_timestamp_ms?: number;
 }
 
 export const handler: Handler = async (
@@ -24,7 +30,16 @@ export const handler: Handler = async (
   try {
     // Parse request body
     const body: PostRequest = JSON.parse(event.body || "{}");
-    const { videoUrl, title } = body;
+    const {
+      videoUrl,
+      title,
+      description,
+      privacy_level,
+      disable_duet,
+      disable_comment,
+      disable_stitch,
+      video_cover_timestamp_ms,
+    } = body;
 
     // Validate inputs
     if (!videoUrl || !title) {
@@ -51,12 +66,22 @@ export const handler: Handler = async (
       };
     }
 
-    // Note: TikTok publishing is not yet implemented
-    // This will throw an error from the platform module
+    // Build metadata object
+    const metadata: Partial<TikTokVideoMetadata> = {
+      description,
+      privacy_level,
+      disable_duet,
+      disable_comment,
+      disable_stitch,
+      video_cover_timestamp_ms,
+    };
+
+    // Publish to TikTok
     const result = await publishVideo(
       { clientKey, clientSecret, accessToken, openId },
       videoUrl,
-      title
+      title,
+      metadata
     );
 
     return {
@@ -66,22 +91,13 @@ export const handler: Handler = async (
         success: true,
         platform: "tiktok",
         shareId: result.shareId,
+        publishId: result.publishId,
+        videoUrl: `https://www.tiktok.com/@user/video/${result.shareId}`,
         message: "Successfully published to TikTok",
       }),
     };
   } catch (error: any) {
     console.error("TikTok posting error:", error);
-
-    // Check if it's the "not implemented" error
-    if (error.message.includes("not implemented")) {
-      return {
-        statusCode: 501,
-        body: JSON.stringify({
-          error: "TikTok publishing not yet implemented",
-          details: "The TikTok Content Posting API integration needs to be completed. See lib/platforms/tiktok.ts",
-        }),
-      };
-    }
 
     return {
       statusCode: 500,

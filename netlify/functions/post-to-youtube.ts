@@ -2,7 +2,7 @@
 // Netlify function to upload videos to YouTube
 
 import { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
-import { publishVideo } from "../../lib/platforms/youtube";
+import { publishVideo, YouTubeVideoMetadata } from "../../lib/platforms/youtube";
 
 interface PostRequest {
   videoBase64: string; // Base64 encoded video file
@@ -10,6 +10,8 @@ interface PostRequest {
   description?: string;
   tags?: string[];
   privacyStatus?: "public" | "private" | "unlisted";
+  categoryId?: string;
+  thumbnailBase64?: string; // Base64 encoded thumbnail image
 }
 
 export const handler: Handler = async (
@@ -27,7 +29,15 @@ export const handler: Handler = async (
   try {
     // Parse request body
     const body: PostRequest = JSON.parse(event.body || "{}");
-    const { videoBase64, title, description, tags, privacyStatus } = body;
+    const {
+      videoBase64,
+      title,
+      description,
+      tags,
+      privacyStatus,
+      categoryId,
+      thumbnailBase64,
+    } = body;
 
     // Validate inputs
     if (!videoBase64 || !title) {
@@ -56,16 +66,21 @@ export const handler: Handler = async (
     // Convert base64 to Buffer
     const videoBuffer = Buffer.from(videoBase64, "base64");
 
+    // Build metadata object
+    const metadata: YouTubeVideoMetadata = {
+      title,
+      description: description || "",
+      tags: tags || [],
+      privacyStatus: privacyStatus || "public",
+      categoryId,
+      thumbnailBase64,
+    };
+
     // Publish to YouTube
     const result = await publishVideo(
       { clientId, clientSecret, refreshToken },
       videoBuffer,
-      {
-        title,
-        description: description || "",
-        tags: tags || [],
-        privacyStatus: privacyStatus || "public",
-      }
+      metadata
     );
 
     return {

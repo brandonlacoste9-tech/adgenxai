@@ -2,11 +2,12 @@
 // Netlify function to publish images to Instagram
 
 import { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
-import { publishImage } from "../../lib/platforms/instagram";
+import { publishImage, publishStory } from "../../lib/platforms/instagram";
 
 interface PostRequest {
   imageUrl: string;
-  caption: string;
+  caption?: string;
+  mediaType?: "post" | "story";
 }
 
 export const handler: Handler = async (
@@ -24,14 +25,23 @@ export const handler: Handler = async (
   try {
     // Parse request body
     const body: PostRequest = JSON.parse(event.body || "{}");
-    const { imageUrl, caption } = body;
+    const { imageUrl, caption, mediaType = "post" } = body;
 
     // Validate inputs
-    if (!imageUrl || !caption) {
+    if (!imageUrl) {
       return {
         statusCode: 400,
         body: JSON.stringify({
-          error: "Missing required fields: imageUrl and caption",
+          error: "Missing required field: imageUrl",
+        }),
+      };
+    }
+
+    if (mediaType === "post" && !caption) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          error: "caption is required for post media type",
         }),
       };
     }
@@ -49,12 +59,10 @@ export const handler: Handler = async (
       };
     }
 
-    // Publish to Instagram
-    const result = await publishImage(
-      { accountId, accessToken },
-      imageUrl,
-      caption
-    );
+    // Publish to Instagram based on media type
+    const result = mediaType === "story"
+      ? await publishStory({ accountId, accessToken }, imageUrl)
+      : await publishImage({ accountId, accessToken }, imageUrl, caption!);
 
     return {
       statusCode: 200,
@@ -62,9 +70,10 @@ export const handler: Handler = async (
       body: JSON.stringify({
         success: true,
         platform: "instagram",
+        mediaType,
         containerId: result.containerId,
         publishedId: result.publishedId,
-        message: "Successfully published to Instagram",
+        message: `Successfully published ${mediaType} to Instagram`,
       }),
     };
   } catch (error: any) {
