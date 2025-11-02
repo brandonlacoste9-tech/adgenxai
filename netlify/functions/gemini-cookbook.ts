@@ -140,12 +140,18 @@ export const handler: Handler = async (event, context) => {
     }
   } catch (error) {
     console.error('Gemini Cookbook API Error:', error);
+    const errorMessage = error instanceof Error 
+      ? error.message 
+      : (typeof error === 'object' && error !== null && 'toString' in error)
+        ? error.toString()
+        : 'Unknown error';
+    
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: errorMessage
       })
     };
   }
