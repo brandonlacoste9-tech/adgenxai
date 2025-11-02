@@ -10,7 +10,11 @@
     "deploy": "netlify deploy --prod",
     "test": "vitest run --reporter=dot",
     "test:watch": "vitest",
-    "test:ci": "vitest run --coverage --reporter=dot"
+    "test:ci": "vitest run --coverage --reporter=dot",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "next": "^14.2.0",
@@ -40,7 +44,10 @@
     "@testing-library/user-event": "^14.5.2",
     "@vitest/coverage-v8": "^2.1.4",
     "jsdom": "^24.1.0",
-    "vitest": "^2.1.4"
+    "vitest": "^2.1.4",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0",
+    "prettier": "^3.2.0"
   },
   "keywords": ["ai", "advertising", "webhook", "mcp", "sensory-cortex"],
   "author": "brandonlacoste9-tech",

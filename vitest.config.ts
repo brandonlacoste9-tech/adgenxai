@@ -11,7 +11,7 @@ export default defineConfig({
     exclude: ["e2e/**", "node_modules/**"],
     coverage: {
       provider: "v8",
-      reporter: ["text", "lcov", "html"],
+      reporter: ["text", "lcov", "html", "json-summary"],
       reportsDirectory: "./coverage",
       include: ["app/**/*.{ts,tsx}"],
       exclude: [
@@ -20,6 +20,12 @@ export default defineConfig({
         "app/layout.tsx",
         "app/page.tsx",
       ],
+      thresholds: {
+        lines: 60,
+        functions: 60,
+        branches: 60,
+        statements: 60,
+      },
     },
   },
   esbuild: {

@@ -1,0 +1,22 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+.next
+out
+dist
+build
+coverage
+
+# Misc
+.DS_Store
+*.pem
+.env*.local
+.vercel
+*.log
+
+# Config
+package-lock.json
+tsconfig.tsbuildinfo
