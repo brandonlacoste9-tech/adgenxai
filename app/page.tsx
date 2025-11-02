@@ -35,7 +35,7 @@ export default function Page() {
 
   return (
     <main>
-      <TopBar onOpenPalette={() => setOpen(true)} />
+      <TopBar onOpenPalette={() => setOpen(true)} paletteOpen={open} />
       <div className="max-w-7xl mx-auto px-4 md:px-6 pt-4 flex justify-end">
         <ShareButton />
       </div>
