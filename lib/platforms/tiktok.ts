@@ -103,7 +103,10 @@ export async function publishVideo(
   const retryDelay = 2000; // 2 seconds
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
-    await new Promise((resolve) => setTimeout(resolve, retryDelay));
+    // Wait before checking status (except first attempt)
+    if (attempt > 0) {
+      await new Promise((resolve) => setTimeout(resolve, retryDelay));
+    }
 
     const statusResponse = await fetch(
       `https://open.tiktokapis.com/v2/post/publish/status/fetch/`,

@@ -28,7 +28,9 @@ const headers = {
   "Content-Type": "application/json",
 };
 
-// In-memory campaign store (use database in production)
+// In-memory campaign store
+// NOTE: Use database (e.g., Supabase) in production as this Map
+// will not persist across serverless function instances
 const campaigns = new Map<string, CampaignData>();
 
 /**
@@ -62,7 +64,7 @@ function verifyWebhookSignature(
  * Handle publish webhook - trigger immediate publishing
  */
 async function handlePublish(data: any): Promise<any> {
-  const campaignId = `campaign-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const campaignId = `campaign-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 
   // Create campaign record
   const campaign: CampaignData = {
@@ -125,7 +127,7 @@ async function handlePublish(data: any): Promise<any> {
  * Handle schedule webhook - schedule content for future publishing
  */
 async function handleSchedule(data: any): Promise<any> {
-  const campaignId = `campaign-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const campaignId = `campaign-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 
   const campaign: CampaignData = {
     id: campaignId,

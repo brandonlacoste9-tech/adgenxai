@@ -91,7 +91,8 @@ function buildPlatformConfig(platforms: PlatformType[]): PlatformConfig {
 
 /**
  * Rate limiting check (simple in-memory implementation)
- * In production, use Redis or similar distributed store
+ * NOTE: In production, use Redis or similar distributed store
+ * as this Map will not persist across serverless function instances
  */
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
@@ -166,7 +167,7 @@ export const handler: Handler = async (event) => {
     }
 
     // Generate campaign ID if not provided
-    const campaignId = campaign_id || `bee-ship-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const campaignId = campaign_id || `bee-ship-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 
     // Check if scheduled for future
     if (scheduleAt) {
