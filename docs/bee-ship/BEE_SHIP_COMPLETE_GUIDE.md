@@ -21,7 +21,7 @@ That's it! The script will:
 
 ### 1. Platform Modules (`lib/platforms/`)
 - **instagram.ts** - Instagram Graph API publishing (ready to use)
-- **tiktok.ts** - TikTok stub (needs implementation)
+- **tiktok.ts** - TikTok Content Posting API integration
 - **youtube.ts** - YouTube stub (needs googleapis setup)
 
 ### 2. Netlify Function (`netlify/functions/bee-ship.ts`)

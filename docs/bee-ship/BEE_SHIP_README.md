@@ -83,7 +83,7 @@ curl -X POST https://your-site.netlify.app/.netlify/functions/bee-ship \
 |------|---------|
 | `netlify/functions/bee-ship.ts` | Main serverless handler |
 | `lib/platforms/instagram.ts` | Instagram Graph API helpers |
-| `lib/platforms/tiktok.ts` | TikTok API stub (fill with your flow) |
+| `lib/platforms/tiktok.ts` | TikTok Content Posting API integration |
 | `lib/platforms/youtube.ts` | YouTube API stub (use googleapis) |
 | `lib/renderer.ts` | Optional external renderer client |
 | `scripts/ship-swarm.sh` | Bash bulk deploy script |
@@ -114,8 +114,8 @@ curl -X POST https://your-site.netlify.app/.netlify/functions/bee-ship \
 
 1. Apply for **TikTok Developer** access: https://developers.tiktok.com
 2. Create an app and enable **Content Posting API**
-3. Get authorization code via OAuth flow
-4. Exchange for access token (see `lib/platforms/tiktok.ts`)
+3. Complete the OAuth flow to capture the **user access token** and `open_id`
+4. Store `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET`, `TIKTOK_ACCESS_TOKEN`, and `TIKTOK_OPEN_ID` in Netlify
 
 ### YouTube
 
@@ -211,7 +211,7 @@ netlify functions:tail bee-ship
 
 1. ✅ Wire feedback loop: track impressions/CTR → feed to Bee agents
 2. ✅ Add scheduling: use Netlify Scheduled Functions or external cron
-3. ✅ Implement TikTok/YouTube flows (fill stubs in `lib/platforms/`)
+3. ✅ Monitor TikTok/YouTube flows (both integrations ship in `lib/platforms/`)
 4. ✅ Add approval UI: create dashboard for review before publish
 5. ✅ Scale: deploy renderer microservice (puppeteer + ffmpeg) on Fly.io/Railway
 

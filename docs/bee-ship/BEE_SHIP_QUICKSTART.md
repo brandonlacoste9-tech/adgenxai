@@ -12,7 +12,7 @@ Your BEE-SHIP platform includes:
 
 - ✅ **Instagram** - Post images with captions
 - ✅ **YouTube** - Upload videos with metadata
-- ⚠️ **TikTok** - Coming soon (stub implemented)
+- ✅ **TikTok** - Publish videos via Content Posting API
 
 ---
 
@@ -33,6 +33,14 @@ INSTAGRAM_ACCESS_TOKEN=your_access_token
 YOUTUBE_CLIENT_ID=your_client_id
 YOUTUBE_CLIENT_SECRET=your_client_secret
 YOUTUBE_REFRESH_TOKEN=your_refresh_token
+```
+
+**Optional for TikTok (enable video publishing):**
+```
+TIKTOK_CLIENT_KEY=your_tiktok_client_key
+TIKTOK_CLIENT_SECRET=your_tiktok_client_secret
+TIKTOK_ACCESS_TOKEN=your_tiktok_user_access_token
+TIKTOK_OPEN_ID=your_tiktok_open_id
 ```
 
 ### Step 2: Wait for Deployment
@@ -87,7 +95,7 @@ All functions are available at: `https://adgenxai.pro/.netlify/functions/`
 |----------|--------|---------|
 | `/post-to-instagram` | POST | Publish image to Instagram |
 | `/post-to-youtube` | POST | Upload video to YouTube |
-| `/post-to-tiktok` | POST | Publish to TikTok (not implemented) |
+| `/post-to-tiktok` | POST | Publish video to TikTok |
 
 ---
 
@@ -157,12 +165,17 @@ const result = await fetch('/.netlify/functions/post-to-youtube', {
 - [YouTube Data API Docs](https://developers.google.com/youtube/v3)
 - [OAuth Playground](https://developers.google.com/oauthplayground/)
 
-### TikTok (Coming Soon)
+### TikTok (Content Posting API)
 
 1. Go to [developers.tiktok.com](https://developers.tiktok.com)
-2. Create an app
-3. Enable "Content Posting API"
-4. Get OAuth credentials
+2. Create an app and request access to the **Content Posting API**
+3. Complete the OAuth flow to obtain a **user access token** and `open_id`
+4. Store the following variables in Netlify:
+   - `TIKTOK_CLIENT_KEY`
+   - `TIKTOK_CLIENT_SECRET`
+   - `TIKTOK_ACCESS_TOKEN`
+   - `TIKTOK_OPEN_ID`
+5. Ensure your videos are hosted on HTTPS URLs reachable by TikTok's fetcher
 
 ---
 
@@ -203,7 +216,7 @@ See [BEE_SHIP_LOCAL_TESTING.md](BEE_SHIP_LOCAL_TESTING.md) for details.
 |---------|--------|-------|
 | Instagram Posting | ✅ Ready | Requires credentials |
 | YouTube Upload | ✅ Ready | Requires credentials |
-| TikTok Posting | ⚠️ Stub | Needs implementation |
+| TikTok Posting | ✅ Ready | Requires Content Posting API access |
 | Demo Page | ✅ Ready | At `/examples/social-posting-demo.html` |
 | API Docs | ✅ Complete | See BEE_SHIP_API_DOCS.md |
 | Local Testing | ✅ Complete | See BEE_SHIP_LOCAL_TESTING.md |

@@ -19,7 +19,7 @@ BEE-SHIP provides serverless functions for publishing content to social media pl
 
 - **Instagram**: Post images with captions
 - **YouTube**: Upload videos with metadata
-- **TikTok**: Post videos (coming soon)
+- **TikTok**: Post videos
 
 All functions are deployed as Netlify serverless functions accessible at:
 ```
@@ -67,7 +67,7 @@ YOUTUBE_REFRESH_TOKEN=your_oauth_refresh_token
 3. Create OAuth 2.0 credentials
 4. Use OAuth Playground to get refresh token with `https://www.googleapis.com/auth/youtube.upload` scope
 
-#### TikTok (Optional - not yet implemented)
+#### TikTok
 ```env
 TIKTOK_CLIENT_KEY=your_tiktok_client_key
 TIKTOK_CLIENT_SECRET=your_tiktok_client_secret
@@ -176,14 +176,12 @@ POST /.netlify/functions/post-to-youtube
 
 ### 3. POST /post-to-tiktok
 
-Publish a video to TikTok.
+Publish a video to TikTok using the TikTok Content Posting API.
 
 **Endpoint:**
 ```
 POST /.netlify/functions/post-to-tiktok
 ```
-
-**Status:** ⚠️ Not yet implemented
 
 **Request Body:**
 ```json
@@ -193,13 +191,32 @@ POST /.netlify/functions/post-to-tiktok
 }
 ```
 
-**Response (501):**
+**Requirements:**
+- `videoUrl`: Public HTTPS URL to an MP4 file (TikTok fetches the video by URL)
+- `title`: Caption text (150 characters max; emojis supported)
+- Environment variables: `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET`, `TIKTOK_ACCESS_TOKEN`, `TIKTOK_OPEN_ID`
+
+**Response (Success - 200):**
 ```json
 {
-  "error": "TikTok publishing not yet implemented",
-  "details": "The TikTok Content Posting API integration needs to be completed"
+  "success": true,
+  "platform": "tiktok",
+  "shareId": "7323456789012345678",
+  "message": "Successfully published to TikTok"
 }
 ```
+
+**Response (Error - 400/500):**
+```json
+{
+  "error": "Failed to post to TikTok",
+  "details": "TikTok reported a failure while publishing"
+}
+```
+
+**Notes:**
+- The function polls TikTok's status endpoint for up to ~20 seconds until publishing completes.
+- TikTok may continue processing the video after the function resolves; allow additional time before it appears in the feed.
 
 ---
 
@@ -368,7 +385,7 @@ export const handler = async () => ({
   body: JSON.stringify({
     instagram: !!process.env.INSTAGRAM_ACCESS_TOKEN,
     youtube: !!process.env.YOUTUBE_CLIENT_ID,
-    tiktok: !!process.env.TIKTOK_CLIENT_KEY,
+    tiktok: !!process.env.TIKTOK_CLIENT_KEY && !!process.env.TIKTOK_OPEN_ID,
   })
 });
 ```
@@ -397,7 +414,8 @@ Check Netlify function logs for detailed error messages:
 - 1 video upload = 1,600 units
 
 ### TikTok
-- TBD (not yet implemented)
+- Rate limits vary by developer account and approval tier
+- Monitor TikTok's developer dashboard for your quota and backoff requirements
 
 ---
 

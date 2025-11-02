@@ -99,7 +99,7 @@ curl -X POST http://localhost:8888/.netlify/functions/post-to-youtube \
   }"
 ```
 
-**Test TikTok (will return not implemented):**
+**Test TikTok (requires valid credentials):**
 ```bash
 curl -X POST http://localhost:8888/.netlify/functions/post-to-tiktok \
   -H "Content-Type: application/json" \
@@ -107,6 +107,8 @@ curl -X POST http://localhost:8888/.netlify/functions/post-to-tiktok \
     "videoUrl": "https://example.com/video.mp4",
     "title": "Test TikTok Post"
   }'
+
+# Returns 200 with shareId when TikTok credentials are configured
 ```
 
 ### Option 4: Using Postman

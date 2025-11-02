@@ -199,8 +199,8 @@ Beehive/
 ├── lib/
 │   └── platforms/
 │       ├── instagram.ts         ✅ Instagram publishing
-│       ├── tiktok.ts           🔨 TikTok stub
-│       └── youtube.ts          🔨 YouTube stub
+│       ├── tiktok.ts           ✅ TikTok publishing
+│       └── youtube.ts          ✅ YouTube publishing
 │
 ├── netlify/
 │   └── functions/
@@ -226,8 +226,8 @@ Beehive/
 | Platform  | Status     | Implementation | Notes |
 |-----------|------------|----------------|-------|
 | Instagram | ✅ Ready   | Complete       | Uses Graph API v17.0 |
-| TikTok    | 🔨 Stub    | Partial        | Needs dev account + impl |
-| YouTube   | 🔨 Stub    | Partial        | Needs googleapis setup |
+| TikTok    | ✅ Ready   | Complete       | Requires Content Posting API credentials |
+| YouTube   | ✅ Ready   | Complete       | Uses googleapis upload flow |
 
 ---
 

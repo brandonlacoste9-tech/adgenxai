@@ -1,5 +1,5 @@
 // netlify/functions/post-to-tiktok.ts
-// Netlify function to publish videos to TikTok (stub - requires implementation)
+// Netlify function to publish videos to TikTok via the Content Posting API
 
 import { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import { publishVideo } from "../../lib/platforms/tiktok";
@@ -42,17 +42,15 @@ export const handler: Handler = async (
     const accessToken = process.env.TIKTOK_ACCESS_TOKEN;
     const openId = process.env.TIKTOK_OPEN_ID;
 
-    if (!clientKey || !clientSecret || !accessToken) {
+    if (!clientKey || !clientSecret || !accessToken || !openId) {
       return {
         statusCode: 500,
         body: JSON.stringify({
-          error: "TikTok credentials not configured. Set TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET, and TIKTOK_ACCESS_TOKEN environment variables.",
+          error: "TikTok credentials not configured. Set TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET, TIKTOK_ACCESS_TOKEN, and TIKTOK_OPEN_ID environment variables.",
         }),
       };
     }
 
-    // Note: TikTok publishing is not yet implemented
-    // This will throw an error from the platform module
     const result = await publishVideo(
       { clientKey, clientSecret, accessToken, openId },
       videoUrl,
@@ -71,18 +69,6 @@ export const handler: Handler = async (
     };
   } catch (error: any) {
     console.error("TikTok posting error:", error);
-
-    // Check if it's the "not implemented" error
-    if (error.message.includes("not implemented")) {
-      return {
-        statusCode: 501,
-        body: JSON.stringify({
-          error: "TikTok publishing not yet implemented",
-          details: "The TikTok Content Posting API integration needs to be completed. See lib/platforms/tiktok.ts",
-        }),
-      };
-    }
-
     return {
       statusCode: 500,
       body: JSON.stringify({

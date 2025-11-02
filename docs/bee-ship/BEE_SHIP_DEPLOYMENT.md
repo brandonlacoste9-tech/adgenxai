@@ -90,19 +90,11 @@ export async function publishImage(
 
 #### `lib\platforms\tiktok.ts`
 ```typescript
-export type TikTokConfig = {
-  clientKey: string;
-  clientSecret: string;
-  accessToken: string;
-};
-
-export async function publishVideo(
-  config: TikTokConfig,
-  videoUrl: string,
-  title: string
-): Promise<{ shareId: string }> {
-  throw new Error("TikTok publishing not implemented. Add TikTok Content Posting API flow.");
-}
+// Full implementation lives in lib/platforms/tiktok.ts
+// Highlights:
+// - Validates client key/secret, access token, and openId
+// - Calls TikTok Content Posting API init endpoint with PULL_FROM_URL
+// - Polls publish status until SUCCESS and returns the share/video id
 ```
 
 #### `lib\platforms\youtube.ts`

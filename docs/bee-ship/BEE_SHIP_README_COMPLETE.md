@@ -204,7 +204,7 @@ Beehive/
 │   └── platforms/
 │       ├── instagram.ts         # IG Graph API
 │       ├── youtube.ts           # YouTube API
-│       └── tiktok.ts            # TikTok stub
+│       └── tiktok.ts            # TikTok Content Posting API integration
 ├── scripts/
 │   ├── ship-swarm.ps1          # PowerShell script
 │   └── ship-swarm.sh           # Bash script

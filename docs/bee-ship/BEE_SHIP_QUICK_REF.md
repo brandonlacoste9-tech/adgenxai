@@ -12,7 +12,7 @@ Double-click: SHIP_BEE_SWARM_NOW.bat
 
 ### Files Created
 - `lib/platforms/instagram.ts` - Instagram publishing ✅
-- `lib/platforms/tiktok.ts` - TikTok stub 🔨
+- `lib/platforms/tiktok.ts` - TikTok Content Posting API client
 - `lib/platforms/youtube.ts` - YouTube stub 🔨  
 - `netlify/functions/bee-ship.ts` - Main handler
 - `scripts/ship-swarm.ps1` - Bulk publisher
@@ -115,7 +115,7 @@ netlify status
 | Platform | Status | Setup Required |
 |----------|--------|----------------|
 | Instagram | ✅ Ready | FB app + long-lived token |
-| TikTok | 🔨 Stub | Dev account + implementation |
+| TikTok | ✅ Ready | Requires Content Posting API credentials |
 | YouTube | 🔨 Stub | googleapis + OAuth |
 
 ---

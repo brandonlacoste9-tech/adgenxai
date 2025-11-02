@@ -29,7 +29,7 @@ Double-click: SHIP_BEE_SWARM_NOW.bat
 ```
 [STEP 1/6] Creating directory structure... ✓
 [STEP 2/6] Creating Instagram platform module... ✓
-[STEP 3/6] Creating TikTok platform stub... ✓
+[STEP 3/6] Creating TikTok platform integration... ✓
 [STEP 4/6] Creating YouTube platform stub... ✓
 [STEP 5/6] Installing dependencies... ✓
 [STEP 6/6] Committing and pushing... ✓
@@ -67,10 +67,11 @@ Double-click: SHIP_BEE_SWARM_NOW.bat
 - [ ] `INSTAGRAM_ACCOUNT_ID` = 17841xxxxxxxxx
 - [ ] `FB_ACCESS_TOKEN` = EAABxxx... (long-lived page token)
 
-**TikTok** (Optional):
+**TikTok**:
 - [ ] `TIKTOK_CLIENT_KEY` = xxx
 - [ ] `TIKTOK_CLIENT_SECRET` = xxx
 - [ ] `TIKTOK_ACCESS_TOKEN` = xxx
+- [ ] `TIKTOK_OPEN_ID` = xxx
 
 **YouTube** (Optional):
 - [ ] `YOUTUBE_CLIENT_ID` = xxx.apps.googleusercontent.com
@@ -198,7 +199,7 @@ git push
 ## NEXT PHASE (Future)
 
 After successful launch:
-- [ ] Implement TikTok publishing
+- [x] Implement TikTok publishing
 - [ ] Implement YouTube publishing
 - [ ] Add scheduler (cron jobs)
 - [ ] Build analytics dashboard

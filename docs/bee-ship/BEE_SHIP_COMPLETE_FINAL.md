@@ -4,7 +4,7 @@
 
 ### Platform Modules (`lib/platforms/`)
 - ✅ `instagram.ts` - Instagram Graph API integration
-- ✅ `tiktok.ts` - TikTok stub (ready for implementation)
+- ✅ `tiktok.ts` - TikTok Content Posting API integration
 - ✅ `youtube.ts` - YouTube Data API integration
 
 ### Netlify Functions (`netlify/functions/`)
