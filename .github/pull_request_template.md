@@ -3,9 +3,10 @@
 
 ### Checklist
 - [ ] ESLint is clean (no errors)
-- [ ] No new CodeQL alerts at warning/error
-- [ ] Tests updated/added for behavior changes
-- [ ] Docs touched if APIs/config changed
+- [ ] TypeScript passes in `npm run typecheck`
+- [ ] Tests added/updated and `npm run test` passes
+- [ ] `npm run build` succeeds locally
+- [ ] Docs updated for config/API changes
 
 ### Handoff
 @copilot

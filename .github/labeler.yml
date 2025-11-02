@@ -1,0 +1,16 @@
+PR-3-providers:
+  - 'app/**'
+  - 'lib/providers/**'
+  - 'scripts/providers/**'
+PR-1-supabase:
+  - 'lib/supabase/**'
+  - 'app/**/supabase/**'
+  - 'docs/supabase/**'
+PR-5-auth:
+  - 'lib/auth/**'
+  - 'app/**/auth/**'
+  - 'docs/auth/**'
+phase2-kickoff:
+  - '.github/workflows/phase2.yml'
+  - 'setup-phase2-automation.sh'
+  - '.github/labeler.yml'
