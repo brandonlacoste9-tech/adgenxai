@@ -14,7 +14,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# lib/ - commented out for TypeScript project, using lib/ for source code
 lib64/
 parts/
 sdist/
