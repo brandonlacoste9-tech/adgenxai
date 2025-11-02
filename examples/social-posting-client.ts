@@ -73,7 +73,7 @@ export async function postToYouTube(
 }
 
 /**
- * Post a video to TikTok (not yet implemented)
+ * Post a video to TikTok
  */
 export async function postToTikTok(
   videoUrl: string,
@@ -147,7 +147,7 @@ try {
   console.error("YouTube error:", error);
 }
 
-// TikTok example (not yet implemented)
+// TikTok example
 try {
   const result = await postToTikTok(
     "https://example.com/my-video.mp4",
