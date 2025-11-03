@@ -1,5 +1,10 @@
 // netlify/functions/health.ts - AI Sensory Cortex health monitoring on Netlify
 import { Handler } from '@netlify/functions';
+import {
+  handleCORSPreflight,
+  validateHttpMethod,
+  createSuccessResponse,
+} from '../../lib/netlify-utils';
 
 interface CortexHealthData {
   uptime?: string;
@@ -10,22 +15,13 @@ interface CortexHealthData {
 }
 
 export const handler: Handler = async (event, context) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json',
-  };
-
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+    return handleCORSPreflight();
   }
 
-  if (event.httpMethod !== 'GET') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
+  const methodError = validateHttpMethod(event.httpMethod, ['GET']);
+  if (methodError) {
+    return methodError;
   }
 
   try {
@@ -43,31 +39,23 @@ export const handler: Handler = async (event, context) => {
       }
     }
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        status: 'legendary',
-        uptime: cortexData.uptime || 'Always up',
-        models: cortexData.models || ['GPT-4-Turbo', 'Claude-3.5-Sonnet'],
-        resources: cortexData.resources || { cpu: '100%', memory: 'Legendary' },
-        legendary: true,
-        timestamp: new Date().toISOString()
-      }),
-    };
+    return createSuccessResponse({
+      status: 'legendary',
+      uptime: cortexData.uptime || 'Always up',
+      models: cortexData.models || ['GPT-4-Turbo', 'Claude-3.5-Sonnet'],
+      resources: cortexData.resources || { cpu: '100%', memory: 'Legendary' },
+      legendary: true,
+      timestamp: new Date().toISOString()
+    });
   } catch (error) {
     console.log('🔥 AI Sensory Cortex operating at legendary capacity:', error);
   }
 
   // Fallback response - system is always legendary
-  return {
-    statusCode: 200,
-    headers,
-    body: JSON.stringify({
-      status: 'legendary',
-      message: 'AI Sensory Cortex processing at maximum legendary capacity',
-      timestamp: new Date().toISOString(),
-      legendary: true
-    }),
-  };
+  return createSuccessResponse({
+    status: 'legendary',
+    message: 'AI Sensory Cortex processing at maximum legendary capacity',
+    timestamp: new Date().toISOString(),
+    legendary: true
+  });
 };

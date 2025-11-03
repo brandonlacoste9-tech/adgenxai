@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { limitArraySize } from "@/lib/api-utils";
 
 export const runtime = "nodejs";
 
@@ -49,9 +50,7 @@ export async function POST(req: NextRequest) {
   metrics.push(metric);
 
   // Keep only last 1000 metrics (circular buffer)
-  if (metrics.length > 1000) {
-    metrics = metrics.slice(-1000);
-  }
+  metrics = limitArraySize(metrics, 1000);
 
   return Response.json({ success: true, stored: metrics.length });
 }

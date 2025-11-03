@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { parseJsonBody, createErrorResponse } from "@/lib/api-utils";
 
 type Body = { model?: string; prompt?: string };
 
@@ -8,17 +9,16 @@ export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const wantStream = searchParams.get("stream") === "1";
 
-  let body: Body;
-  try {
-    body = await req.json();
-  } catch {
-    return Response.json({ error: "Invalid JSON body" }, { status: 400 });
+  const body = await parseJsonBody<Body>(req);
+  if (!body) {
+    return createErrorResponse("Invalid JSON body", 400);
   }
+
   const model = body.model ?? "openai/gpt-5";
   const prompt = (body.prompt ?? "").trim();
 
   if (!prompt) {
-    return Response.json({ error: "Missing 'prompt'" }, { status: 400 });
+    return createErrorResponse("Missing 'prompt'", 400);
   }
 
   // Non-streaming path (JSON)

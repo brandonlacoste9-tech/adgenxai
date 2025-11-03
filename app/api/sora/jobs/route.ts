@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { createErrorResponse } from "@/lib/api-utils";
 
 /**
  * GET /api/sora/jobs
@@ -61,9 +62,6 @@ export async function GET(req: NextRequest) {
 
     return Response.json(mockJobs);
   } catch (error) {
-    return Response.json(
-      { error: (error as Error).message },
-      { status: 500 }
-    );
+    return createErrorResponse((error as Error).message, 500);
   }
 }

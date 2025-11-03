@@ -1,5 +1,12 @@
 // netlify/functions/webhook.ts - Main webhook routing to your AI Sensory Cortex on Netlify
 import { Handler } from '@netlify/functions';
+import {
+  CORS_HEADERS,
+  handleCORSPreflight,
+  validateHttpMethod,
+  createSuccessResponse,
+  createErrorResponse,
+} from '../../lib/netlify-utils';
 
 interface RequestData {
   type?: string;
@@ -19,23 +26,13 @@ interface CortexResponse {
 }
 
 export const handler: Handler = async (event, context) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Content-Type': 'application/json',
-  };
-
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+    return handleCORSPreflight();
   }
 
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'POST method required' }),
-    };
+  const methodError = validateHttpMethod(event.httpMethod, ['POST']);
+  if (methodError) {
+    return methodError;
   }
 
   try {
@@ -85,28 +82,18 @@ export const handler: Handler = async (event, context) => {
       }
     }
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        success: true,
-        message: `🎉 LEGENDARY! Your AI Sensory Cortex ${type || 'request'} completed successfully!`,
-        processing_id: processingId,
-        cortex_response: cortexResponse,
-        timestamp: new Date().toISOString()
-      }),
-    };
+    return createSuccessResponse({
+      success: true,
+      message: `🎉 LEGENDARY! Your AI Sensory Cortex ${type || 'request'} completed successfully!`,
+      processing_id: processingId,
+      cortex_response: cortexResponse,
+      timestamp: new Date().toISOString()
+    });
 
   } catch (error) {
     console.error('Webhook error:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        message: '🔥 AI Sensory Cortex operating at maximum capacity. Please try again in a moment.',
-        timestamp: new Date().toISOString()
-      }),
-    };
+    return createErrorResponse({
+      error: '🔥 AI Sensory Cortex operating at maximum capacity. Please try again in a moment.',
+    }, 500);
   }
 };

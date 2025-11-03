@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { soraClient, SoraGenerationRequest } from "@/lib/sora/sora-client";
+import { createErrorResponse } from "@/lib/api-utils";
 
 export const runtime = "nodejs";
 
@@ -17,17 +18,11 @@ export async function POST(req: NextRequest) {
 
     // Validate input
     if (!prompt || prompt.trim().length === 0) {
-      return Response.json(
-        { error: "Prompt is required" },
-        { status: 400 }
-      );
+      return createErrorResponse("Prompt is required", 400);
     }
 
     if (prompt.length > 10000) {
-      return Response.json(
-        { error: "Prompt too long (max 10000 chars)" },
-        { status: 400 }
-      );
+      return createErrorResponse("Prompt too long (max 10000 chars)", 400);
     }
 
     // Create generation request
@@ -49,9 +44,6 @@ export async function POST(req: NextRequest) {
       message: "Video generation queued. Check status with /api/sora/status?jobId=...",
     });
   } catch (error) {
-    return Response.json(
-      { error: (error as Error).message },
-      { status: 500 }
-    );
+    return createErrorResponse((error as Error).message, 500);
   }
 }

@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { soraClient } from "@/lib/sora/sora-client";
+import { createErrorResponse } from "@/lib/api-utils";
 
 export const runtime = "nodejs";
 
@@ -12,20 +13,14 @@ export async function GET(req: NextRequest) {
   const jobId = searchParams.get("jobId");
 
   if (!jobId) {
-    return Response.json(
-      { error: "jobId query parameter required" },
-      { status: 400 }
-    );
+    return createErrorResponse("jobId query parameter required", 400);
   }
 
   try {
     const job = await soraClient.getJobStatus(jobId);
 
     if (!job) {
-      return Response.json(
-        { error: "Job not found" },
-        { status: 404 }
-      );
+      return createErrorResponse("Job not found", 404);
     }
 
     return Response.json({
@@ -39,9 +34,6 @@ export async function GET(req: NextRequest) {
       error: job.error,
     });
   } catch (error) {
-    return Response.json(
-      { error: (error as Error).message },
-      { status: 500 }
-    );
+    return createErrorResponse((error as Error).message, 500);
   }
 }

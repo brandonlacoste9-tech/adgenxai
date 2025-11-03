@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { createErrorResponse, limitArraySize } from "@/lib/api-utils";
 
 export const runtime = "nodejs";
 
@@ -30,10 +31,7 @@ export async function POST(req: NextRequest) {
     const { model, tokens } = await req.json();
 
     if (!model || !tokens) {
-      return Response.json(
-        { error: "Missing model or tokens" },
-        { status: 400 }
-      );
+      return createErrorResponse("Missing model or tokens", 400);
     }
 
     // Record usage
@@ -44,16 +42,11 @@ export async function POST(req: NextRequest) {
     });
 
     // Keep recent logs only (last 10000 entries)
-    if (usageLog.length > 10000) {
-      usageLog = usageLog.slice(-10000);
-    }
+    usageLog = limitArraySize(usageLog, 10000);
 
     return Response.json({ success: true, logged: true });
   } catch (error) {
-    return Response.json(
-      { error: "Failed to log usage" },
-      { status: 500 }
-    );
+    return createErrorResponse("Failed to log usage", 500);
   }
 }
 
