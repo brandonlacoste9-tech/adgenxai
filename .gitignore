@@ -224,3 +224,4 @@ Thumbs.db
 # IDE
 .vscode/settings.json
 *.log
+tsconfig.tsbuildinfo
