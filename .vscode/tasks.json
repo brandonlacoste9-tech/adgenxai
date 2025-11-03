@@ -40,6 +40,18 @@
       "presentation": {
         "reveal": "silent"
       }
+    },
+    {
+      "label": "Refresh: PR & Problems",
+      "type": "shell",
+      "command": "gh pr view --json mergeable,statusCheckRollup --jq '.' && gh pr checks && npm run typecheck || true",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "focus": false
+      },
+      "problemMatcher": []
     }
   ]
 }
