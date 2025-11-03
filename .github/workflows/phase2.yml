@@ -58,6 +58,9 @@ jobs:
     needs: [label]
     if: github.event_name == 'pull_request'
     steps:
+      - name: Install GitHub CLI
+        uses: cli/gh-action@v2
+
       - name: Post CCR request comment (mentions @copilot)
         env:
           GH_TOKEN: ${{ github.token }}
@@ -83,6 +86,8 @@ jobs:
     needs: [request-copilot-review]
     if: github.event_name == 'pull_request'
     steps:
+      - name: Install GitHub CLI
+        uses: cli/gh-action@v2
       - name: Post Claude planning comment
         env:
           GH_TOKEN: ${{ github.token }}
@@ -95,4 +100,5 @@ jobs:
             - **PR-1 Supabase**: Replace mock reads with RPC/SQL views + real-time channels
             - **PR-5 Auth**: Supabase Auth; enforce RLS; ensure all API routes check user ownership
 
+            Keep PRs < 400 LOC each, include tests & docs updates, follow Aurora theme patterns, and link to the **Phase-2** project.'
             Keep PRs < 400 LOC each, include tests & docs updates, follow Aurora theme patterns, and link to the **Phase-2** project.'
