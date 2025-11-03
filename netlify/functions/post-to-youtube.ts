@@ -3,6 +3,14 @@
 
 import { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import { publishVideo } from "../../lib/platforms/youtube";
+import {
+  validateHttpMethod,
+  parseRequestBody,
+  validateRequiredFields,
+  validateEnvVars,
+  successResponse,
+  errorResponse,
+} from "../../app/lib/netlify/function-helpers";
 
 interface PostRequest {
   videoBase64: string; // Base64 encoded video file
@@ -16,49 +24,42 @@ export const handler: Handler = async (
   event: HandlerEvent,
   context: HandlerContext
 ) => {
-  // Only allow POST requests
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: "Method not allowed. Use POST." }),
-    };
-  }
+  // Validate HTTP method
+  const methodError = validateHttpMethod(event, "POST");
+  if (methodError) return methodError;
+
+  // Parse request body
+  const { body, error: parseError } = parseRequestBody<PostRequest>(event);
+  if (parseError) return parseError;
+
+  // Validate required fields
+  const fieldsError = validateRequiredFields(body!, ["videoBase64", "title"]);
+  if (fieldsError) return fieldsError;
+
+  const { videoBase64, title, description, tags, privacyStatus } = body!;
+
+  // Validate environment variables
+  const envError = validateEnvVars(
+    {
+      YOUTUBE_CLIENT_ID: process.env.YOUTUBE_CLIENT_ID,
+      YOUTUBE_CLIENT_SECRET: process.env.YOUTUBE_CLIENT_SECRET,
+      YOUTUBE_REFRESH_TOKEN: process.env.YOUTUBE_REFRESH_TOKEN,
+    },
+    "YouTube"
+  );
+  if (envError) return envError;
 
   try {
-    // Parse request body
-    const body: PostRequest = JSON.parse(event.body || "{}");
-    const { videoBase64, title, description, tags, privacyStatus } = body;
-
-    // Validate inputs
-    if (!videoBase64 || !title) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          error: "Missing required fields: videoBase64 and title",
-        }),
-      };
-    }
-
-    // Get YouTube credentials from environment variables
-    const clientId = process.env.YOUTUBE_CLIENT_ID;
-    const clientSecret = process.env.YOUTUBE_CLIENT_SECRET;
-    const refreshToken = process.env.YOUTUBE_REFRESH_TOKEN;
-
-    if (!clientId || !clientSecret || !refreshToken) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({
-          error: "YouTube credentials not configured. Set YOUTUBE_CLIENT_ID, YOUTUBE_CLIENT_SECRET, and YOUTUBE_REFRESH_TOKEN environment variables.",
-        }),
-      };
-    }
-
     // Convert base64 to Buffer
     const videoBuffer = Buffer.from(videoBase64, "base64");
 
     // Publish to YouTube
     const result = await publishVideo(
-      { clientId, clientSecret, refreshToken },
+      {
+        clientId: process.env.YOUTUBE_CLIENT_ID!,
+        clientSecret: process.env.YOUTUBE_CLIENT_SECRET!,
+        refreshToken: process.env.YOUTUBE_REFRESH_TOKEN!,
+      },
       videoBuffer,
       {
         title,
@@ -68,25 +69,15 @@ export const handler: Handler = async (
       }
     );
 
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        success: true,
-        platform: "youtube",
-        videoId: result.videoId,
-        videoUrl: `https://www.youtube.com/watch?v=${result.videoId}`,
-        message: "Successfully uploaded to YouTube",
-      }),
-    };
+    return successResponse({
+      success: true,
+      platform: "youtube",
+      videoId: result.videoId,
+      videoUrl: `https://www.youtube.com/watch?v=${result.videoId}`,
+      message: "Successfully uploaded to YouTube",
+    });
   } catch (error: any) {
     console.error("YouTube upload error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        error: "Failed to upload to YouTube",
-        details: error.message,
-      }),
-    };
+    return errorResponse("Failed to upload to YouTube", error.message);
   }
 };

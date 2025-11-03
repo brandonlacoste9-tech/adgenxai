@@ -3,6 +3,14 @@
 
 import { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import { publishVideo } from "../../lib/platforms/tiktok";
+import {
+  validateHttpMethod,
+  parseRequestBody,
+  validateRequiredFields,
+  validateEnvVars,
+  successResponse,
+  errorResponse,
+} from "../../app/lib/netlify/function-helpers";
 
 interface PostRequest {
   videoUrl: string;
@@ -13,82 +21,63 @@ export const handler: Handler = async (
   event: HandlerEvent,
   context: HandlerContext
 ) => {
-  // Only allow POST requests
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: "Method not allowed. Use POST." }),
-    };
-  }
+  // Validate HTTP method
+  const methodError = validateHttpMethod(event, "POST");
+  if (methodError) return methodError;
+
+  // Parse request body
+  const { body, error: parseError } = parseRequestBody<PostRequest>(event);
+  if (parseError) return parseError;
+
+  // Validate required fields
+  const fieldsError = validateRequiredFields(body!, ["videoUrl", "title"]);
+  if (fieldsError) return fieldsError;
+
+  const { videoUrl, title } = body!;
+
+  // Validate environment variables
+  const envError = validateEnvVars(
+    {
+      TIKTOK_CLIENT_KEY: process.env.TIKTOK_CLIENT_KEY,
+      TIKTOK_CLIENT_SECRET: process.env.TIKTOK_CLIENT_SECRET,
+      TIKTOK_ACCESS_TOKEN: process.env.TIKTOK_ACCESS_TOKEN,
+    },
+    "TikTok"
+  );
+  if (envError) return envError;
 
   try {
-    // Parse request body
-    const body: PostRequest = JSON.parse(event.body || "{}");
-    const { videoUrl, title } = body;
-
-    // Validate inputs
-    if (!videoUrl || !title) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          error: "Missing required fields: videoUrl and title",
-        }),
-      };
-    }
-
-    // Get TikTok credentials from environment variables
-    const clientKey = process.env.TIKTOK_CLIENT_KEY;
-    const clientSecret = process.env.TIKTOK_CLIENT_SECRET;
-    const accessToken = process.env.TIKTOK_ACCESS_TOKEN;
-    const openId = process.env.TIKTOK_OPEN_ID;
-
-    if (!clientKey || !clientSecret || !accessToken) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({
-          error: "TikTok credentials not configured. Set TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET, and TIKTOK_ACCESS_TOKEN environment variables.",
-        }),
-      };
-    }
-
     // Note: TikTok publishing is not yet implemented
     // This will throw an error from the platform module
     const result = await publishVideo(
-      { clientKey, clientSecret, accessToken, openId },
+      {
+        clientKey: process.env.TIKTOK_CLIENT_KEY!,
+        clientSecret: process.env.TIKTOK_CLIENT_SECRET!,
+        accessToken: process.env.TIKTOK_ACCESS_TOKEN!,
+        openId: process.env.TIKTOK_OPEN_ID,
+      },
       videoUrl,
       title
     );
 
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        success: true,
-        platform: "tiktok",
-        shareId: result.shareId,
-        message: "Successfully published to TikTok",
-      }),
-    };
+    return successResponse({
+      success: true,
+      platform: "tiktok",
+      shareId: result.shareId,
+      message: "Successfully published to TikTok",
+    });
   } catch (error: any) {
     console.error("TikTok posting error:", error);
 
     // Check if it's the "not implemented" error
     if (error.message.includes("not implemented")) {
-      return {
-        statusCode: 501,
-        body: JSON.stringify({
-          error: "TikTok publishing not yet implemented",
-          details: "The TikTok Content Posting API integration needs to be completed. See lib/platforms/tiktok.ts",
-        }),
-      };
+      return errorResponse(
+        "TikTok publishing not yet implemented",
+        "The TikTok Content Posting API integration needs to be completed. See lib/platforms/tiktok.ts",
+        501
+      );
     }
 
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        error: "Failed to post to TikTok",
-        details: error.message,
-      }),
-    };
+    return errorResponse("Failed to post to TikTok", error.message);
   }
 };
