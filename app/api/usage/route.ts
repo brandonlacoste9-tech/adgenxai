@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { withErrorHandler, successResponse, errorResponse, validateFields } from "@/app/lib/api/error-handler";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -26,58 +27,47 @@ const DEFAULT_LIMITS: Record<string, number> = {
   "openai/gpt-4o": 500000,
 };
 
-export async function POST(req: NextRequest) {
-  try {
-    const { model, tokens } = await req.json();
+export const POST = withErrorHandler(async (req: NextRequest) => {
+  const { model, tokens } = await req.json();
 
-    if (!model || !tokens) {
-      return Response.json(
-        { error: "Missing model or tokens" },
-        { status: 400 }
-      );
-    }
+  const validationError = validateFields({ model, tokens }, ["model", "tokens"]);
+  if (validationError) return validationError;
 
-    // Record usage
-    usageLog.push({
-      model,
-      tokens,
-      timestamp: Date.now(),
-    });
+  // Record usage
+  usageLog.push({
+    model,
+    tokens,
+    timestamp: Date.now(),
+  });
 
-    // Keep recent logs only (last 10000 entries)
-    if (usageLog.length > 10000) {
-      usageLog = usageLog.slice(-10000);
-    }
-
-    return Response.json({ success: true, logged: true });
-  } catch (error) {
-    return Response.json(
-      { error: "Failed to log usage" },
-      { status: 500 }
-    );
+  // Keep recent logs only (last 10000 entries)
+  if (usageLog.length > 10000) {
+    usageLog = usageLog.slice(-10000);
   }
-}
 
-export async function GET(req: NextRequest) {
+  return successResponse({ success: true, logged: true });
+});
+
+export const GET = withErrorHandler(async (req: NextRequest) => {
   const { searchParams } = new URL(req.url);
   const model = searchParams.get("model");
 
   // If specific model requested
   if (model) {
     const stats = getModelStats(model);
-    return Response.json(stats);
+    return successResponse(stats);
   }
 
   // All models
   const allModels = Object.keys(DEFAULT_LIMITS);
   const allStats = allModels.map((m) => getModelStats(m));
 
-  return Response.json({
+  return successResponse({
     models: allStats,
     totalTokens: allStats.reduce((sum, s) => sum + s.totalTokens, 0),
     timestamp: Date.now(),
   });
-}
+});
 
 function getModelStats(model: string): UsageData {
   const limit = DEFAULT_LIMITS[model] || 1000000;
@@ -110,7 +100,7 @@ function getModelStats(model: string): UsageData {
 }
 
 // Admin endpoint to reset (for testing)
-export async function DELETE(req: NextRequest) {
+export const DELETE = withErrorHandler(async (req: NextRequest) => {
   usageLog = [];
-  return Response.json({ success: true, message: "Usage log cleared" });
-}
+  return successResponse({ success: true, message: "Usage log cleared" });
+});

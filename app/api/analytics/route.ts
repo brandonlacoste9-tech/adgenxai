@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { withErrorHandler, successResponse } from "@/app/lib/api/error-handler";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -33,7 +34,7 @@ interface AnalyticsReport {
 // In-memory store (in production, use database)
 let metrics: StreamingMetric[] = [];
 
-export async function POST(req: NextRequest) {
+export const POST = withErrorHandler(async (req: NextRequest) => {
   const body = await req.json();
 
   // Validate incoming metric
@@ -54,10 +55,10 @@ export async function POST(req: NextRequest) {
     metrics = metrics.slice(-1000);
   }
 
-  return Response.json({ success: true, stored: metrics.length });
-}
+  return successResponse({ success: true, stored: metrics.length });
+});
 
-export async function GET(req: NextRequest) {
+export const GET = withErrorHandler(async (req: NextRequest) => {
   const { searchParams } = new URL(req.url);
   const action = searchParams.get("action");
 
@@ -67,19 +68,19 @@ export async function GET(req: NextRequest) {
 
   if (action === "reset") {
     metrics = [];
-    return Response.json({ success: true, message: "Metrics cleared" });
+    return successResponse({ success: true, message: "Metrics cleared" });
   }
 
   // Default: return all metrics
-  return Response.json({
+  return successResponse({
     metrics,
     count: metrics.length,
   });
-}
+});
 
 function getAnalyticsReport(): Response {
   if (metrics.length === 0) {
-    return Response.json({
+    return successResponse({
       totalRequests: 0,
       successRate: 0,
       abortRate: 0,
@@ -164,5 +165,5 @@ function getAnalyticsReport(): Response {
     modelBreakdown,
   };
 
-  return Response.json(report);
+  return successResponse(report);
 }
