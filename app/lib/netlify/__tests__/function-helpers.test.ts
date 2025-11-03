@@ -63,7 +63,7 @@ describe("Function Helpers", () => {
     });
 
     it("should return error when fields missing", () => {
-      const body = { field1: "value1" };
+      const body: Record<string, string> = { field1: "value1" };
       const result = validateRequiredFields(body, ["field1", "field2"] as const);
       expect(result).not.toBeNull();
       expect(result?.statusCode).toBe(400);
