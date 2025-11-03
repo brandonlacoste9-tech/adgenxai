@@ -61,14 +61,14 @@ AdGenXAI uses a **Sensory Cortex** pattern where:
 ## Sensory Cortex Functions
 
 Current webhook functions deployed:
-- [ ] `webhook.ts` - Main webhook orchestrator
-- [ ] `webhook-telemetry.ts` - Telemetry collection
-- [ ] `health.ts` - Health check endpoint
-- [ ] `github-webhook.ts` - GitHub event processing
-- [ ] `post-to-instagram.ts` - Instagram publishing
-- [ ] `post-to-tiktok.ts` - TikTok publishing
-- [ ] `post-to-youtube.ts` - YouTube publishing
-- [ ] `telemetry-dashboard.ts` - Metrics dashboard
+- `webhook.ts` - Main webhook orchestrator
+- `webhook-telemetry.ts` - Telemetry collection
+- `health.ts` - Health check endpoint
+- `github-webhook.ts` - GitHub event processing
+- `post-to-instagram.ts` - Instagram publishing
+- `post-to-tiktok.ts` - TikTok publishing
+- `post-to-youtube.ts` - YouTube publishing
+- `telemetry-dashboard.ts` - Metrics dashboard
 
 ---
 

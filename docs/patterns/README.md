@@ -15,7 +15,7 @@ This staging area collects proven patterns for:
 
 ## Current Architecture
 
-AdGenXAI uses the **Bee Agent API** (configured via `BEE_API_URL` and `BEE_API_KEY`) for AI-powered content generation, not OpenAI's Codex or GPT APIs.
+AdGenXAI uses the **Bee Agent API** (configured via `BEE_API_URL` and `BEE_API_KEY`) for AI-powered content generation.
 
 ### Key Components
 
