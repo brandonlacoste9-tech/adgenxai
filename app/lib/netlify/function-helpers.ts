@@ -1,4 +1,4 @@
-// netlify/functions/lib/function-helpers.ts
+// app/lib/netlify/function-helpers.ts
 // Shared utilities for Netlify Functions to reduce code duplication
 
 import { HandlerEvent, HandlerResponse } from "@netlify/functions";

@@ -1,4 +1,4 @@
-// netlify/functions/lib/__tests__/function-helpers.test.ts
+// app/lib/netlify/__tests__/function-helpers.test.ts
 import { describe, it, expect } from "vitest";
 import {
   validateHttpMethod,

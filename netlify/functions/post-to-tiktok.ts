@@ -35,7 +35,7 @@ export const handler: Handler = async (
 
   const { videoUrl, title } = body!;
 
-  // Validate environment variables
+  // Validate environment variables (openId is optional)
   const envError = validateEnvVars(
     {
       TIKTOK_CLIENT_KEY: process.env.TIKTOK_CLIENT_KEY,
