@@ -1,5 +1,8 @@
 import { NextRequest } from "next/server";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/sora/jobs
  * Retrieve list of all Sora generation jobs

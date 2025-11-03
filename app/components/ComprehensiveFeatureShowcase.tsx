@@ -2,20 +2,20 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Sparkles, 
-  Zap, 
-  Bot, 
-  Palette, 
-  Video, 
-  Globe, 
-  Brain, 
+import {
+  Sparkles,
+  Zap,
+  Bot,
+  Palette,
+  Video,
+  Globe,
+  Brain,
   Wand2,
   Code,
   Layers,
   Hexagon,
   BookOpen,
-  Orchestra
+  Workflow
 } from "lucide-react";
 
 interface Feature {
@@ -34,7 +34,7 @@ const features: Feature[] = [
     id: "campaign-orchestration",
     title: "Campaign Orchestration Engine",
     description: "Revolutionary unified platform - one API call orchestrates 11 AI models to create complete marketing campaigns automatically.",
-    icon: <Orchestra className="w-6 h-6" />,
+    icon: <Workflow className="w-6 h-6" />,
     category: "orchestration",
     status: "live",
     highlight: true

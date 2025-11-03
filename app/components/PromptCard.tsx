@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useRef, useState } from "react";
-import { useStreamingMetrics } from "../../lib/hooks/useStreamingMetrics";
+import { useStreamingMetrics } from "@/lib/hooks/useStreamingMetrics";
 
 export default function PromptCard() {
   const [model, setModel] = useState("openai/gpt-5");

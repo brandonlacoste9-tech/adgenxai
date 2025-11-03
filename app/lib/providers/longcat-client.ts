@@ -125,14 +125,13 @@ export class LongCatClient {
 
   private async makeRequest(endpoint: string, options: RequestInit = {}): Promise<any> {
     const url = `${this.config.baseUrl}${endpoint}`;
-    
+
     const defaultOptions: RequestInit = {
       headers: {
         'Authorization': `Bearer ${this.config.apiKey}`,
         'Content-Type': 'application/json',
         'User-Agent': 'AdGenXAI/1.0',
       },
-      timeout: this.config.timeout,
     };
 
     const requestOptions = { ...defaultOptions, ...options };
@@ -199,6 +198,3 @@ export function createLongCatClient(config?: Partial<LongCatConfig>): LongCatCli
     ...config,
   });
 }
-
-// Export types for external use
-export type { LongCatConfig, LongCatVideoRequest, LongCatVideoResponse };
