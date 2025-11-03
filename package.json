@@ -7,7 +7,8 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "dev": "netlify dev",
-    "deploy": "netlify deploy --prod"
+    "deploy": "netlify deploy --prod",
+    "triage:prs": "node scripts/pr-triage.mjs"
   },
   "dependencies": {
     "@netlify/functions": "^2.4.0",
