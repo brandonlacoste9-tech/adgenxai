@@ -10,7 +10,8 @@ import HeroAurora from "@/components/HeroAurora";
 import AgentFirstShowcase from "@/components/AgentFirstShowcase";
 
 // Lazy load heavy below-the-fold components for better initial load performance
-const CampaignOrchestrationDemo = lazy(() => import("@/components/CampaignOrchestrationDemo"));
+// Note: CampaignOrchestrationDemo component not yet created
+// const CampaignOrchestrationDemo = lazy(() => import("@/components/CampaignOrchestrationDemo"));
 const ComprehensiveFeatureShowcase = lazy(() => import("@/components/ComprehensiveFeatureShowcase"));
 const FeatureRail = lazy(() => import("@/components/FeatureRail"));
 const PersonaPreview = lazy(() => import("@/components/PersonaPreview"));
@@ -55,9 +56,11 @@ export default function Page() {
       <AgentFirstShowcase />
       
       {/* 🎯 Campaign Orchestration Demo - The Revolutionary Core */}
+      {/* TODO: Create CampaignOrchestrationDemo component
       <Suspense fallback={<SectionLoader />}>
         <CampaignOrchestrationDemo />
       </Suspense>
+      */}
       
       {/* 🌟 NEW: Comprehensive Feature Showcase - Complete AI Ecosystem */}
       <Suspense fallback={<SectionLoader />}>

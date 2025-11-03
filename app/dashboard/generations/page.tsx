@@ -27,7 +27,7 @@ export default function GenerationsPage() {
 
   useEffect(() => {
     let pollInterval = 5000; // Start at 5 seconds
-    let timeoutId: NodeJS.Timeout;
+    let timeoutId: NodeJS.Timeout | undefined;
     
     const fetchJobs = async () => {
       try {

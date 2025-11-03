@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
 interface AnalyticsData {
   totalRequests: number;
@@ -301,7 +301,7 @@ function AnalyticsMetric({ title, value, unit, icon, change }: AnalyticsMetricPr
 }
 
 // Memoized component to prevent recalculating maxCount on every render
-function LatencyDistributionChart({ 
+const LatencyDistributionChart = React.memo(function LatencyDistributionChart({ 
   distribution 
 }: { 
   distribution: { bucket: string; count: number }[] 
@@ -335,4 +335,4 @@ function LatencyDistributionChart({
       ))}
     </>
   );
-}
+});
