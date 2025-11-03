@@ -1,19 +1,28 @@
 #!/usr/bin/env bash
 set -e
 
-TMPFILE="$(mktemp /tmp/claude-selection.XXXXXX).md"
+# Create temp files with proper security and cleanup
+TMPFILE="$(mktemp "${TMPDIR:-/tmp}/claude-selection.XXXXXX.md")"
+OUTFILE="${TMPFILE}.out"
+
+# Ensure cleanup on exit
+trap 'rm -f "$TMPFILE" "$OUTFILE"' EXIT
+
 echo "Reading stdin into: $TMPFILE"
 cat - > "$TMPFILE"
 
 echo "Calling Claude..."
-claude review "$TMPFILE" > "${TMPFILE}.out" || true
-echo "Output written to: ${TMPFILE}.out"
-
-# Open in VS Code if available
-if command -v code >/dev/null 2>&1; then
-  code --reuse-window "${TMPFILE}.out" || true
+if claude review "$TMPFILE" > "$OUTFILE"; then
+  echo "Output written to: $OUTFILE"
+  
+  # Open in VS Code if available
+  if command -v code >/dev/null 2>&1; then
+    code --reuse-window "$OUTFILE" || true
+  else
+    echo "Open the file manually: $OUTFILE"
+  fi
+  exit 0
 else
-  echo "Open the file manually: ${TMPFILE}.out"
+  echo "Error: Claude review failed" >&2
+  exit 1
 fi
-
-exit 0

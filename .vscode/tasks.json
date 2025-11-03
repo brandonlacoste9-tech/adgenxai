@@ -40,6 +40,39 @@
       "presentation": {
         "reveal": "silent"
       }
+    },
+    {
+      "label": "Claude: Review File",
+      "type": "shell",
+      "command": "claude review \"${file}\" > \"${file}.claude.md\" && code --reuse-window \"${file}.claude.md\"",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Claude: Generate Unit Test (Vitest)",
+      "type": "shell",
+      "command": "claude generate-test \"${file}\" > \"${file}.claude.test.patch\"",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Claude: Produce Git Patch For File",
+      "type": "shell",
+      "command": "claude generate-patch \"${file}\" > \"${file}.claude.patch\"",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
     }
   ]
 }
