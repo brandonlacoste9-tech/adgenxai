@@ -1,0 +1,15 @@
+name: Ensure Codex scripts are executable
+on:
+  push:
+    paths:
+      - 'scripts/codex/*.sh'
+  pull_request:
+    paths:
+      - 'scripts/codex/*.sh'
+jobs:
+  chmod:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make Codex scripts executable
+        run: chmod +x scripts/codex/setup.sh scripts/codex/maintenance.sh

@@ -1,253 +1,183 @@
 # Copilot Instructions for AdGenXAI - AI Sensory Cortex
 
 ## Project Overview
-AdGenXAI is a TypeScript-based AI automation platform that operates as a "Sensory Cortex" - processing webhooks to orchestrate AI-powered advertising workflows. The architecture is serverless-first, using Netlify Functions as the primary compute layer.
+AdGenXAI is a TypeScript serverless platform that acts as an "AI Sensory Cortex" - processing GitHub webhooks to orchestrate AI-powered advertising workflows. Built on Netlify Functions with LongCat integration for video generation.
 
-## Core Architecture Patterns
+## Development: Package Manager & Workflows
 
-### Sensory Cortex Design
-- **Webhook-driven**: All interactions flow through GitHub webhooks processed by Netlify Functions
-- **Event-based**: Functions respond to events and trigger downstream AI workflows
-- **Telemetry-focused**: Built-in monitoring and observability via `telemetry-dashboard.ts` and `webhook-telemetry.ts`
-- **Health monitoring**: Real-time status via `/health` endpoint with cortex configuration details
+This repository uses **npm** as the canonical package manager.
 
-### Function Structure (`netlify/functions/`)
+Common commands:
+- Install deps: `npm ci` (CI) or `npm install` (local)
+- Dev (Netlify): `npm run dev`  # runs Netlify dev which proxies functions + SSR
+- Build: `npm run build`        # production build (TypeScript compilation)
+- Test: TypeScript validation with `npm run typecheck`
+- Deploy: `npm run deploy`      # production deployment to Netlify
+
+If you prefer `pnpm`, update the lockfile and CI config accordingly — but open a PR to avoid merge conflicts. We standardize on `npm` to match Netlify and the existing CI configuration.
+
+## Core Architecture
+
+### Serverless Functions (`netlify/functions/`)
 All functions follow this pattern:
 ```typescript
 import type { Handler } from '@netlify/functions';
 
 export const handler: Handler = async (event) => {
-  // 1. Validate HTTP method and headers
-  // 2. Parse and log event data with deliveryId
-  // 3. Process business logic
-  // 4. Return structured JSON response
+  // 1. Validate HTTP method (POST only for webhooks)
+  // 2. Extract GitHub headers (x-github-event, x-github-delivery)
+  // 3. Parse payload and log with deliveryId for tracing
+  // 4. Process business logic
+  // 5. Return structured JSON with statusCode
 };
 ```
 
-## Critical Development Workflows
-
-### Local Development
-```bash
-npm run dev          # Starts netlify dev server (not standard Next.js)
-npm run typecheck    # TypeScript validation (required before PRs)  
-npm run build        # Compiles TypeScript to dist/
-npm run deploy       # Production deployment to Netlify
-```
-
-### CI/CD Pipeline
-- **Trigger**: All PRs and pushes to main
-- **Jobs**: typecheck → build (sequential)
-- **Node version**: 18 (locked for consistency)
-- **Cache strategy**: npm cache with `--prefer-offline`
-
-## Project-Specific Conventions
+**Key Functions:**
+- `github-webhook.ts` - Main webhook processor, logs all GitHub events
+- `sora-generate.ts` - LongCat video generation API (adapter preserving Sora routes)
+- `health.ts` - System health with cortex configuration details
+- `telemetry-dashboard.ts` - Real-time monitoring interface
+- `webhook-telemetry.ts` - Event tracking and observability
 
 ### TypeScript Configuration
-- **Target**: ES2022 with ES modules (`"type": "module"` in package.json)
-- **Strict mode**: Enabled with comprehensive type checking
+- **ES Modules**: `"type": "module"` with ES2022 target
+- **Strict mode**: Full type checking enabled
+- **Paths**: Functions in `netlify/functions/**/*`, packages in `packages/**/*`
 - **Output**: Compiled to `dist/` directory
-- **Include paths**: `netlify/functions/**/*` and `packages/**/*`
 
-### Security & Monitoring Patterns
-- **No PII logging**: Strict policy against logging sensitive data
-- **Auth middleware**: Required on all routes returning sensitive data
-- **Webhook validation**: All GitHub webhooks include deliveryId tracking
-- **Network policy**: External API calls restricted (see `docs/Codex_NETWORK_POLICY.md`)
+## Sensory Cortex: Webhook Event Mapping
 
-### Error Handling
-```typescript
-// Standard error response pattern
-return {
-  statusCode: 405,
-  body: JSON.stringify({ error: 'Method not allowed' })
-};
+We receive GitHub webhooks at `/.netlify/functions/github-webhook` and route them into the Sensory Cortex. Major event handlers:
+
+- `push` → indexer + echo ritual (updates repo memory)
+- `pull_request` → PR telemetry & policy gating
+- `pull_request_review` → triggers CodeX knowledge sync
+- `issue_comment` → triggers bot responses or agent workflows
+- `workflow_run` → CI telemetry + automated agent training
+
+Example: `push` handling pseudo-code:
+1. Validate signature with `GITHUB_WEBHOOK_SECRET`
+2. Extract `commits[]`, `pusher`, `ref`
+3. Normalize to internal `Event` schema → push to `telemetry` queue
+4. Trigger downstream `bee-swarm` tasks when necessary
+
+## Environment Variables
+
+| Name | Required | Purpose | Example / Notes |
+|---|---:|---|---|
+| LONGCAT_API_KEY | yes | LongCat API access for video generation | `sk-xxxxx` (store in Netlify env) |
+| LONGCAT_BASE_URL | optional | LongCat API endpoint | `https://api.longcat.ai/v1` |
+| GITHUB_WEBHOOK_SECRET | yes | GitHub webhook signature validation | store in GitHub secrets |
+| NETLIFY_AUTH_TOKEN | optional | Netlify CLI / deploy tokens | store in GitHub secrets |
+| NETLIFY_SITE_ID | optional | Site id for CLI deploys | used by `ntl deploy` |
+
+**Security**: Never log or expose API keys. Use Netlify environment variables for production and `.env` (gitignored) for local development.
+
+## Telemetry Event Schema
+
+```json
+{
+  "eventId": "uuid-v4",
+  "source": "github",
+  "type": "push|pr|telemetry|codex",
+  "timestamp": "2025-11-03T10:00:00Z",
+  "payload": { /* event-specific object */ },
+  "level": "info|warn|error",
+  "meta": {
+    "repo": "owner/repo",
+    "actor": "username",
+    "requestId": "tracing-id"
+  },
+  "tags": ["sensory","webhook","build"]
+}
 ```
 
-### Telemetry Integration
-- All functions log structured events with timestamps
-- Delivery IDs track webhook processing end-to-end
-- Health endpoint exposes cortex configuration state
-- 30-day telemetry retention policy
+**Retention:**
+- Raw events: 30 days
+- Aggregated metrics: 365 days
+
+## Netlify & Deployment
+
+Key `netlify.toml` settings:
+- `build.command = "npm run build"`
+- `functions.directory = "netlify/functions"`
+
+**Deployment Notes:**
+- Ensure `package-lock.json` is in sync with `package.json` (Netlify uses `npm ci`)
+- TypeScript compilation required before deployment
+- If you see `Module not found` on Netlify, check `tsconfig` path mappings and package-lock.json sync
+
+## Project-Specific Patterns
+
+### Webhook Processing
+- **Validation**: Always check `x-github-event` and `x-github-delivery` headers
+- **Logging**: Structure logs with deliveryId, repository, action, timestamp
+- **Idempotency**: Functions designed to handle duplicate deliveries safely
+- **Error handling**: Return 405 for wrong methods, structured JSON for all responses
+
+### Security & Monitoring
+- **No PII**: Strict policy against logging sensitive data (see AGENTS.md)
+- **Auth middleware**: Required on sensitive endpoints
+- **Network policy**: External API calls restricted (see AGENTS.md)
+- **Telemetry**: 30-day retention with structured event tracking
+
+### AI Integration
+- **LongCat**: Video generation via adapter preserving `/api/sora/*` routes
+- **Request format**: Zod validation for prompts, duration, aspect ratio, style
+- **CORS**: All AI endpoints include proper CORS headers
+- **Error handling**: Graceful fallbacks with proper status codes and error details
+
+## Testing & Quality Assurance
+
+### Required Checks (per AGENTS.md)
+```bash
+npm run typecheck           # TypeScript validation (required)
+pnpm lint                   # Code quality (if pnpm configured)
+pnpm test -- --coverage    # Unit tests with coverage
+npm run codeql             # Security scanning
+```
+
+### CI/CD Pipeline (.github/workflows/ci.yml)
+- **Triggers**: PRs and pushes to main
+- **Jobs**: typecheck → build (sequential)
+- **Node**: Version 18 locked, npm cache with `--prefer-offline`
+- **Required**: TypeScript must compile without errors
+
+### Review Standards
+- Auth middleware on routes returning sensitive data
+- No secrets in logs or responses
+- Unit tests required for behavior changes
+- Delivery ID tracking for all webhook events
 
 ## Integration Points
 
 ### External Dependencies
-- **OpenAI**: AI model integration (`openai` package v6.7.0)
-- **Netlify**: Serverless runtime and blob storage (`@netlify/functions`, `@netlify/blobs`)
-- **Zod**: Runtime type validation for webhook payloads
-- **Express**: Used within functions for routing (not standalone server)
+- **@netlify/functions**: Serverless runtime
+- **@netlify/blobs**: Persistent storage
+- **LongCat client**: Video generation integration
+- **zod**: Runtime validation for webhook payloads
+- **express**: Internal routing within functions
 
-### GitHub Integration
-- **Webhook events**: Processed via `github-webhook.ts`
-- **Event types**: Repository, PR, and issue events
-- **Validation**: Headers include `x-github-event` and `x-github-delivery`
+### Local Development Setup
+1. Copy `.env.example` → `.env` with required API keys
+2. Run `npm ci --prefer-offline` for consistent dependencies
+3. Use `npm run dev` for local development with hot reload
+4. Access functions at `/.netlify/functions/[function-name]`
 
-### AI Workflow Orchestration
-- **Sora integration**: Video generation via `sora-generate.ts`
-- **Content processing**: AI-powered advertising content creation
-- **Event-driven**: Triggered by GitHub repository activities
+## Key Files Reference
 
-## Key Files & Directories
+**Core Architecture:**
+- `netlify/functions/github-webhook.ts` - Webhook entry point
+- `tsconfig.json` - ES2022 modules configuration
+- `package.json` - Netlify-specific scripts, ES module type
 
-### Essential Architecture Files
-- `netlify/functions/github-webhook.ts` - Main webhook entry point
-- `netlify/functions/health.ts` - System health and configuration
-- `netlify/functions/telemetry-dashboard.ts` - Monitoring interface
-- `tsconfig.json` - TypeScript configuration with ES2022 modules
+**Documentation:**
+- `AGENTS.md` - Security policies and test commands
+- `WELCOME.md` - Onboarding for new contributors
+- `.github/workflows/ci.yml` - Build pipeline
 
-### Documentation & Conventions
-- `AGENTS.md` - AI agent guidelines and security policies
-- `docs/Codex_NETWORK_POLICY.md` - External API access restrictions  
-- `.github/workflows/ci.yml` - CI pipeline configuration
-- `scripts/` - Automation and operations scripts
+**Configuration:**
+- `.env.example` - Required environment variables
+- `netlify.toml` - Function configuration and routing
 
-### Development Guidelines
-- `package.json` - Scripts use `netlify dev` not standard Node.js patterns
-- `.env.example` - Environment variable templates
-- `netlify.toml` - Deployment and function configuration
-
-## Testing & Quality Assurance
-
-### Required Checks
-- **TypeScript**: `npm run typecheck` must pass
-- **Unit tests**: Required for behavior changes (`pnpm test`)
-- **Security scan**: `npm run codeql` for vulnerability detection
-- **Lint**: `pnpm lint` for code quality
-
-### Review Standards
-- No secrets or PII in logs
-- Auth middleware on sensitive endpoints
-- Structured error responses
-- Event tracking with delivery IDs
-- Network policy compliance for external calls
-
-This codebase prioritizes observability, security, and event-driven AI automation within a serverless architecture.
-
-## Local Development & Tests (Quickstart)
-
-1. Copy `.env.example` → `.env.local` and fill keys (no secrets in Git).
-2. Start Netlify dev (serverless + frontend):
-   ```bash
-   npm ci
-   npm run dev        # uses netlify dev; runs functions + Next.js
-   ```
-3. Run unit tests:
-   ```bash
-   npm test
-   ```
-4. Run integration tests (Playwright or API mocks):
-   ```bash
-   npx playwright test   # if configured
-   ```
-5. Lint & typecheck:
-   ```bash
-   npm run lint
-   npm run typecheck
-   ```
-
-## Provider Adapter Interface
-
-```typescript
-// lib/providers/types.ts
-export type Msg = { role: 'user'|'assistant'|'system'; content: string };
-
-export interface ProviderConfig {
-  apiKey?: string;
-  baseUrl?: string;
-  model?: string;
-  extra?: Record<string, any>;
-}
-
-export interface StreamingChunk {
-  text: string;
-  done?: boolean;
-  meta?: Record<string, any>;
-}
-
-export interface ProviderAdapter {
-  name: string; // 'openai' | 'github'
-  init(config: ProviderConfig): Promise<void>;
-  // streaming generator for server-sent events
-  stream(messages: Msg[], opts?: { model?: string; stop?: string[] }):
-    AsyncGenerator<StreamingChunk, void, unknown>;
-  // optional token accounting helper
-  countTokens?(text: string): Promise<{ promptTokens: number; completionTokens: number }>;
-}
-```
-
-## Telemetry / Echo Event Schema
-
-```json
-{
-  "event_type": "dispatch|response|error|approval",
-  "agent": "string",
-  "run_id": "string",
-  "thread_id": "string|null",
-  "payload": { /* domain object */ },
-  "ts": "ISO-8601 timestamp",
-  "meta": { "duration_ms": 123, "tokens_used": 456, "status": "ok|error|aborted" }
-}
-```
-
-## Webhook Processing Rules
-
-- Always parse `X-Hub-Signature` (or provider signature) and verify before processing.
-- Use `delivery_id` or `X-Request-Id` to detect duplicates. Persist processed delivery IDs with TTL.
-- Design handlers to be idempotent: if processing a second time, skip side effects.
-- Emit Echo events at: received → validated → dispatched → completed/failed.
-- For long-running jobs, return 202 with `run_id` and use Echo/History for follow-up.
-
-## Supabase RLS Example
-
-```sql
--- Example: restrict `projects` rows to owner_id = auth.uid()
-ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "project_owner_only" ON projects
-  FOR SELECT USING (owner_id = auth.uid());
-
--- For inserts you might require:
-CREATE POLICY "project_insert_own" ON projects
-  FOR INSERT WITH CHECK (owner_id = auth.uid());
-```
-
-## CCR Autofix Policy
-
-### Safe autofixes:
-- ESLint `--fix` formatting & trivial refactors
-- Typo fixes in comments, README
-- Minor test assertions when unit test rerun passes
-
-### Require human review (no auto-apply):
-- RLS or auth changes
-- Provider credentials or runtime changes
-- Large refactors or changes that affect data model
-- Any change that increases attack surface (CORS, network rules)
-
-## Example PR Template for Agent PRs
-
-```markdown
-PR title: feat(pr-3): provider - <short description>
-
-Body:
-- Summary: what changed and why
-- Files changed (bullet list)
-- Tests: how they were run
-- Env required: e.g., AI_PROVIDER=openai
-- Risk: Low/Medium/High
-- Rollback: revert commit or feature flag AI_PROVIDER=github
-- Checklist:
-  - [ ] ESLint passes
-  - [ ] TS strict passes
-  - [ ] Unit tests pass
-  - [ ] Integration smoke tested with netlify dev
-```
-
-## Monitoring & Alerts
-
-- Define thresholds for metrics (Echo/Metric ritual):
-  - errors_per_minute > 5 → alert
-  - avg_latency_ms > 2000 → warn
-  - token_spend_per_day > budget_threshold → alert
-- All alerts must map to a runbook: doc/incident-runbooks.md
-- Snapshot Postgres nightly, rotate service role keys monthly.
+This codebase prioritizes webhook-driven automation, comprehensive telemetry, and secure AI integration within a serverless architecture.

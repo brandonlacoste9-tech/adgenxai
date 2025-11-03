@@ -1,0 +1,32 @@
+﻿[
+  {
+    "title": "Refactor and implement core generator system",
+    "body": "Rebuild the generator logic for modularity and support for future engines. Acceptance criteria:\n- Modular source structure (per-engine)\n- Passes integration tests\n- Linked to 'Agent Mode Launch' milestone.",
+    "labels": ["agent-mode", "api", "frontend", "infra"],
+    "milestone": "Agent Mode Launch"
+  },
+  {
+    "title": "Integrate unified social publishing endpoints",
+    "body": "Wire the API and frontend for instant publishing to Instagram, YouTube, X/Twitter, and TikTok. Tracks status, handles retries, and shows per-platform results.\nAcceptance:\n- Works with 'Publish to All' in UI\n- Status codes handled and errors surfaced\n- CI test coverage exists",
+    "labels": ["agent-mode", "api", "frontend"],
+    "milestone": "Agent Mode Launch"
+  },
+  {
+    "title": "Harden Stripe/Coinbase webhook and entitlements logic",
+    "body": "Add validation for all payment webhooks. Ensure new subscriptions and upgrades grant correct permissions. Acceptance:\n- Webhook signature tests\n- Permissions and limits enforced per tier\n- Docs in README.deploy.md",
+    "labels": ["billing", "infra", "api"],
+    "milestone": "Agent Mode Launch"
+  },
+  {
+    "title": "Add dashboard analytics for generator and publishing usage",
+    "body": "Implement real-time and historical analytics dashboard. K-Factor, referral, and sentiment analytics visualized. Acceptance:\n- Live metrics data in dashboard\n- Trend sparkline for 14 days\n- Data export works",
+    "labels": ["analytics", "dashboard", "growth"],
+    "milestone": "Agent Mode Launch"
+  },
+  {
+    "title": "Set up team collaboration features (comments, roles, approvals)",
+    "body": "Enable multi-user collaboration with roles, comments, approvals, and notifications. Acceptance:\n- Org role assignment in UI\n- Comments visible and editable\n- Approval flow triggers notifications",
+    "labels": ["collaboration", "frontend", "api"],
+    "milestone": "Agent Mode Launch"
+  }
+]
