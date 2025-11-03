@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simple to-do list application with local storage">
+    <title>To-Do List - AdGenXAI</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/todo.css">
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header>
+        <nav class="container">
+            <a href="index.html" class="logo">BEE-<span>SHIP</span></a>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">☰</button>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="demo.html">Try Demo</a></li>
+                <li><a href="todo.html">To-Do List</a></li>
+                <li><a href="https://github.com/brandonlacoste9-tech/adgenxai" target="_blank">Documentation</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="todo-main">
+        <div class="container">
+            <div class="todo-container">
+                <h1>📝 My To-Do List</h1>
+                <p class="subtitle">Keep track of your tasks with local storage</p>
+
+                <!-- Input Section -->
+                <div class="todo-input-section">
+                    <input 
+                        type="text" 
+                        id="taskInput" 
+                        class="task-input" 
+                        placeholder="What do you need to do?"
+                        aria-label="New task input"
+                    >
+                    <button id="addTaskBtn" class="add-task-btn" aria-label="Add task">
+                        <span class="btn-text">Add Task</span>
+                        <span class="btn-icon">+</span>
+                    </button>
+                </div>
+
+                <!-- Filter and Stats Section -->
+                <div class="todo-controls">
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="active">Active</button>
+                        <button class="filter-btn" data-filter="completed">Completed</button>
+                    </div>
+                    <div class="task-stats">
+                        <span id="taskCount">0 tasks</span>
+                    </div>
+                </div>
+
+                <!-- Task List -->
+                <ul id="taskList" class="task-list" aria-label="Task list">
+                    <!-- Tasks will be dynamically added here -->
+                </ul>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="empty-state">
+                    <div class="empty-icon">✨</div>
+                    <p>No tasks yet. Add one above to get started!</p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="todo-actions">
+                    <button id="clearCompletedBtn" class="action-btn secondary-btn">
+                        Clear Completed
+                    </button>
+                    <button id="clearAllBtn" class="action-btn danger-btn">
+                        Clear All Tasks
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>BEE-SHIP</h3>
+                    <p>Autonomous social media publishing platform powered by serverless APIs</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="demo.html">Try Demo</a></li>
+                        <li><a href="todo.html">To-Do List</a></li>
+                        <li><a href="https://github.com/brandonlacoste9-tech/adgenxai" target="_blank">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>About This App</h3>
+                    <ul>
+                        <li>Simple & Fast</li>
+                        <li>Local Storage</li>
+                        <li>No Account Required</li>
+                        <li>Fully Responsive</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Connect</h3>
+                    <ul>
+                        <li><a href="https://github.com/brandonlacoste9-tech/adgenxai" target="_blank">GitHub</a></li>
+                        <li><a href="https://app.netlify.com/sites/adgenxai" target="_blank">Netlify Dashboard</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 AdGenXAI BEE-SHIP. Built with HTML, CSS, and JavaScript</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/todo.js"></script>
+</body>
+</html>
