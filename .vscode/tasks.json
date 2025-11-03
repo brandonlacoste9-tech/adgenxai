@@ -44,7 +44,7 @@
     {
       "label": "Claude: Review File",
       "type": "shell",
-      "command": "claude review \"${file}\" > \"${file}.claude.md\" && code --reuse-window \"${file}.claude.md\"",
+      "command": "set -e; OUT=\"${file}.claude.md\"; claude review \"${file}\" > \"$OUT\" && code --reuse-window \"$OUT\"",
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -55,7 +55,7 @@
     {
       "label": "Claude: Generate Unit Test (Vitest)",
       "type": "shell",
-      "command": "claude generate-test \"${file}\" > \"${file}.claude.test.patch\"",
+      "command": "set -e; OUT=\"${file}.claude.test.patch\"; claude generate-test \"${file}\" > \"$OUT\" && echo \"Test patch written to: $OUT\"",
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -66,7 +66,7 @@
     {
       "label": "Claude: Produce Git Patch For File",
       "type": "shell",
-      "command": "claude generate-patch \"${file}\" > \"${file}.claude.patch\"",
+      "command": "set -e; OUT=\"${file}.claude.patch\"; claude generate-patch \"${file}\" > \"$OUT\" && echo \"Patch written to: $OUT\"",
       "presentation": {
         "echo": true,
         "reveal": "always",

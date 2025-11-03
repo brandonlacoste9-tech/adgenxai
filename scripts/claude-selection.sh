@@ -16,6 +16,7 @@ if claude review "$TMPFILE" > "$OUTFILE"; then
   echo "Output written to: $OUTFILE"
   
   # Open in VS Code if available
+  # Note: Opening in VS Code is optional, so we don't fail if it's unavailable or errors
   if command -v code >/dev/null 2>&1; then
     code --reuse-window "$OUTFILE" || true
   else
