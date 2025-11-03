@@ -132,7 +132,6 @@ export class LongCatClient {
         'Content-Type': 'application/json',
         'User-Agent': 'AdGenXAI/1.0',
       },
-      timeout: this.config.timeout,
     };
 
     const requestOptions = { ...defaultOptions, ...options };
@@ -199,6 +198,3 @@ export function createLongCatClient(config?: Partial<LongCatConfig>): LongCatCli
     ...config,
   });
 }
-
-// Export types for external use
-export type { LongCatConfig, LongCatVideoRequest, LongCatVideoResponse };
