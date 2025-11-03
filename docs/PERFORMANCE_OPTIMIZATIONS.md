@@ -156,8 +156,8 @@ This document outlines the performance optimizations implemented in AdGenXAI and
    - Queue failed requests for retry
    - Background sync for analytics
    
-4. **Install Missing Dependencies**: Currently blocking full build
-   - `lucide-react` for icons
+4. **Resolve Build Blockers**: Ensure required modules exist
+   - Use lightweight inline icons (no external `lucide-react` dependency required)
    - Create missing components (`CampaignOrchestrationDemo`, `sora-client`)
    - This will allow production build optimization
 

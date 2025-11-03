@@ -2,27 +2,12 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Sparkles, 
-  Zap, 
-  Bot, 
-  Palette, 
-  Video, 
-  Globe, 
-  Brain, 
-  Wand2,
-  Code,
-  Layers,
-  Hexagon,
-  BookOpen,
-  Workflow
-} from "lucide-react";
 
 interface Feature {
   id: string;
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: string;
   category: "orchestration" | "ai-models" | "platforms" | "tools";
   status: "live" | "beta" | "coming-soon";
   highlight?: boolean;
@@ -34,7 +19,7 @@ const features: Feature[] = [
     id: "campaign-orchestration",
     title: "Campaign Orchestration Engine",
     description: "Revolutionary unified platform - one API call orchestrates 11 AI models to create complete marketing campaigns automatically.",
-    icon: <Workflow className="w-6 h-6" />,
+    icon: "🧠",
     category: "orchestration",
     status: "live",
     highlight: true
@@ -45,7 +30,7 @@ const features: Feature[] = [
     id: "kimi-linear",
     title: "Kimi-Linear Strategy",
     description: "Advanced strategic planning and market analysis with linear thought processing for comprehensive campaign foundations.",
-    icon: <Brain className="w-6 h-6" />,
+    icon: "🧭",
     category: "ai-models",
     status: "live"
   },
@@ -53,7 +38,7 @@ const features: Feature[] = [
     id: "hunyuan-3d",
     title: "Hunyuan 3D Assets",
     description: "Revolutionary 3D content generation for immersive advertising experiences and product visualizations.",
-    icon: <Layers className="w-6 h-6" />,
+    icon: "🧩",
     category: "ai-models",
     status: "live"
   },
@@ -61,7 +46,7 @@ const features: Feature[] = [
     id: "worldgrow",
     title: "WorldGrow Global",
     description: "Global market expansion strategies with cultural adaptation and international campaign optimization.",
-    icon: <Globe className="w-6 h-6" />,
+    icon: "🌍",
     category: "ai-models",
     status: "live"
   },
@@ -69,7 +54,7 @@ const features: Feature[] = [
     id: "longcat-video",
     title: "LongCat Video",
     description: "Advanced video content generation with narrative continuity and engagement optimization.",
-    icon: <Video className="w-6 h-6" />,
+    icon: "🎬",
     category: "ai-models",
     status: "live"
   },
@@ -77,7 +62,7 @@ const features: Feature[] = [
     id: "ditto",
     title: "Ditto Brand Voice",
     description: "Consistent brand voice across all channels with personality adaptation and tone optimization.",
-    icon: <Wand2 className="w-6 h-6" />,
+    icon: "🪄",
     category: "ai-models",
     status: "live"
   },
@@ -85,7 +70,7 @@ const features: Feature[] = [
     id: "nitro-e",
     title: "Nitro-E Performance",
     description: "High-performance ad copy generation optimized for conversion rates and engagement metrics.",
-    icon: <Zap className="w-6 h-6" />,
+    icon: "⚡",
     category: "ai-models",
     status: "live"
   },
@@ -95,7 +80,7 @@ const features: Feature[] = [
     id: "beehive-swarm",
     title: "BeeHive Swarm Intelligence",
     description: "Distributed AI agents working together like a hive mind for collaborative campaign creation and optimization.",
-    icon: <Hexagon className="w-6 h-6" />,
+    icon: "🐝",
     category: "platforms",
     status: "live",
     highlight: true
@@ -104,7 +89,7 @@ const features: Feature[] = [
     id: "gemini-cookbook",
     title: "Gemini Cookbook Lab",
     description: "Advanced AI experimentation platform with Google Gemini integration for cutting-edge content generation.",
-    icon: <BookOpen className="w-6 h-6" />,
+    icon: "📚",
     category: "platforms",
     status: "live"
   },
@@ -112,7 +97,7 @@ const features: Feature[] = [
     id: "fusion-orchestra",
     title: "AdGenXAI Fusion",
     description: "Multi-model orchestration system that combines different AI capabilities into unified campaign workflows.",
-    icon: <Bot className="w-6 h-6" />,
+    icon: "🤖",
     category: "platforms",
     status: "live"
   },
@@ -122,7 +107,7 @@ const features: Feature[] = [
     id: "api-orchestration",
     title: "Unified API Layer",
     description: "Single API endpoint that intelligently routes to optimal AI models based on campaign requirements.",
-    icon: <Code className="w-6 h-6" />,
+    icon: "🛠️",
     category: "tools",
     status: "live"
   },
@@ -130,7 +115,7 @@ const features: Feature[] = [
     id: "cost-optimization",
     title: "Cost Intelligence",
     description: "AI-powered cost optimization delivering 80-90% savings through intelligent model routing and batch processing.",
-    icon: <Sparkles className="w-6 h-6" />,
+    icon: "💡",
     category: "tools",
     status: "live"
   },
@@ -138,7 +123,7 @@ const features: Feature[] = [
     id: "creative-suite",
     title: "Creative AI Suite",
     description: "Comprehensive creative tools powered by Dall-E-3, Claude-3.5-Sonnet, GPT-4-Turbo, and Stable Diffusion.",
-    icon: <Palette className="w-6 h-6" />,
+    icon: "🎨",
     category: "tools",
     status: "live"
   }
@@ -251,8 +236,10 @@ export default function ComprehensiveFeatureShowcase() {
                   transition={{ duration: 0.5 }}
                   className={`w-16 h-16 rounded-xl bg-gradient-to-br ${categoryColors[feature.category]} p-4 mb-6 shadow-lg`}
                 >
-                  <div className="text-white w-full h-full flex items-center justify-center">
-                    {feature.icon}
+                  <div className="text-white text-3xl w-full h-full flex items-center justify-center">
+                    <span role="img" aria-hidden>
+                      {feature.icon}
+                    </span>
                   </div>
                 </motion.div>
 
