@@ -158,11 +158,31 @@ npm run codeql             # Security scanning
 - **zod**: Runtime validation for webhook payloads
 - **express**: Internal routing within functions
 
-### Local Development Setup
+### Local Development & Debugging
+
+### Setup
 1. Copy `.env.example` → `.env` with required API keys
 2. Run `npm ci --prefer-offline` for consistent dependencies
 3. Use `npm run dev` for local development with hot reload
 4. Access functions at `/.netlify/functions/[function-name]`
+
+### Debug Mode
+To enable runtime debug for webhook processing:
+```bash
+DEBUG_WEBHOOK_PROCESSING=1 npm run dev
+```
+
+To enable LongCat API debug logging:
+```bash
+DEBUG_LONGCAT=1 npm run dev
+```
+
+To disable LongCat adapter (rollback):
+```bash
+USE_LONGCAT=0 npm run dev  # Returns 501 errors
+```
+
+This prints gated debug info and is safe for local troubleshooting.
 
 ## Key Files Reference
 
