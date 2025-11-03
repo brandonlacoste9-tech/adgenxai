@@ -217,6 +217,9 @@ node_modules/
 .next/
 out/
 
+# TypeScript
+tsconfig.tsbuildinfo
+
 # OS
 .DS_Store
 Thumbs.db
