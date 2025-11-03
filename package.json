@@ -10,7 +10,8 @@
     "deploy": "netlify deploy --prod",
     "test": "vitest run --reporter=dot",
     "test:watch": "vitest",
-    "test:ci": "vitest run --coverage --reporter=dot"
+    "test:ci": "vitest run --coverage --reporter=dot",
+    "triage:prs": "node scripts/pr-triage.mjs"
   },
   "dependencies": {
     "@netlify/blobs": "^7.0.0",
