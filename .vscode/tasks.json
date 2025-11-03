@@ -44,7 +44,7 @@
     {
       "label": "Refresh: PR & Problems",
       "type": "shell",
-      "command": "gh pr view --json mergeable,statusCheckRollup --jq '.' && gh pr checks && npm run typecheck || true",
+      "command": "gh pr view 104 --json mergeable,statusCheckRollup,state --jq '.' && gh pr checks 104 && npm run typecheck || true",
       "presentation": {
         "echo": true,
         "reveal": "always",
