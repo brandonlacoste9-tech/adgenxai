@@ -3,7 +3,6 @@ set -e
 
 # Create temp files with proper security and cleanup
 TMPFILE="$(mktemp "${TMPDIR:-/tmp}/claude-selection.XXXXXX")"
-mv "$TMPFILE" "${TMPFILE}.md"
 TMPFILE="${TMPFILE}.md"
 OUTFILE="${TMPFILE}.out"
 
