@@ -90,15 +90,12 @@ function getAnalyticsReport(): Response {
   }
 
   const totalRequests = metrics.length;
-  const successes = metrics.filter((m) => m.status === "success").length;
-  const aborts = metrics.filter((m) => m.wasAborted).length;
+  let successes = 0;
+  let aborts = 0;
+  let totalLatency = 0;
+  let totalDuration = 0;
 
-  const avgLatency =
-    metrics.reduce((sum, m) => sum + m.latency, 0) / totalRequests;
-  const avgDuration =
-    metrics.reduce((sum, m) => sum + m.totalDuration, 0) / totalRequests;
-
-  // Model breakdown
+  // Model breakdown tracking
   const modelMap = new Map<
     string,
     {
@@ -108,7 +105,15 @@ function getAnalyticsReport(): Response {
     }
   >();
 
+  // Single pass through metrics array - optimize from multiple iterations
   metrics.forEach((m) => {
+    // Aggregate totals
+    if (m.status === "success") successes++;
+    if (m.wasAborted) aborts++;
+    totalLatency += m.latency;
+    totalDuration += m.totalDuration;
+
+    // Model breakdown
     const current = modelMap.get(m.model) || {
       count: 0,
       successes: 0,
@@ -119,6 +124,9 @@ function getAnalyticsReport(): Response {
     current.totalLatency += m.latency;
     modelMap.set(m.model, current);
   });
+
+  const avgLatency = totalLatency / totalRequests;
+  const avgDuration = totalDuration / totalRequests;
 
   const modelBreakdown: Record<
     string,
