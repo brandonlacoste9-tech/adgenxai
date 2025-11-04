@@ -4,9 +4,9 @@
   "description": "Advanced GitHub PR and Issue management system with multi-agent coordination",
   "main": "dist/index.js",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "node src/index.js",
     "dev": "tsx watch index.ts",
-    "build": "esbuild src/index.js --bundle --platform=node --outfile=dist/index.js --format=esm",
+    "build": "esbuild src/index.js --bundle --platform=node --outfile=dist/index.js --format=esm --external:express --external:octokit --external:prom-client --external:crypto",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "lint": "eslint . --ext .ts,.tsx",

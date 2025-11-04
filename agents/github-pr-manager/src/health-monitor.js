@@ -3,7 +3,7 @@
  * Provides real-time health metrics, circuit breaker status, and system diagnostics
  */
 
-const EventEmitter = require('events');
+import { EventEmitter } from 'events';
 
 class HealthMonitor extends EventEmitter {
     constructor(options = {}) {

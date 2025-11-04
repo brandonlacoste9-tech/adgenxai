@@ -1,6 +1,6 @@
 // src/metrics.js
-const client = require('prom-client');
-const Redis = require('ioredis');
+import client from 'prom-client';
+import Redis from 'ioredis';
 
 const redis = new Redis(process.env.REDIS_URL || 'redis://127.0.0.1:6379');
 
@@ -207,7 +207,7 @@ function gracefulShutdown() {
 process.on('SIGTERM', gracefulShutdown);
 process.on('SIGINT', gracefulShutdown);
 
-module.exports = {
+export {
   attachMetricsEndpoint,
   recordWebhookProcessed,
   recordWebhookError,
@@ -217,6 +217,8 @@ module.exports = {
   processedCounter,
   errorCounter,
   queueGauge,
-  gracefulShutdown,
-  _internal: { redis, poll } // for tests or manual cleanup
+  gracefulShutdown
 };
+
+// Internal exports for tests or manual cleanup
+export const _internal = { redis, poll };
