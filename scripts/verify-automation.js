@@ -16,7 +16,7 @@ const checks = {
 };
 
 console.log('🔍 GitHub Automation Verification - Issue #110\n');
-console.log('=' .repeat(60));
+console.log('='.repeat(60));
 
 // Check 1: GitHub Workflows
 console.log('\n📋 Checking GitHub Workflows...');
@@ -182,7 +182,8 @@ console.log(`   ✅ Passed: ${checks.passed.length}`);
 console.log(`   ⚠️  Warnings: ${checks.warnings.length}`);
 console.log(`   ❌ Failed: ${checks.failed.length}`);
 
-const passRate = (checks.passed.length / (checks.passed.length + checks.failed.length)) * 100;
+const totalChecks = checks.passed.length + checks.failed.length;
+const passRate = totalChecks > 0 ? (checks.passed.length / totalChecks) * 100 : 0;
 console.log(`   📊 Pass Rate: ${passRate.toFixed(1)}%`);
 
 // Exit code

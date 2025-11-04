@@ -55,49 +55,68 @@ jobs:
       - name: Generate Health Report
         id: report
         run: |
-          cat << 'EOF' > health-report.md
-          ## 🤖 GitHub Automation Health Report
-          **Generated:** $(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          **Workflow:** Automated Health Monitor
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          WORKFLOW_COUNT="${{ steps.workflows.outputs.count }}"
+          AGENT_FILES="${{ steps.agents.outputs.files }}"
+          
+          CLI_STATUS="❌ Not found"
+          if [ -f dist/index.js ]; then
+            CLI_STATUS="✅ Installed"
+          fi
+          
+          DOC_STATUS="❌ Missing"
+          if [ -f GITHUB_AUTOMATION_STATUS_REPORT.md ]; then
+            DOC_STATUS="✅ Available"
+          fi
+          
+          RECOMMENDATION="- Restore dist/index.js for webhook handling"
+          if [ -f dist/index.js ]; then
+            RECOMMENDATION="- Consider deploying webhook server to production"
+          fi
+          
+          VERIFICATION_OUTPUT=$(cat verification-output.txt 2>/dev/null || echo "Verification not available")
+          
+          cat > health-report.md << EOF
+## 🤖 GitHub Automation Health Report
+**Generated:** ${TIMESTAMP}
+**Workflow:** Automated Health Monitor
 
-          ### 📊 System Metrics
-          - **Active Workflows:** ${{ steps.workflows.outputs.count }}
-          - **Agent Framework Files:** ${{ steps.agents.outputs.files }}
-          - **GitHub Agent CLI:** $(test -f dist/index.js && echo "✅ Installed" || echo "❌ Not found")
-          - **Documentation:** $(test -f GITHUB_AUTOMATION_STATUS_REPORT.md && echo "✅ Available" || echo "❌ Missing")
+### 📊 System Metrics
+- **Active Workflows:** ${WORKFLOW_COUNT}
+- **Agent Framework Files:** ${AGENT_FILES}
+- **GitHub Agent CLI:** ${CLI_STATUS}
+- **Documentation:** ${DOC_STATUS}
 
-          ### 🔍 Verification Results
-          ```
-          $(cat verification-output.txt || echo "Verification not available")
-          ```
+### 🔍 Verification Results
+\`\`\`
+${VERIFICATION_OUTPUT}
+\`\`\`
 
-          ### 📋 Active Automation Features
-          - ✅ GitHub Actions CI/CD Pipeline
-          - ✅ CodeQL Security Scanning
-          - ✅ Automated Issue Response System
-          - ✅ Cortex Observer (Hourly Telemetry)
-          - ✅ Auto-Labeling for PRs
-          - ✅ Copilot Integration
-          - ⚠️  Multi-Agent Framework (Not deployed)
-          - ⚠️  Webhook Server (Not in production)
+### 📋 Active Automation Features
+- ✅ GitHub Actions CI/CD Pipeline
+- ✅ CodeQL Security Scanning
+- ✅ Automated Issue Response System
+- ✅ Cortex Observer (Hourly Telemetry)
+- ✅ Auto-Labeling for PRs
+- ✅ Copilot Integration
+- ⚠️  Multi-Agent Framework (Not deployed)
+- ⚠️  Webhook Server (Not in production)
 
-          ### 🎯 Recommendations
-          $(test -f dist/index.js && echo "- Consider deploying webhook server to production" || echo "- Restore dist/index.js for webhook handling")
-          - Review agent framework deployment status
-          - Verify all workflows are functioning as expected
-          - Update Issue #110 with current implementation status
+### 🎯 Recommendations
+${RECOMMENDATION}
+- Review agent framework deployment status
+- Verify all workflows are functioning as expected
+- Update Issue #110 with current implementation status
 
-          ### 🔗 Quick Links
-          - [Automation Status Report](../GITHUB_AUTOMATION_STATUS_REPORT.md)
-          - [Agent Quick Reference](../GITHUB_AGENT_QUICK_REF.md)
-          - [Installation Guide](../GITHUB_AGENT_INSTALLATION_PLAN.md)
+### 🔗 Quick Links
+- [Automation Status Report](../GITHUB_AUTOMATION_STATUS_REPORT.md)
+- [Agent Quick Reference](../GITHUB_AGENT_QUICK_REF.md)
+- [Installation Guide](../GITHUB_AGENT_INSTALLATION_PLAN.md)
 
-          ---
-          *This report is generated automatically by the Automation Health Monitor workflow.*
-          EOF
-
-          # Make timestamp work properly
-          sed -i "s/\$(date -u +\"%Y-%m-%dT%H:%M:%SZ\")/$(date -u +"%Y-%m-%dT%H:%M:%SZ")/g" health-report.md
+---
+*This report is generated automatically by the Automation Health Monitor workflow.*
+EOF
+          
           cat health-report.md
 
       - name: Post to Issue #110
