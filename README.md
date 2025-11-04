@@ -24,6 +24,12 @@ npm run dev
 - **[START_HERE_BEE_SHIP.md](START_HERE_BEE_SHIP.md)** - Deployment automation guide
 - **[PHASE2_README.md](PHASE2_README.md)** - Autonomous PR workflow setup
 
+### 🤖 GitHub Automation (Issue #110)
+- **[GITHUB_AUTOMATION_QUICK_START.md](GITHUB_AUTOMATION_QUICK_START.md)** - ⭐ Start here for automation
+- **[GITHUB_AUTOMATION_STATUS_REPORT.md](GITHUB_AUTOMATION_STATUS_REPORT.md)** - Complete implementation status
+- **[GITHUB_AGENT_QUICK_REF.md](GITHUB_AGENT_QUICK_REF.md)** - Quick reference commands
+- **[GITHUB_AGENT_INSTALLATION_PLAN.md](GITHUB_AGENT_INSTALLATION_PLAN.md)** - Detailed installation guide
+
 ---
 
 ## 🎯 What is AdGenXAI?
