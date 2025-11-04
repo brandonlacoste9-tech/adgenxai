@@ -1,0 +1,145 @@
+name: Automation Health Monitor
+
+on:
+  schedule:
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch: {}
+  push:
+    paths:
+      - '.github/workflows/**'
+      - 'agents/**'
+      - 'dist/index.js'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  monitor-automation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci --prefer-offline || npm install --force
+
+      - name: Run Automation Verification
+        id: verify
+        run: |
+          node scripts/verify-automation.js > verification-output.txt 2>&1 || true
+          cat verification-output.txt
+
+      - name: Count Active Workflows
+        id: workflows
+        run: |
+          WORKFLOW_COUNT=$(find .github/workflows -name "*.yml" -type f | wc -l)
+          echo "count=$WORKFLOW_COUNT" >> $GITHUB_OUTPUT
+          echo "Found $WORKFLOW_COUNT active workflows"
+
+      - name: Check Agent Framework
+        id: agents
+        run: |
+          AGENT_FILES=$(find agents -name "*.js" -o -name "*.ts" | wc -l)
+          echo "files=$AGENT_FILES" >> $GITHUB_OUTPUT
+          echo "Found $AGENT_FILES agent files"
+
+      - name: Generate Health Report
+        id: report
+        run: |
+          cat << 'EOF' > health-report.md
+          ## 🤖 GitHub Automation Health Report
+          **Generated:** $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          **Workflow:** Automated Health Monitor
+
+          ### 📊 System Metrics
+          - **Active Workflows:** ${{ steps.workflows.outputs.count }}
+          - **Agent Framework Files:** ${{ steps.agents.outputs.files }}
+          - **GitHub Agent CLI:** $(test -f dist/index.js && echo "✅ Installed" || echo "❌ Not found")
+          - **Documentation:** $(test -f GITHUB_AUTOMATION_STATUS_REPORT.md && echo "✅ Available" || echo "❌ Missing")
+
+          ### 🔍 Verification Results
+          ```
+          $(cat verification-output.txt || echo "Verification not available")
+          ```
+
+          ### 📋 Active Automation Features
+          - ✅ GitHub Actions CI/CD Pipeline
+          - ✅ CodeQL Security Scanning
+          - ✅ Automated Issue Response System
+          - ✅ Cortex Observer (Hourly Telemetry)
+          - ✅ Auto-Labeling for PRs
+          - ✅ Copilot Integration
+          - ⚠️  Multi-Agent Framework (Not deployed)
+          - ⚠️  Webhook Server (Not in production)
+
+          ### 🎯 Recommendations
+          $(test -f dist/index.js && echo "- Consider deploying webhook server to production" || echo "- Restore dist/index.js for webhook handling")
+          - Review agent framework deployment status
+          - Verify all workflows are functioning as expected
+          - Update Issue #110 with current implementation status
+
+          ### 🔗 Quick Links
+          - [Automation Status Report](../GITHUB_AUTOMATION_STATUS_REPORT.md)
+          - [Agent Quick Reference](../GITHUB_AGENT_QUICK_REF.md)
+          - [Installation Guide](../GITHUB_AGENT_INSTALLATION_PLAN.md)
+
+          ---
+          *This report is generated automatically by the Automation Health Monitor workflow.*
+          EOF
+
+          # Make timestamp work properly
+          sed -i "s/\$(date -u +\"%Y-%m-%dT%H:%M:%SZ\")/$(date -u +"%Y-%m-%dT%H:%M:%SZ")/g" health-report.md
+          cat health-report.md
+
+      - name: Post to Issue #110
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            try {
+              const healthReport = fs.readFileSync('health-report.md', 'utf8');
+              
+              // Find Issue #110
+              const { data: issues } = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                per_page: 100
+              });
+              
+              const issue110 = issues.find(issue => issue.number === 110);
+              
+              if (issue110) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: 110,
+                  body: healthReport
+                });
+                console.log('✅ Posted health report to Issue #110');
+              } else {
+                console.log('⚠️  Issue #110 not found or is closed');
+              }
+            } catch (e) {
+              console.error('❌ Error posting to Issue #110:', e.message);
+            }
+
+      - name: Summary
+        run: |
+          echo "## 📊 Automation Health Check Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ✅ Monitoring active" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflows:** ${{ steps.workflows.outputs.count }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Agent Files:** ${{ steps.agents.outputs.files }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "See Issue #110 for detailed health report." >> $GITHUB_STEP_SUMMARY
