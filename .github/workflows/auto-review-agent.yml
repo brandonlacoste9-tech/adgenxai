@@ -1,0 +1,83 @@
+name: Auto-Review Agent
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run mode (no actual changes)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      repos:
+        description: 'Repositories to review (comma-separated, e.g., adgenxai,Beehive)'
+        required: false
+        default: 'adgenxai,Beehive'
+        type: string
+  
+  # Optional: Schedule for automatic runs (disabled by default)
+  # schedule:
+  #   - cron: '0 */6 * * *'  # Every 6 hours
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  auto-review:
+    name: Run Auto-Review Agent
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Trigger Netlify Auto-Review Function
+        env:
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          REPOS: ${{ github.event.inputs.repos || 'adgenxai,Beehive' }}
+        run: |
+          echo "🤖 Triggering Auto-Review Agent"
+          echo "Dry Run: $DRY_RUN"
+          echo "Repositories: $REPOS"
+          echo ""
+          
+          # Call the Netlify function
+          response=$(curl -s -w "\n%{http_code}" -X POST \
+            "https://www.adgenxai.pro/.netlify/functions/auto-review-agent?dryRun=$DRY_RUN&repos=$REPOS")
+          
+          # Extract status code and body
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          
+          echo "HTTP Status: $http_code"
+          echo ""
+          echo "Response:"
+          echo "$body" | jq '.' || echo "$body"
+          
+          # Check if successful
+          if [ "$http_code" -eq 200 ]; then
+            echo ""
+            echo "✅ Auto-review completed successfully"
+            exit 0
+          else
+            echo ""
+            echo "❌ Auto-review failed with status $http_code"
+            exit 1
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### 🤖 Auto-Review Agent Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Dry Run**: ${{ github.event.inputs.dry_run || 'false' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Repositories**: ${{ github.event.inputs.repos || 'adgenxai,Beehive' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Time**: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
