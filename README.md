@@ -21,7 +21,8 @@ npm run dev
 
 - **[PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md)** - Project goals, features, and roadmap
 - **[docs/README.md](docs/README.md)** - Complete documentation hub
-- **[docs/AUTO_REVIEW_AGENT.md](docs/AUTO_REVIEW_AGENT.md)** - 🤖 Auto-Review Agent for bulk PR/issue review
+- **[docs/AUTO_REVIEW_AGENT.md](docs/AUTO_REVIEW_AGENT.md)** - 🤖 Auto-Review Agent (full docs)
+- **[docs/AUTO_REVIEW_AGENT_QUICKREF.md](docs/AUTO_REVIEW_AGENT_QUICKREF.md)** - 🚀 Quick Reference Guide
 - **[START_HERE_BEE_SHIP.md](START_HERE_BEE_SHIP.md)** - Deployment automation guide
 - **[PHASE2_README.md](PHASE2_README.md)** - Autonomous PR workflow setup
 
