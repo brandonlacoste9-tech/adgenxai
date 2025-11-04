@@ -126,7 +126,19 @@ Full documentation: [docs/README.md](docs/README.md)
 
 ## 🤝 Contributing
 
-We welcome contributions! See our [Phase 2 autonomous PR workflow](PHASE2_README.md) for how to contribute using AI-powered code review and automation.
+We welcome contributions! Here's how to get started:
+
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Complete contribution guide with workflow, standards, and best practices
+- **[PHASE2_README.md](PHASE2_README.md)** - Autonomous PR workflow and AI-powered code review
+- **Issue Templates** - Use our templates for [bug reports](.github/ISSUE_TEMPLATE/bug_report.md), [feature requests](.github/ISSUE_TEMPLATE/feature_request.md), or [agent tasks](.github/ISSUE_TEMPLATE/agent_task.md)
+
+### Quick Start for Contributors
+
+1. Fork the repository
+2. Create a feature branch (`feat/your-feature`)
+3. Follow our [development guidelines](CONTRIBUTING.md#development-guidelines)
+4. Submit a PR using our [PR template](.github/pull_request_template.md)
+5. Let our AI agents help with code review and automation!
 
 ---
 
