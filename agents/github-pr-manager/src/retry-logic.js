@@ -237,13 +237,8 @@ class RetryLogic {
 }
 
 // Export both the class and convenience functions
-module.exports = {
-    RetryLogic,
-    RetryableError,
-    
-    // Convenience functions
-    retry: (operation, options) => new RetryLogic(options).execute(operation),
-    retryHttp: RetryLogic.retryHttpRequest,
-    wrap: RetryLogic.wrap,
-    createRetryable: RetryLogic.createRetryable
-};
+export { RetryLogic, RetryableError };
+export const retry = (operation, options) => new RetryLogic(options).execute(operation);
+export const retryHttp = RetryLogic.retryHttpRequest;
+export const wrap = RetryLogic.wrap;
+export const createRetryable = RetryLogic.createRetryable;

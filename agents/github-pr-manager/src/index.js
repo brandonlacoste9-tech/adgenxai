@@ -451,7 +451,7 @@ async function analyzePRWithResilience(pr, repository, deliveryId) {
     if (TOKEN && analysis.riskLevel !== 'low') {
       await githubCircuitBreaker.execute(async () => {
         await retryableGitHubCall(async () => {
-          await addLabelsToePR(repository, pr.number, analysis);
+          await addLabelsToPR(repository, pr.number, analysis);
         });
       });
     }
@@ -536,23 +536,7 @@ async function analyzeIssueWithResilience(issue, repository, deliveryId) {
   }
 }
 
-    // Generate and post review comment if high risk
-    if (TOKEN && (analysis.riskLevel === 'high' || analysis.riskLevel === 'critical')) {
-      await postAIReviewComment(repository, pr.number, prData, analysis);
-    }
-
-    const duration = (Date.now() - startTime) / 1000;
-    recordAIAnalysis('pr', duration, 'success');
-    processedPRsCounter.inc({ action: 'analyzed', status: 'success' });
-
-  } catch (error) {
-    const duration = (Date.now() - startTime) / 1000;
-    recordAIAnalysis('pr', duration, 'error');
-    recordError('ai_analysis', 'pr');
-    processedPRsCounter.inc({ action: 'analyzed', status: 'error' });
-    safeLog(`AI analysis failed for PR #${pr.number}:`, error.message);
-  }
-}async function analyzeIssueWithAI(issue, repository) {
+async function analyzeIssueWithAI(issue, repository) {
   if (!ENABLE_AI_ANALYSIS) {
     safeLog(`AI analysis disabled for issue #${issue.number}`);
     return;
@@ -578,7 +562,7 @@ async function analyzeIssueWithResilience(issue, repository, deliveryId) {
   }
 }
 
-async function addLabelsToePR(repository, prNumber, analysis) {
+async function addLabelsToPR(repository, prNumber, analysis) {
   try {
     const labels = [];
     
@@ -677,7 +661,7 @@ async function managePRsOnce() {
     return;
   }
   const [owner, repo] = REPO.split("/");
-  if (!owner || repo) {
+  if (!owner || !repo) {
     safeLog("Malformed GITHUB_REPOSITORY, expected owner/repo:", REPO);
     return;
   }
@@ -757,7 +741,7 @@ async function performScheduledAIAnalysis(owner, repo, pr) {
     
     // Only take action for high-risk PRs to avoid noise
     if (analysis.riskLevel === 'high' || analysis.riskLevel === 'critical') {
-      await addLabelsToePR({ owner: { login: owner }, name: repo }, pr.number, analysis);
+      await addLabelsToPR({ owner: { login: owner }, name: repo }, pr.number, analysis);
       
       if (analysis.concerns.length > 0) {
         await postAIReviewComment({ owner: { login: owner }, name: repo }, pr.number, prData, analysis);

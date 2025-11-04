@@ -194,4 +194,4 @@ class CircuitBreaker {
     }
 }
 
-module.exports = CircuitBreaker;
+export default CircuitBreaker;

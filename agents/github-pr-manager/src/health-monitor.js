@@ -322,4 +322,4 @@ class HealthMonitor extends EventEmitter {
     }
 }
 
-module.exports = HealthMonitor;
+export default HealthMonitor;
