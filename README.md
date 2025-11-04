@@ -21,6 +21,7 @@ npm run dev
 
 - **[PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md)** - Project goals, features, and roadmap
 - **[docs/README.md](docs/README.md)** - Complete documentation hub
+- **[docs/AUTO_REVIEW_AGENT.md](docs/AUTO_REVIEW_AGENT.md)** - 🤖 Auto-Review Agent for bulk PR/issue review
 - **[START_HERE_BEE_SHIP.md](START_HERE_BEE_SHIP.md)** - Deployment automation guide
 - **[PHASE2_README.md](PHASE2_README.md)** - Autonomous PR workflow setup
 
@@ -56,6 +57,7 @@ Built with Next.js, TypeScript, Tailwind CSS, and Netlify Functions.
 - [ ] Enhanced provider system (PR-3)
 - [ ] Supabase Auth (PR-5)
 - [ ] Real-time subscriptions
+- ✅ **Auto-Review Agent** - Bulk PR/issue automation
 
 ### Phase 3 (Planned)
 - [ ] Social media publishing
