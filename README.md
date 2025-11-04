@@ -126,7 +126,27 @@ Full documentation: [docs/README.md](docs/README.md)
 
 ## 🤝 Contributing
 
-We welcome contributions! See our [Phase 2 autonomous PR workflow](PHASE2_README.md) for how to contribute using AI-powered code review and automation.
+We welcome contributions! AdGenXAI features an **autonomous PR workflow** with AI-powered code review and agent-driven automation.
+
+### Quick Start for Contributors
+
+1. **Read**: [CONTRIBUTING.md](CONTRIBUTING.md) - Complete contribution guide
+2. **Choose**: Pick an issue or create one using our templates:
+   - 🐛 [Bug Report](.github/ISSUE_TEMPLATE/bug_report.md)
+   - ✨ [Feature Request](.github/ISSUE_TEMPLATE/feature_request.md)
+   - 🤖 [Agent Task](.github/ISSUE_TEMPLATE/agent_task.md)
+3. **Develop**: Follow our code style and architecture patterns
+4. **Test**: Run `npm run lint && npm run typecheck && npm run test`
+5. **Submit**: Create PR and @copilot will review automatically
+
+### Autonomous Agent Workflow
+
+- **Code Review**: Automatic review by @copilot on every PR
+- **Security Scanning**: CodeQL runs on all code changes
+- **Agent Tasks**: Well-scoped tasks (<400 LOC) can be executed by agents
+- **Stacked PRs**: Complex features broken into agent-manageable chunks
+
+See [PHASE2_README.md](PHASE2_README.md) for autonomous workflow details and [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 
