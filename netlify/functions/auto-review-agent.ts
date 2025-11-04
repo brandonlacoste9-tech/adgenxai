@@ -15,7 +15,7 @@
  */
 
 import type { Handler, HandlerEvent, HandlerContext, HandlerResponse } from '@netlify/functions';
-import { runAutoReview } from '../../agents/github-pr-manager/src/auto-review-agent';
+import { runAutoReview } from '../../agents/github-pr-manager/src/auto-review-agent.js';
 
 export const handler: Handler = async (event: HandlerEvent, context: HandlerContext): Promise<HandlerResponse> => {
   const startTime = Date.now();
