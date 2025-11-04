@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "test:ci": "vitest run --coverage --reporter=dot",
     "test:integration": "node tests/integration/postSignedWebhook.js",
+    "test:agent-cli": "node tests/github-agent-cli-test.js",
     "test:syntax": "Get-ChildItem -Path . -Include *.js -Recurse | Where-Object { $_.FullName -notmatch 'node_modules' } | ForEach-Object { node -c $_.FullName }",
     "lint": "eslint . --ext .js,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.ts,.tsx --fix",
