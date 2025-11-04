@@ -49,6 +49,8 @@ function Write-Status {
 
 function Ensure-Token {
     param([string] $ApiBase)
+    $ApiTimeoutSeconds = 8
+    
     if (-not $env:GITHUB_TOKEN -or [string]::IsNullOrWhiteSpace($env:GITHUB_TOKEN)) {
         Write-Status "GITHUB_TOKEN not set in session. Set it with: $env:GITHUB_TOKEN = 'ghp_your_token'" "Error"
         exit 1
@@ -57,7 +59,7 @@ function Ensure-Token {
     $headers = @{ Authorization = "token $($env:GITHUB_TOKEN)"; "User-Agent" = "pr-automation" }
 
     try {
-        $response = Invoke-RestMethod -Uri "$ApiBase/user" -Headers $headers -Method Get -TimeoutSec 8
+        $response = Invoke-RestMethod -Uri "$ApiBase/user" -Headers $headers -Method Get -TimeoutSec $ApiTimeoutSeconds
         if (-not $response.login) {
             throw "GitHub API returned an unexpected payload."
         }
@@ -107,8 +109,19 @@ function Invoke-Process {
 
     Write-Status "Starting $Description" "Info"
     $process = [System.Diagnostics.Process]::Start($psi)
-    $stdout = $process.StandardOutput.ReadToEnd()
-    $stderr = $process.StandardError.ReadToEnd()
+    
+    # Read stdout and stderr concurrently to avoid deadlock
+    $stdoutJob = Start-Job -ScriptBlock { param($so) $so.ReadToEnd() } -ArgumentList $process.StandardOutput
+    $stderrJob = Start-Job -ScriptBlock { param($se) $se.ReadToEnd() } -ArgumentList $process.StandardError
+
+    # Wait for both jobs to finish
+    Wait-Job -Job $stdoutJob, $stderrJob | Out-Null
+    $stdout = Receive-Job -Job $stdoutJob
+    $stderr = Receive-Job -Job $stderrJob
+
+    # Clean up jobs
+    Remove-Job -Job $stdoutJob, $stderrJob | Out-Null
+    
     $process.WaitForExit()
 
     if ($stderr) {

@@ -148,8 +148,7 @@ const run = async () => {
     const directory = dirname(absoluteOutput);
     await mkdir(directory, { recursive: true });
 
-    const tempDirectory = directory || process.cwd();
-    const tempFile = join(tempDirectory === '' ? tmpdir() : tempDirectory, `.triage-${randomUUID()}.tmp`);
+    const tempFile = join(directory === '' ? tmpdir() : directory, `.triage-${randomUUID()}.tmp`);
     await writeFile(tempFile, content, { encoding: 'utf8' });
     await rm(absoluteOutput, { force: true });
     await rename(tempFile, absoluteOutput);
@@ -157,7 +156,7 @@ const run = async () => {
 
   await writeOutput(payload);
 
-  if (!options.dryRun && options.force) {
+  if (options.force) {
     process.stderr.write('Force flag ignored because automation merge is disabled in this build.\n');
   }
 };
