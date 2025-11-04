@@ -12,29 +12,29 @@ jobs:
     if: contains(github.event.issue.labels.*.name, 'automation') || contains(github.event.issue.labels.*.name, 'agents')
     env:
       AGENT_DRY_RUN: ${{ secrets.AGENT_DRY_RUN || 'true' }}
-    
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
         cache: 'npm'
-        
+
     - name: Install dependencies
       run: |
         npm ci
         npm install -g github-agent-cli
-        
+
     - name: Validate Configuration
       run: |
         echo "🔍 Validating trigger actions and event types..."
         echo "Event: ${{ github.event_name }}"
         echo "Action: ${{ github.event.action }}"
         echo "Dry Run Mode: $AGENT_DRY_RUN"
-        
+
         # Validate expected event types
         if [[ "${{ github.event_name }}" == "issues" ]]; then
           echo "✅ Valid issue event type"
@@ -43,7 +43,7 @@ jobs:
         else
           echo "⚠️  Unexpected event type: ${{ github.event_name }}"
         fi
-        
+
     - name: Deploy GitHub Agent
       run: |
         echo "🚀 Deploying GitHub Agent for issue response..."
@@ -54,16 +54,16 @@ jobs:
           pm2 start dist/index.js --name github-issue-responder
           sleep 3
         fi
-        
+
     - name: Health Check Validation
       run: |
         echo "🏥 Validating health endpoints..."
-        
+
         if [[ "$AGENT_DRY_RUN" == "false" ]]; then
           # Test health endpoint
           HEALTH_RESPONSE=$(curl -s http://localhost:3001/health || echo '{"status":"unavailable"}')
           echo "Health endpoint response: $HEALTH_RESPONSE"
-          
+
           HEALTH_STATUS=$(echo "$HEALTH_RESPONSE" | jq -r '.status' || echo "unknown")
           if [[ "$HEALTH_STATUS" == "healthy" ]]; then
             echo "✅ Health check passed"
@@ -71,7 +71,7 @@ jobs:
             echo "❌ Health check failed: $HEALTH_STATUS"
             exit 1
           fi
-          
+
           # Test webhook endpoint availability
           WEBHOOK_TEST=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3001/webhook || echo "000")
           if [[ "$WEBHOOK_TEST" == "405" ]] || [[ "$WEBHOOK_TEST" == "200" ]]; then
@@ -82,7 +82,7 @@ jobs:
         else
           echo "⚠️  DRY RUN: Health check validation skipped"
         fi
-        
+
     - name: Process Issue Event
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -91,7 +91,7 @@ jobs:
         ISSUE_ACTION: ${{ github.event.action }}
       run: |
         echo "🤖 Processing issue #$ISSUE_NUMBER: $ISSUE_TITLE"
-        
+
         if [[ "$AGENT_DRY_RUN" == "false" ]]; then
           # Test webhook endpoint with idempotency key
           IDEMPOTENCY_KEY="workflow-${{ github.run_id }}-$ISSUE_NUMBER-$(date +%s)"
@@ -116,7 +116,7 @@ jobs:
         else
           echo "⚠️  DRY RUN: Webhook processing skipped"
         fi
-          
+
     - name: Generate Automated Response
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -124,11 +124,11 @@ jobs:
       run: |
         # SLO Monitoring - Track response time
         START_TIME=$(date +%s)
-        
+
         # Check if this is issue #110 or similar automation issues
         if [[ "$ISSUE_NUMBER" == "110" ]] || [[ "${{ github.event.issue.title }}" == *"AUTOMATED AGENTS"* ]]; then
           echo "🤖 Generating response for automation management issue #$ISSUE_NUMBER"
-          
+
           if [[ "$AGENT_DRY_RUN" == "false" ]]; then
             # Get agent health status
             HEALTH_STATUS=$(curl -s http://localhost:3001/health | jq -r '.status' || echo "unknown")
@@ -137,18 +137,18 @@ jobs:
             HEALTH_STATUS="dry-run-mode"
             UPTIME="0"
           fi
-          
+
           # Create automated response comment
           RESPONSE="## 🤖 GitHub Agent CLI - Automated Response
 
-**Timestamp:** $(date -u +"%Y-%m-%dT%H:%M:%SZ")  
-**Issue:** #$ISSUE_NUMBER  
+**Timestamp:** $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+**Issue:** #$ISSUE_NUMBER
 **Agent Status:** ✅ ACTIVE
 **Dry Run Mode:** $AGENT_DRY_RUN
 
 ### 📊 Current Agent Metrics
 - **Health Status:** $HEALTH_STATUS
-- **Uptime:** ${UPTIME}s  
+- **Uptime:** ${UPTIME}s
 - **Webhook Endpoint:** http://localhost:3001/webhook
 - **Processing Status:** ✅ Online and monitoring
 - **Coverage:** 47% (Alpha-to-Theta agents)
@@ -164,7 +164,7 @@ jobs:
 
 ### 🔄 Next Steps
 - 🤖 Continue monitoring repository automation
-- 📊 Provide real-time status updates  
+- 📊 Provide real-time status updates
 - 🚨 Process critical issues with priority (#80, #82)
 - 📈 Maintain agent coordination protocols
 - 🔄 Support /rerun and expand commands
@@ -181,12 +181,12 @@ jobs:
           echo "$RESPONSE" > /tmp/agent_response.md
           echo "📝 Automated response prepared for issue #$ISSUE_NUMBER"
           cat /tmp/agent_response.md
-          
+
           # Calculate SLO response time
           END_TIME=$(date +%s)
           RESPONSE_TIME=$((END_TIME - START_TIME))
           echo "⏱️  SLO Response Time: ${RESPONSE_TIME}s (Target: <30s)"
-          
+
           if [[ $RESPONSE_TIME -lt 30 ]]; then
             echo "✅ SLO Met: Response time within target"
           else
@@ -195,31 +195,31 @@ jobs:
         else
           echo "ℹ️  Standard issue processing for #$ISSUE_NUMBER"
         fi
-        
+
     - name: Attach Logs
       if: always()
       run: |
         echo "📋 Collecting and attaching logs..."
-        
+
         # Create log directory
         mkdir -p /tmp/agent-logs
-        
+
         # Collect PM2 logs if available
         if [[ "$AGENT_DRY_RUN" == "false" ]]; then
           pm2 logs github-issue-responder --lines 100 --nostream > /tmp/agent-logs/pm2-logs.txt 2>&1 || echo "No PM2 logs available"
         fi
-        
+
         # Collect workflow logs
         echo "Workflow Run ID: ${{ github.run_id }}" > /tmp/agent-logs/workflow-info.txt
         echo "Issue Number: ${{ github.event.issue.number }}" >> /tmp/agent-logs/workflow-info.txt
         echo "Action: ${{ github.event.action }}" >> /tmp/agent-logs/workflow-info.txt
         echo "Dry Run: $AGENT_DRY_RUN" >> /tmp/agent-logs/workflow-info.txt
         echo "Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> /tmp/agent-logs/workflow-info.txt
-        
+
         # List collected logs
         echo "📁 Collected logs:"
         ls -lah /tmp/agent-logs/
-        
+
     - name: Upload Logs Artifact
       if: always()
       uses: actions/upload-artifact@v4
@@ -227,7 +227,7 @@ jobs:
         name: agent-logs-${{ github.run_id }}
         path: /tmp/agent-logs/
         retention-days: 7
-        
+
     - name: Cleanup
       if: always()
       run: |
