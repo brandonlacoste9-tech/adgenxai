@@ -16,10 +16,12 @@ export async function POST(req: NextRequest) {
   
   try {
     const body = await req.json();
-    const { prompt, model, duration, quality, aspectRatio, mode = 'production', priority = 'quality' } = body as Partial<SoraGenerationRequest> & {
+    const { prompt, model, duration, quality, aspectRatio, mode = 'production', priority = 'quality', userTier, userId } = body as Partial<SoraGenerationRequest> & {
       aspectRatio?: string;
       mode?: 'preview' | 'production';
       priority?: 'speed' | 'quality' | 'cost';
+      userTier?: 'free' | 'pro' | 'enterprise';
+      userId?: string;
     };
 
     // Validate input
@@ -64,9 +66,14 @@ export async function POST(req: NextRequest) {
     );
     
     // Track provider selection for telemetry
+    const providerName = providerSelection.provider.toLowerCase();
+    const telemetryProvider = (providerName === 'longcat' || providerName === 'sora') 
+      ? providerName 
+      : 'sora'; // Default to sora if unknown provider
+    
     telemetry.trackVideoRequest({
       requestId,
-      provider: providerSelection.provider.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+      provider: telemetryProvider,
       prompt_length: prompt.length,
       duration: videoDuration,
       model,
@@ -124,7 +131,7 @@ export async function POST(req: NextRequest) {
     // Track success
     telemetry.trackVideoResult({
       requestId,
-      provider: providerSelection.provider.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+      provider: telemetryProvider,
       status: 'queued',
       latency_ms: Date.now() - startTime
     });
