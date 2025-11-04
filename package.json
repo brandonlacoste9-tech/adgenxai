@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "deploy": "netlify deploy --prod",
     "test": "vitest run --reporter=dot",
     "test:watch": "vitest",
     "test:ci": "vitest run --coverage --reporter=dot",
@@ -21,7 +20,12 @@
     "agent:deploy": "github-agent deploy",
     "agent:health": "github-agent health --detailed",
     "agent:status": "github-agent status",
-    "agent:monitor": "github-agent monitor --interval 30"
+    "agent:monitor": "github-agent monitor --interval 30",
+    "deploy": "bash scripts/deploy-to-netlify.sh production",
+    "deploy:preview": "bash scripts/deploy-to-netlify.sh preview",
+    "verify": "bash scripts/verify-deployment.sh",
+    "predeploy": "npm run typecheck && npm test",
+    "postdeploy": "echo 'Deployment complete! Run npm run verify to test your site.'"
   },
   "dependencies": {
     "@netlify/blobs": "^7.0.0",
