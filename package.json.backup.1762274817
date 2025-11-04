@@ -26,7 +26,8 @@
   "dependencies": {
     "@netlify/blobs": "^7.0.0",
     "@netlify/functions": "^2.4.0",
-    "@supabase/supabase-js": "^2.79.0",
+    "@next/swc-win32-x64-msvc": "14.2.33",
+    "@supabase/supabase-js": "^2.39.0",
     "apexcharts": "^4.7.0",
     "axios": "^1.6.0",
     "echarts": "^5.4.3",
@@ -75,7 +76,6 @@
   "author": "brandonlacoste9-tech",
   "license": "MIT",
   "optionalDependencies": {
-    "@next/swc-win32-x64-msvc": "14.2.33",
     "@rollup/rollup-win32-x64-msvc": "^4.52.5"
   }
 }

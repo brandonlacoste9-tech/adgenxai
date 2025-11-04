@@ -12,21 +12,21 @@ export interface ProviderSelection {
   estimatedLatency?: number;
   reason: string;
   fallbacks?: string[];
-}
-
-export interface ProviderRequest {
-  promptLength: number;
-  quality?: 'standard' | 'high' | 'premium';
-  maxLatency?: number;
-  budget?: number;
-  userTier?: string;
+  cacheStatus?: 'hit' | 'miss' | 'none';
 }
 
 /**
  * Select the best video provider based on requirements
  * Stub implementation - always returns 'sora-1' for now
  */
-export async function selectVideoProvider(request: ProviderRequest): Promise<ProviderSelection> {
+export async function selectVideoProvider(
+  prompt: string,
+  videoDuration?: number,
+  mode?: string,
+  priority?: string,
+  userTier?: string,
+  userId?: string
+): Promise<ProviderSelection> {
   // Stub implementation
   return {
     provider: 'sora-1',
@@ -34,7 +34,8 @@ export async function selectVideoProvider(request: ProviderRequest): Promise<Pro
     estimatedCost: 0.05,
     estimatedLatency: 5000,
     reason: 'Default provider (stub implementation)',
-    fallbacks: ['sora-hd']
+    fallbacks: ['sora-hd'],
+    cacheStatus: 'none'
   };
 }
 
@@ -51,6 +52,12 @@ export const providerSelector = {
 
   getProviderStatus: async (provider: string): Promise<{ available: boolean; latency: number }> => {
     return { available: true, latency: 100 };
+  },
+
+  cacheResult: async (request: any, result: any, provider: string): Promise<void> => {
+    // Stub implementation for Phase 2 - caching functionality to be implemented
+    // Will store video generation results for faster repeat requests
+    return Promise.resolve();
   }
 };
 

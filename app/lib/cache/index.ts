@@ -10,12 +10,15 @@
  */
 
 // Core interfaces and utilities
-export {
+export type {
   CacheAdapter,
   CacheEntry,
   CacheConfig,
   CacheStats,
-  CacheGenerationParams,
+  CacheGenerationParams
+} from './cache-adapter';
+
+export {
   CacheMissError,
   CacheStorageError,
   DEFAULT_CACHE_CONFIG,
@@ -48,12 +51,6 @@ export {
   cacheMetrics,
   instrumentedCacheAdapter
 } from './cache-metrics';
-
-// Re-export telemetry interfaces for convenience
-export type {
-  CachePerformanceEvent,
-  CacheStatsEvent
-} from '../telemetry';
 
 /**
  * Quick start guide for cache integration:

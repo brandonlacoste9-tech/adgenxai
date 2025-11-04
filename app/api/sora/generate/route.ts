@@ -52,6 +52,9 @@ export async function POST(req: NextRequest) {
     }
 
     const videoDuration = duration || 10;
+    // TODO: Phase 2 - implement user auth and tier management
+    const userTier = 'standard'; // Stub value
+    const userId = 'anonymous'; // Stub value
 
     // Use ProviderSelector to choose optimal provider (with caching support)
     const providerSelection = await selectVideoProvider(
