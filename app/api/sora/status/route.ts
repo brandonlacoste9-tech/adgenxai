@@ -1,12 +1,13 @@
 import { NextRequest } from "next/server";
-import { soraClient } from "@/lib/sora/sora-client";
+import { longCatVideoClient } from "@/lib/longcat/longcat-video-client";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
  * GET /api/sora/status?jobId=...
- * Poll the status of a Sora generation job
+ * Poll the status of a LongCat-Video generation job
+ * (Maintains Sora-compatible API for backward compatibility)
  */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -20,7 +21,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const job = await soraClient.getJobStatus(jobId);
+    const job = await longCatVideoClient.getJobStatus(jobId);
 
     if (!job) {
       return Response.json(
@@ -33,15 +34,29 @@ export async function GET(req: NextRequest) {
       jobId: job.id,
       status: job.status,
       prompt: job.prompt,
-      model: job.model,
+      model: "LongCat-Video",
+      provider: "longcat-video",
+      modelStack: "open-source",
       createdAt: job.createdAt,
       completedAt: job.completedAt,
       videoUrl: job.videoUrl,
+      thumbnailUrl: job.thumbnailUrl,
+      progress: job.progress,
+      estimatedCost: job.estimatedCost,
+      processingTimeMs: job.processingTimeMs,
+      duration: job.duration,
+      quality: job.quality,
+      aspectRatio: job.aspectRatio,
       error: job.error,
+      costSavings: "~95% cost reduction vs proprietary models",
     });
   } catch (error) {
     return Response.json(
-      { error: (error as Error).message },
+      { 
+        error: (error as Error).message,
+        provider: "longcat-video",
+        modelStack: "open-source"
+      },
       { status: 500 }
     );
   }

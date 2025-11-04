@@ -1,36 +1,33 @@
 import { NextRequest } from "next/server";
-import { soraClient, SoraGenerationRequest } from "@/lib/sora/sora-client";
-import { telemetry, generateRequestId } from "@/lib/telemetry";
-import { selectVideoProvider, providerSelector } from "@/lib/providers/provider-selector";
+import { longCatVideoClient, LongCatVideoRequest } from "@/lib/longcat/longcat-video-client";
 
 export const runtime = "nodejs";
 
 /**
- * POST /api/sora/generate
- * Request a video generation from Sora
+ * POST /api/sora/generate (now using LongCat-Video)
+ * Request a video generation from LongCat-Video (open-source replacement for Sora)
  * Returns immediately with job ID (async processing)
+ * 
+ * AdGenXAI Open-Source Model Stack - Priority P0 Model
+ * Cost Savings: ~95% reduction vs Sora ($0.01-0.03/sec vs $1-3/sec)
  */
 export async function POST(req: NextRequest) {
-  const requestId = generateRequestId();
   const startTime = Date.now();
   
   try {
     const body = await req.json();
-    const { prompt, model, duration, quality, aspectRatio, mode = 'production', priority = 'quality' } = body as Partial<SoraGenerationRequest> & {
-      aspectRatio?: string;
-      mode?: 'preview' | 'production';
-      priority?: 'speed' | 'quality' | 'cost';
-    };
+    const { 
+      prompt, 
+      duration = 10, 
+      quality = "hd", 
+      aspectRatio = "16:9",
+      fps = 30,
+      style = "commercial",
+      seed
+    } = body;
 
     // Validate input
     if (!prompt || prompt.trim().length === 0) {
-      telemetry.trackVideoResult({
-        requestId,
-        provider: 'sora',
-        status: 'validation_error',
-        latency_ms: Date.now() - startTime,
-        error: 'Missing prompt'
-      });
       return Response.json(
         { error: "Prompt is required" },
         { status: 400 }
@@ -38,121 +35,54 @@ export async function POST(req: NextRequest) {
     }
 
     if (prompt.length > 10000) {
-      telemetry.trackVideoResult({
-        requestId,
-        provider: 'sora',
-        status: 'validation_error', 
-        latency_ms: Date.now() - startTime,
-        error: 'Prompt too long'
-      });
       return Response.json(
         { error: "Prompt too long (max 10000 chars)" },
         { status: 400 }
       );
     }
 
-    const videoDuration = duration || 10;
-
-    // Use ProviderSelector to choose optimal provider (with caching support)
-    const providerSelection = await selectVideoProvider(
-      prompt.trim(),
-      videoDuration,
-      mode,
-      priority,
-      userTier,
-      userId
-    );
-    
-    // Track provider selection for telemetry
-    telemetry.trackVideoRequest({
-      requestId,
-      provider: providerSelection.provider.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-      prompt_length: prompt.length,
-      duration: videoDuration,
-      model,
-      quality,
-      aspectRatio
-    });
-
-    // Create generation request
-    const request: SoraGenerationRequest = {
-      prompt: prompt.trim(),
-      model: (model as "sora-1" | "sora-1-hd") || "sora-1",
-      duration: videoDuration as any,
-      quality: quality as any,
-      aspectRatio: aspectRatio as any,
-    };
-
-    // Check if we have a cache hit first
-    if (providerSelection.cacheStatus === 'hit') {
-      // Return cached result immediately
-      return Response.json({
-        jobId: 'cached_' + Date.now(),
-        status: 'completed',
-        createdAt: new Date().toISOString(),
-        requestId,
-        provider: providerSelection.provider,
-        estimatedCost: providerSelection.estimatedCost,
-        estimatedLatency: providerSelection.estimatedLatency,
-        selectionReason: providerSelection.reason,
-        fallbackProviders: providerSelection.fallbacks,
-        cacheStatus: 'hit',
-        message: `Cached result available from ${providerSelection.provider}`,
-      });
-    }
-
-    // Submit to Sora (or selected provider)
-    const job = await soraClient.generateVideo(request);
-
-    // Cache the result for future requests
-    if (job.status === 'completed' || job.status === 'queued') {
-      await providerSelector.cacheResult(
-        {
-          contentType: 'video',
-          mode,
-          duration: videoDuration,
-          priority,
-          userTier,
-          userId,
-          prompt: prompt.trim()
-        },
-        job,
-        providerSelection.provider
+    // LongCat-Video supports up to 5 minutes (300 seconds)
+    if (duration > 300) {
+      return Response.json(
+        { error: "Duration too long (max 300 seconds for LongCat-Video)" },
+        { status: 400 }
       );
     }
 
-    // Track success
-    telemetry.trackVideoResult({
-      requestId,
-      provider: providerSelection.provider.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-      status: 'queued',
-      latency_ms: Date.now() - startTime
-    });
+    // Create LongCat-Video generation request
+    const request: LongCatVideoRequest = {
+      prompt: prompt.trim(),
+      duration,
+      quality,
+      aspectRatio,
+      fps,
+      style,
+      seed,
+    };
+
+    // Submit to LongCat-Video
+    const job = await longCatVideoClient.generateVideo(request);
 
     return Response.json({
       jobId: job.id,
       status: job.status,
       createdAt: job.createdAt,
-      requestId,
-      provider: providerSelection.provider,
-      estimatedCost: providerSelection.estimatedCost,
-      estimatedLatency: providerSelection.estimatedLatency,
-      selectionReason: providerSelection.reason,
-      fallbackProviders: providerSelection.fallbacks,
-      message: `Video generation queued with ${providerSelection.provider}. Check status with /api/sora/status?jobId=...`,
+      provider: "longcat-video",
+      model: "LongCat-Video",
+      modelStack: "open-source",
+      estimatedCost: job.estimatedCost,
+      maxDuration: 300, // 5 minutes
+      costSavings: "~95% cost reduction vs proprietary models",
+      message: `Video generation queued with LongCat-Video. Check status with /api/sora/status?jobId=${job.id}`,
+      modelInfo: longCatVideoClient.getModelInfo(),
     });
   } catch (error) {
-    // Track error
-    telemetry.trackVideoResult({
-      requestId,
-      provider: 'sora',
-      status: 'error',
-      latency_ms: Date.now() - startTime,
-      error: (error as Error).message
-    });
-    
     return Response.json(
-      { error: (error as Error).message },
+      { 
+        error: (error as Error).message,
+        provider: "longcat-video",
+        modelStack: "open-source"
+      },
       { status: 500 }
     );
   }
