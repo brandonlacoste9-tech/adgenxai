@@ -215,7 +215,8 @@ async function respondToIssue110WithIdempotency(idempotencyKey) {
 
 // Main execution wrapper
 async function respondToIssue110() {
-  const idempotencyKey = `issue-110-${Date.now()}-${process.pid}`;
+  // Generate unique idempotency key with timestamp, pid, and random component
+  const idempotencyKey = `issue-110-${Date.now()}-${process.pid}-${Math.random().toString(36).substr(2, 9)}`;
   return respondToIssue110WithIdempotency(idempotencyKey);
 }
 

@@ -38,13 +38,17 @@ class GitHubAgentManager {
   calculateRealTimeMetrics() {
     const activeCount = Object.values(this.agentStatus).filter(a => a.status === 'active' || a.status === 'processing').length;
     const completedCount = Object.values(this.agentStatus).filter(a => a.status === 'completed').length;
-    
+
     this.metrics.activeAgents = activeCount;
     this.metrics.coveredIssues = activeCount;
-    this.metrics.coveragePercentage = Math.round((this.metrics.coveredIssues / this.metrics.totalIssues) * 100);
-    this.metrics.successRate = this.metrics.totalIssues > 0 ? Math.round((completedCount / this.metrics.totalIssues) * 100) : 0;
+    this.metrics.coveragePercentage = this.metrics.totalIssues > 0
+      ? Math.round((this.metrics.coveredIssues / this.metrics.totalIssues) * 100)
+      : 0;
+    this.metrics.successRate = this.metrics.totalIssues > 0
+      ? Math.round((completedCount / this.metrics.totalIssues) * 100)
+      : 0;
     this.metrics.lastUpdate = new Date().toISOString();
-    
+
     return this.metrics;
   }
   
@@ -74,11 +78,13 @@ class GitHubAgentManager {
   
   processBatchMergeQueue() {
     console.log('\n🔄 Processing batch merge queue...');
-    
-    // Sort by priority (alpha priority first)
+
+    // Priority order for sorting
+    const DEFAULT_PRIORITY_VALUE = 3;
+    const priorityOrder = { alpha: 1, high: 2, normal: 3, low: 4 };
+
     const sortedQueue = this.batchMergeQueue.sort((a, b) => {
-      const priorityOrder = { alpha: 1, high: 2, normal: 3, low: 4 };
-      return (priorityOrder[a.priority] || 3) - (priorityOrder[b.priority] || 3);
+      return (priorityOrder[a.priority] || DEFAULT_PRIORITY_VALUE) - (priorityOrder[b.priority] || DEFAULT_PRIORITY_VALUE);
     });
     
     sortedQueue.forEach((item, index) => {
