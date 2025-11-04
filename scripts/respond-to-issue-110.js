@@ -3,14 +3,78 @@
 const axios = require('axios');
 
 // GitHub Agent for Issue #110 - Automated Repository Management
-async function respondToIssue110() {
+// Enhanced with health check validation and idempotency support
+
+// Idempotency cache to track requests
+const processedRequests = new Map();
+
+async function validateHealthEndpoints(baseUrl) {
+  console.log('🔍 Validating health endpoints...');
+  
+  try {
+    // Validate /health endpoint
+    const healthResponse = await axios.get(`${baseUrl}/health`, {
+      timeout: 5000,
+      validateStatus: () => true
+    });
+    
+    if (healthResponse.status === 200 && healthResponse.data.status) {
+      console.log('✅ /health endpoint: PASSED');
+      console.log(`   Status: ${healthResponse.data.status}`);
+      console.log(`   Uptime: ${Math.round(healthResponse.data.uptime)}s`);
+    } else {
+      console.warn('⚠️  /health endpoint: Unexpected response');
+      return false;
+    }
+    
+    // Validate /webhook endpoint (should accept POST)
+    const webhookResponse = await axios.post(`${baseUrl}/webhook`, 
+      { test: true },
+      {
+        timeout: 5000,
+        validateStatus: () => true,
+        headers: { 'X-GitHub-Event': 'ping' }
+      }
+    );
+    
+    if (webhookResponse.status === 200) {
+      console.log('✅ /webhook endpoint: PASSED');
+      console.log(`   Accepts POST requests`);
+    } else {
+      console.warn(`⚠️  /webhook endpoint: HTTP ${webhookResponse.status}`);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('❌ Health endpoint validation failed:', error.message);
+    return false;
+  }
+}
+
+async function respondToIssue110WithIdempotency(idempotencyKey) {
+  // Check if request already processed (idempotency)
+  if (processedRequests.has(idempotencyKey)) {
+    console.log('⚠️  Request already processed (idempotent):', idempotencyKey);
+    return processedRequests.get(idempotencyKey);
+  }
+  
   const baseUrl = 'http://localhost:3001';
   
   console.log('🤖 GitHub Agent CLI - Issue #110 Response System');
-  console.log('📋 Automated Agents: Active GitHub Repository Management\n');
+  console.log('📋 Automated Agents: Active GitHub Repository Management');
+  console.log('🔑 Idempotency Key:', idempotencyKey);
+  console.log('');
   
   try {
-    // Check agent health first
+    // Validate health endpoints first
+    const healthValid = await validateHealthEndpoints(baseUrl);
+    if (!healthValid) {
+      throw new Error('Health endpoint validation failed');
+    }
+    console.log('');
+    
+    // Check agent health
     console.log('🔍 Checking GitHub Agent health...');
     const healthResponse = await axios.get(`${baseUrl}/health`);
     console.log('✅ GitHub Agent Status:', healthResponse.data.status);
@@ -46,6 +110,7 @@ async function respondToIssue110() {
       headers: {
         'X-GitHub-Event': 'issues',
         'X-GitHub-Delivery': `issue-110-${Date.now()}`,
+        'X-Idempotency-Key': idempotencyKey,
         'Content-Type': 'application/json'
       }
     });
@@ -126,13 +191,32 @@ async function respondToIssue110() {
     console.log('📝 Ready to post to Issue #110 thread');
     console.log('🔄 GitHub Agent CLI fully integrated with repository automation');
     
+    // Store in idempotency cache
+    const result = { success: true, response: automatedResponse };
+    processedRequests.set(idempotencyKey, result);
+    
+    return result;
+    
   } catch (error) {
     console.error('❌ Error processing Issue #110:', error.message);
     console.log('\n💡 Troubleshooting:');
     console.log('   1. Ensure GitHub Agent is running: npm run agent:deploy');
     console.log('   2. Check agent status: npm run agent:status');
     console.log('   3. Verify health: npm run agent:health');
+    console.log('   4. Validate endpoints: /health and /webhook');
+    
+    // Store error in idempotency cache
+    const errorResult = { success: false, error: error.message };
+    processedRequests.set(idempotencyKey, errorResult);
+    
+    throw error;
   }
+}
+
+// Main execution wrapper
+async function respondToIssue110() {
+  const idempotencyKey = `issue-110-${Date.now()}-${process.pid}`;
+  return respondToIssue110WithIdempotency(idempotencyKey);
 }
 
 // Execute the automated response
