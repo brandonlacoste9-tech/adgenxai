@@ -23,6 +23,7 @@ npm run dev
 - **[docs/README.md](docs/README.md)** - Complete documentation hub
 - **[START_HERE_BEE_SHIP.md](START_HERE_BEE_SHIP.md)** - Deployment automation guide
 - **[PHASE2_README.md](PHASE2_README.md)** - Autonomous PR workflow setup
+- **[docs/AUTO_REVIEW_AGENT.md](docs/AUTO_REVIEW_AGENT.md)** - Bulk PR/Issue auto-review automation
 
 ---
 
@@ -50,6 +51,7 @@ Built with Next.js, TypeScript, Tailwind CSS, and Netlify Functions.
 - ✅ Agent performance tracking
 - ✅ BEE-SHIP automated deployment
 - ✅ Aurora-themed responsive UI
+- ✅ Bulk auto-review agent for PRs/issues
 
 ### Phase 2 (In Progress)
 - [ ] Supabase database integration (PR-1)
