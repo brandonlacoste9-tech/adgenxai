@@ -1,0 +1,2 @@
+      - name: Run Netlify Bulk Auto Agent
+        run: curl -X POST https://www.adgenxai.pro/.netlify/functions/auto-review-agent
