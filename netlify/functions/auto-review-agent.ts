@@ -13,7 +13,8 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 
 // Import the auto-review agent
-// Note: We'll use dynamic import to handle the TypeScript compilation
+// Note: Using dynamic import for Netlify Functions to ensure proper bundling
+// and to avoid issues with TypeScript compilation in serverless environment
 async function loadAutoReviewAgent() {
   const module = await import('../../agents/github-pr-manager/src/auto-review-agent');
   return module.AutoReviewAgent;

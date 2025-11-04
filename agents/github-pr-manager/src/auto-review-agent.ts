@@ -217,10 +217,10 @@ export class AutoReviewAgent {
     // Check if issue needs attention
     if (comments === 0 && !labels.includes('needs-triage')) {
       needsResponse = true;
-      message = 'New issue detected - adding triage label';
+      message = 'New issue detected - needs triage';
     }
     
-    if (body.length < 30) {
+    if (body.length < 30 && !needsResponse) {
       needsResponse = true;
       message = 'Issue description is too short';
     }
@@ -360,7 +360,7 @@ export class AutoReviewAgent {
         failed++;
         results.push({
           repository: fullRepo,
-          type: 'pr',
+          type: 'issue', // Changed to 'issue' as a generic error type
           number: 0,
           title: 'Repository processing failed',
           status: 'error',
