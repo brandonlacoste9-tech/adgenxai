@@ -211,6 +211,10 @@ __marimo__/
 .env.local
 .netlify/
 dist/
+!agents/github-pr-manager/
+!agents/github-pr-manager/dist/
+!agents/github-pr-manager/dist/index.js
+!agents/github-pr-manager/ecosystem.config.js
 node_modules/
 
 # OS
