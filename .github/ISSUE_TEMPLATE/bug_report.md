@@ -57,7 +57,9 @@ assignees: ''
 - [ ] Assigned to milestone or agent
 
 ## Handoff to Agents
-@copilot If this is a **code bug** with clear repro steps, please:
+<!-- Note: @copilot mentions are for documentation and human workflow. Agent assignment happens via GitHub's assignment features. -->
+
+If this is a **code bug** with clear repro steps, maintainers can assign to @copilot to:
 1. Reproduce the issue locally
 2. Identify root cause using CodeQL/ESLint
 3. Propose minimal fix

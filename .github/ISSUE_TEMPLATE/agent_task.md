@@ -96,14 +96,16 @@ assignees: ''
 ---
 
 ## Agent Instructions
-@copilot You are authorized to:
+<!-- Note: @copilot mentions are for documentation and human workflow. Agent assignment happens via GitHub's assignment features. -->
+
+When assigned to this task, @copilot is authorized to:
 
 1. **Analyze** the codebase and understand the task
 2. **Plan** the minimal changes needed (<400 LOC total)
 3. **Implement** following all requirements above
 4. **Test** thoroughly (lint, typecheck, unit tests)
 5. **Create PR** with:
-   - Title: `[agent] <scope>: <description>`
+   - Title: `[AGENT] <scope>: <description>`
    - Description: Links to this issue, changes made, testing done
    - Labels: `agent-task`, scope label (PR-1/PR-3/PR-5/dashboard/etc)
 

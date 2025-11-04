@@ -80,7 +80,9 @@ assignees: ''
 - [ ] Labeled with scope (PR-1 | PR-3 | PR-5 | dashboard | agents | docs)
 
 ## Handoff to Agents
-@copilot If this is a **well-scoped feature** (<400 LOC, clear requirements), please:
+<!-- Note: @copilot mentions are for documentation and human workflow. Agent assignment happens via GitHub's assignment features. -->
+
+If this is a **well-scoped feature** (<400 LOC, clear requirements), maintainers can assign to @copilot to:
 1. Create implementation plan
 2. Check for conflicts with existing code
 3. Estimate LOC and complexity
