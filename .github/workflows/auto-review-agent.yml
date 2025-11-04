@@ -1,0 +1,97 @@
+name: Auto-Review Agent
+
+# This workflow triggers the bulk auto-review agent to process
+# ALL open PRs and issues in both repositories:
+# - brandonlacoste9-tech/adgenxai  
+# - brandonlacoste9-tech/Beehive
+
+on:
+  # Manual trigger via GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for running bulk review'
+        required: false
+        default: 'Manual trigger'
+  
+  # Optional: Schedule to run automatically
+  # Uncomment to enable scheduled runs (e.g., daily at 2 AM UTC)
+  # schedule:
+  #   - cron: '0 2 * * *'  # Daily at 2 AM UTC
+  
+  # Optional: Trigger on PR events (commented out by default)
+  # pull_request:
+  #   types: [opened, synchronize]
+
+jobs:
+  bulk-review:
+    name: Run Bulk Auto-Review
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run Netlify Auto-Review Agent
+        run: |
+          echo "🤖 Triggering Auto-Review Agent via Netlify Function"
+          echo "📅 Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          echo "📝 Reason: ${{ github.event.inputs.reason || 'Scheduled run' }}"
+          echo ""
+          
+          # Call the Netlify function
+          response=$(curl -s -X POST \
+            -w "\n%{http_code}" \
+            https://www.adgenxai.pro/.netlify/functions/auto-review-agent)
+          
+          # Extract HTTP status code (last line) and body (everything else)
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          
+          echo "📊 Response Status: $http_code"
+          echo ""
+          echo "📄 Response Body:"
+          echo "$body" | jq '.' || echo "$body"
+          echo ""
+          
+          # Check if successful
+          if [ "$http_code" = "200" ]; then
+            echo "✅ Auto-Review Agent completed successfully!"
+            
+            # Parse and display summary
+            summary=$(echo "$body" | jq -r '.summary // empty')
+            if [ -n "$summary" ]; then
+              echo ""
+              echo "📊 Summary:"
+              echo "$body" | jq '.summary'
+            fi
+            
+            exit 0
+          else
+            echo "❌ Auto-Review Agent failed with status $http_code"
+            exit 1
+          fi
+      
+      - name: Post summary comment (on failure)
+        if: failure()
+        run: |
+          echo "⚠️ Auto-Review Agent encountered an error"
+          echo "Check the logs above for details"
+          echo "You may need to:"
+          echo "  1. Verify GitHub token is configured in Netlify"
+          echo "  2. Check repository permissions"
+          echo "  3. Review Netlify function logs"
+      
+      - name: Monitoring links
+        if: always()
+        run: |
+          echo ""
+          echo "🔗 Monitoring Links:"
+          echo "  AdgenXAI PRs: https://github.com/brandonlacoste9-tech/adgenxai/pulls?state=open"
+          echo "  AdgenXAI Issues: https://github.com/brandonlacoste9-tech/adgenxai/issues?state=open"
+          echo "  Beehive PRs: https://github.com/brandonlacoste9-tech/Beehive/pulls?state=open"
+          echo "  Beehive Issues: https://github.com/brandonlacoste9-tech/Beehive/issues?state=open"
+          echo ""
+          echo "💡 To run again manually:"
+          echo "  Browser: https://www.adgenxai.pro/.netlify/functions/auto-review-agent"
+          echo "  CLI: curl -X POST https://www.adgenxai.pro/.netlify/functions/auto-review-agent"
