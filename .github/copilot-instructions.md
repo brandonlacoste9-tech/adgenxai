@@ -1,105 +1,43 @@
-# Copilot Instructions
+# Copilot Code Review — AdGenXAI
+
+## Priorities
+1) Security: RLS, auth checks, webhook validation, secrets safety.
+2) Cost Optimization: Cache-first architecture with 50-80% API call reduction.
+3) Correctness: provider adapters, streaming, fallback logic.
+4) Quality: ESLint clean, TypeScript strict, mobile-first Aurora styling.
 
 ## Repo Context
+- Providers: LongCat-Video primary with intelligent ProviderSelector (11 models).
+- Cache: Hash-based Netlify Blobs caching with TTL, compression, auto-cleanup.
+- DB: Supabase with RLS (use views/RPC; avoid ad-hoc SQL in routes).
+- Auth: Supabase Auth JWT; every API path checks user/tenant ownership.
+- Netlify Functions for webhooks/orchestration.
+- Telemetry: Comprehensive cache/provider metrics for cost optimization.
 
-This repo: **AdGenXAI**  
-Role in stack: AI-powered advertising automation platform with GitHub PR management  
-Primary runtime: Next.js 14 / TypeScript  
-Deployment: Netlify with serverless functions
+## Rules
+- PRs < 400 LOC net change.
+- No secrets in code; use `process.env.*`.
+- Update tests & docs for any behavior change.
+- Keep QUICKSTART, PROVIDER_INTEGRATION, DATABASE_SCHEMA in sync.
+- **Cache-First**: Always check cache before expensive provider calls.
+- **Test Coverage**: Include cache tests for any provider/API changes.
+- **TTL Strategy**: Use dynamic TTL based on content type and user tier.
 
-## Architecture Hints
+## When suggesting fixes
+- Open **stacked PRs** by scope (Cache / Providers / Supabase / Auth).
+- Add short rationale + file list + test notes.
+- Apply labels: `PR-4: Cache`, `PR-3: Providers`, `PR-1: Supabase`, `PR-5: Auth`.
+- Link each PR to the **Phase-2** project.
 
-- **Module system**: ES6 modules with Next.js App Router
-- **Key folders**: app/ (Next.js routes), lib/ (utilities), agents/ (automation), components/ (UI)
-- **Integration points**: GitHub API, AI providers (OpenAI/GitHub Models), Netlify Blobs cache, BeeHive agent orchestration
-- **Provider selector pattern**: Intelligent AI routing based on cost, quality, latency
-- **Circuit breaker pattern**: Automatic failover when providers fail
-
-## AI Agent Rules
-
-- Extend existing utilities before adding new ones
-- All network calls must handle errors and timeouts
-- Commit style: `feat:`, `fix:`, `ci:`, `docs:`
-- Never generate or commit secrets, tokens, or API keys
-- Test changes before PR submission
-- Use provider selector for AI calls (app/lib/providers/provider-selector.ts)
-- Cache-first strategy with Netlify Blobs for cost reduction
-- All GitHub operations should use the resilient PR manager (agents/github-pr-manager/)
-
-## Critical Patterns
-
-### Provider Selection
-
-```javascript
-// Use intelligent provider selection
-import { selectProvider } from "@/lib/providers/provider-selector";
-const provider = await selectProvider({ mode: "preview", quality: "balanced" });
-```
-
-### Cache Integration
-
-```javascript
-// Leverage cache for cost reduction
-import {
-  getCachedResponse,
-  setCachedResponse,
-} from "@/lib/cache/cache-adapter";
-const cached = await getCachedResponse(hash);
-if (!cached) {
-  const result = await aiProvider.generate(prompt);
-  await setCachedResponse(hash, result, ttl);
-}
-```
-
-### GitHub Automation
-
-```javascript
-// Use resilient GitHub PR manager
-import { GitHubPRManager } from "@/agents/github-pr-manager";
-const prManager = new GitHubPRManager();
-await prManager.processWithCircuitBreaker(webhook);
-```
-
-## BeeHive Integration
-
-- **Badge Ritual**: Authentication and authorization
-- **Metrics Ritual**: Performance monitoring and analytics
-- **Echo Ritual**: Learning from interactions
-- **History Ritual**: Memory and context preservation
-
-## Project-Specific Conventions
-
-- **Aurora theme**: Consistent styling with Tailwind CSS and Framer Motion
-- **Cost-aware development**: Preview mode uses cheap/fast providers, production uses quality providers
-- **Sensory cortex pattern**: Webhook-driven AI orchestration
-- **Roadmap governance**: Progress tracked in docs/milestones.json with automated burndown
-
-## Example Integrations
-
-### New AI Feature
-
-When adding new AI functionality:
-
-1. Use provider selector for routing
-2. Implement cache-first strategy
-3. Add BeeHive ritual integration
-4. Include circuit breaker for resilience
-5. Update roadmap milestone progress
-
-### GitHub Automation
-
-When extending PR automation:
-
-1. Add to agents/github-pr-manager/src/
-2. Use circuit breaker patterns
-3. Implement backpressure control
-4. Add comprehensive metrics
-5. Test with webhook suite
-
-## Avoid
-
-- Direct AI provider calls (use provider selector)
-- Uncached expensive operations
-- GitHub API calls without circuit breakers
-- Hardcoded provider configurations
-- Breaking the Aurora design system
+## Cache Architecture (Critical)
+- **Location**: `app/lib/cache/` - Hash-based caching with Netlify Blobs
+- **Performance**: Sub-second cache hits vs 30+ second generation times
+- **Cost Impact**: 50-80% reduction in provider API calls
+- **Key Components**:
+  - `CacheAdapter` interface with get/set/delete operations
+  - `NetlifyCacheAdapter` with compression and TTL management
+  - `ProviderSelector` integration for cache-first selection
+  - `CacheMetrics` for telemetry and performance monitoring
+- **Usage**: Provider selection automatically checks cache, stores results
+- **TTL Strategy**: Dynamic based on content type, user tier, complexity
+- **Monitoring**: Real-time cache hit/miss rates, size tracking, health checks
