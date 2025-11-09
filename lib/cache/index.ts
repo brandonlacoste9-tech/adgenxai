@@ -10,12 +10,15 @@
  */
 
 // Core interfaces and utilities
-export {
+export type {
   CacheAdapter,
   CacheEntry,
   CacheConfig,
   CacheStats,
-  CacheGenerationParams,
+  CacheGenerationParams
+} from './cache-adapter';
+
+export {
   CacheMissError,
   CacheStorageError,
   DEFAULT_CACHE_CONFIG,
