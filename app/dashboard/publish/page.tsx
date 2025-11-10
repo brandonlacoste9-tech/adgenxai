@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import DOMPurify from 'dompurify';
 
 interface GeneratedContent {
   title: string;
@@ -242,7 +243,7 @@ export default function PublishPage() {
               </h2>
               
               <div className="prose dark:prose-invert max-w-none">
-                <div dangerouslySetInnerHTML={{ __html: generatedContent.content }} />
+                <ContentPreview content={generatedContent.content} />
               </div>
 
               <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
@@ -411,4 +412,27 @@ export default function PublishPage() {
       </div>
     </div>
   );
+}
+
+/**
+ * ContentPreview component that sanitizes HTML before rendering
+ * to prevent XSS attacks
+ */
+function ContentPreview({ content }: { content: string }) {
+  const sanitizedContent = useMemo(() => {
+    // Only sanitize on the client side
+    if (typeof window !== 'undefined') {
+      // DOMPurify sanitization prevents XSS attacks by removing malicious scripts
+      // and keeping only safe HTML elements and attributes
+      return DOMPurify.sanitize(content, {
+        ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'strong', 'em', 'br', 'img', 'blockquote', 'code', 'pre'],
+        ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'target', 'rel']
+      });
+    }
+    return content;
+  }, [content]);
+
+  // Safe to use dangerouslySetInnerHTML here because content is sanitized by DOMPurify
+  // which removes all potentially malicious scripts and attributes
+  return <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />;
 }
