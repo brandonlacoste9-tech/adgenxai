@@ -88,6 +88,23 @@ This documentation maps David Ondrej's proven Agent-First methodologies to the B
 - Testing guide
 - Troubleshooting
 
+### 🔗 Platform Integrations
+
+**[integrations/README.md](./integrations/README.md)** — *Third-party integrations overview*
+- Available integrations
+- Coming soon platforms
+- Integration architecture
+- Developer guide
+- Security considerations
+
+**[integrations/GHOST.md](./integrations/GHOST.md)** — *Ghost CMS integration guide*
+- Setup and configuration
+- API key generation
+- Publishing workflows
+- Best practices
+- Troubleshooting
+- API reference
+
 ---
 
 ## 🗺️ Navigation by Role

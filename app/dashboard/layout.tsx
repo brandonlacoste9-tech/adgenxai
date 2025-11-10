@@ -17,6 +17,8 @@ export default function DashboardLayout({
     { href: "/dashboard/analytics", label: "Analytics", icon: "📈" },
     { href: "/dashboard/templates", label: "Templates", icon: "📝" },
     { href: "/dashboard/generations", label: "Generations", icon: "✨" },
+    { href: "/dashboard/publish", label: "Publish", icon: "🚀" },
+    { href: "/dashboard/integrations", label: "Integrations", icon: "🔗" },
     { href: "/dashboard/agent-performance", label: "Agent Performance", icon: "🤖" },
     { href: "/dashboard/rituals", label: "BeeHive Rituals", icon: "🐝" },
     { href: "/dashboard/settings", label: "Settings", icon: "⚙️" },
