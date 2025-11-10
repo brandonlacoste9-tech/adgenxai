@@ -28,7 +28,7 @@
     "@netlify/functions": "^2.4.0",
     "@next/swc-win32-x64-msvc": "14.2.33",
     "@supabase/supabase-js": "^2.39.0",
-    "apexcharts": "^4.7.0",
+    "apexcharts": "^5.3.6",
     "axios": "^1.6.0",
     "echarts": "^5.4.3",
     "echarts-for-react": "^3.0.2",
