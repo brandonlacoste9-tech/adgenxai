@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import DOMPurify from 'dompurify';
 
@@ -72,11 +72,6 @@ export default function PublishPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          config: {
-            url: process.env.NEXT_PUBLIC_GHOST_URL || '',
-            contentApiKey: process.env.NEXT_PUBLIC_GHOST_CONTENT_API_KEY || '',
-            adminApiKey: process.env.NEXT_PUBLIC_GHOST_ADMIN_API_KEY || ''
-          },
           content: generatedContent,
           options: {
             status: publishStatus,
@@ -419,18 +414,32 @@ export default function PublishPage() {
  * to prevent XSS attacks
  */
 function ContentPreview({ content }: { content: string }) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const sanitizedContent = useMemo(() => {
-    // Only sanitize on the client side
-    if (typeof window !== 'undefined') {
-      // DOMPurify sanitization prevents XSS attacks by removing malicious scripts
-      // and keeping only safe HTML elements and attributes
-      return DOMPurify.sanitize(content, {
-        ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'strong', 'em', 'br', 'img', 'blockquote', 'code', 'pre'],
-        ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'target', 'rel']
-      });
+    if (!isClient) {
+      return '';
     }
-    return content;
-  }, [content]);
+
+    // DOMPurify sanitization prevents XSS attacks by removing malicious scripts
+    // and keeping only safe HTML elements and attributes
+    return DOMPurify.sanitize(content, {
+      ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'strong', 'em', 'br', 'img', 'blockquote', 'code', 'pre'],
+      ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'target', 'rel']
+    });
+  }, [content, isClient]);
+
+  if (!isClient) {
+    return (
+      <pre className="whitespace-pre-wrap font-sans text-gray-900 dark:text-gray-100">
+        {content}
+      </pre>
+    );
+  }
 
   // Safe to use dangerouslySetInnerHTML here because content is sanitized by DOMPurify
   // which removes all potentially malicious scripts and attributes
