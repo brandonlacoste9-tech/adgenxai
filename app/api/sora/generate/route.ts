@@ -58,15 +58,14 @@ export async function POST(req: NextRequest) {
       prompt.trim(),
       videoDuration,
       mode,
-      priority,
-      userTier,
-      userId
+      priority
     );
     
     // Track provider selection for telemetry
+    const normalizedProvider = providerSelection.provider.toLowerCase().includes('longcat') ? 'longcat' : 'sora';
     telemetry.trackVideoRequest({
       requestId,
-      provider: providerSelection.provider.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+      provider: normalizedProvider as 'longcat' | 'sora',
       prompt_length: prompt.length,
       duration: videoDuration,
       model,
@@ -112,8 +111,6 @@ export async function POST(req: NextRequest) {
           mode,
           duration: videoDuration,
           priority,
-          userTier,
-          userId,
           prompt: prompt.trim()
         },
         job,
@@ -124,7 +121,7 @@ export async function POST(req: NextRequest) {
     // Track success
     telemetry.trackVideoResult({
       requestId,
-      provider: providerSelection.provider.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+      provider: normalizedProvider as 'longcat' | 'sora',
       status: 'queued',
       latency_ms: Date.now() - startTime
     });
