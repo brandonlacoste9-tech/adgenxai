@@ -26,7 +26,6 @@
   "dependencies": {
     "@netlify/blobs": "^7.0.0",
     "@netlify/functions": "^2.4.0",
-    "@next/swc-win32-x64-msvc": "14.2.33",
     "@supabase/supabase-js": "^2.39.0",
     "apexcharts": "^5.3.6",
     "axios": "^1.6.0",
