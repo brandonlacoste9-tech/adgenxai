@@ -16,10 +16,22 @@ export async function POST(req: NextRequest) {
   
   try {
     const body = await req.json();
-    const { prompt, model, duration, quality, aspectRatio, mode = 'production', priority = 'quality' } = body as Partial<SoraGenerationRequest> & {
+    const {
+      prompt,
+      model,
+      duration,
+      quality,
+      aspectRatio,
+      mode = 'production',
+      priority = 'quality',
+      userTier = 'free',
+      userId = 'anonymous'
+    } = body as Partial<SoraGenerationRequest> & {
       aspectRatio?: string;
       mode?: 'preview' | 'production';
       priority?: 'speed' | 'quality' | 'cost';
+      userTier?: 'free' | 'pro' | 'enterprise';
+      userId?: string;
     };
 
     // Validate input

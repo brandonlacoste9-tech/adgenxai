@@ -12,7 +12,7 @@ export interface TelemetryEvent {
 
 export interface VideoGenerationRequestEvent {
   requestId: string;
-  provider: 'longcat' | 'sora';
+  provider: string;
   prompt_length: number;
   duration?: number;
   model?: string;
@@ -22,7 +22,7 @@ export interface VideoGenerationRequestEvent {
 
 export interface VideoGenerationResultEvent {
   requestId: string;
-  provider: 'longcat' | 'sora';
+  provider: string;
   status: string;
   latency_ms: number;
   error?: string;
