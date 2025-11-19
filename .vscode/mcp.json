@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "description": "GitHub MCP Server (OAuth-based)",
+      "capabilities": {
+        "tools": true,
+        "resources": true,
+        "prompts": true
+      }
+    }
+  }
+}
