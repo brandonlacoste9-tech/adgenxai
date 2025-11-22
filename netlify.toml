@@ -1,3 +1,15 @@
+<<<<<<< HEAD
+[build]
+  command = "node build.js"
+  publish = "public"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+=======
 # netlify.toml - NETLIFY DEPLOYMENT CONFIGURATION FOR ADGENXAI
 [build]
   command = "npm run build"
@@ -14,11 +26,18 @@
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
+>>>>>>> c08b4bdc99057b9b8c01981ab541c60b55ffb6f3
   status = 200
 
 [[headers]]
   for = "/*"
   [headers.values]
+<<<<<<< HEAD
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"
+    X-XSS-Protection = "1; mode=block"
+=======
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
@@ -32,3 +51,4 @@
   for = "/public/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+>>>>>>> c08b4bdc99057b9b8c01981ab541c60b55ffb6f3

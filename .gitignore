@@ -1,3 +1,54 @@
+<<<<<<< HEAD
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build output
+public/
+dist/
+.netlify/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.tmp
+*.temp
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
+# Legacy project files
+*adgenxai*
+*AdGenXAI*
+.clinerules/byterover-rules.md
+.kilocode/rules/byterover-rules.md
+.roo/rules/byterover-rules.md
+.windsurf/rules/byterover-rules.md
+.cursor/rules/byterover-rules.mdc
+.kiro/steering/byterover-rules.md
+.qoder/rules/byterover-rules.md
+.augment/rules/byterover-rules.md
+=======
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -225,3 +276,4 @@ Thumbs.db
 # IDE
 .vscode/settings.json
 *.log
+>>>>>>> c08b4bdc99057b9b8c01981ab541c60b55ffb6f3
