@@ -8,6 +8,7 @@ import MobileCreateDock from "@/components/MobileCreateDock";
 
 import HeroAurora from "@/components/HeroAurora";
 import AgentFirstShowcase from "@/components/AgentFirstShowcase";
+import CalendarWidget from "@/components/CalendarWidget";
 
 // Lazy load heavy below-the-fold components for better initial load performance
 // Note: CampaignOrchestrationDemo component not yet created
@@ -54,14 +55,17 @@ export default function Page() {
 
       <HeroAurora />
       <AgentFirstShowcase />
-      
+
+      {/* 📅 Campaign Calendar - Plan Your Content Strategy */}
+      <CalendarWidget />
+
       {/* 🎯 Campaign Orchestration Demo - The Revolutionary Core */}
       {/* TODO: Create CampaignOrchestrationDemo component
       <Suspense fallback={<SectionLoader />}>
         <CampaignOrchestrationDemo />
       </Suspense>
       */}
-      
+
       {/* 🌟 NEW: Comprehensive Feature Showcase - Complete AI Ecosystem */}
       <Suspense fallback={<SectionLoader />}>
         <ComprehensiveFeatureShowcase />

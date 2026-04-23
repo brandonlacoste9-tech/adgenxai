@@ -1,22 +1,4 @@
 {
-<<<<<<< HEAD
-  "name": "your-project-name",
-  "version": "1.0.0",
-  "description": "Your project description",
-  "main": "index.js",
-  "scripts": {
-    "build": "your-fixed-build-command",
-    "test": "your-test-command"
-  },
-  "dependencies": {
-    "fs-extra": "^10.0.0"
-  },
-  "devDependencies": {},
-  "keywords": [],
-  "author": "Your Name",
-  "license": "ISC"
-}
-=======
   "name": "adgenxai",
   "version": "1.0.0",
   "description": "AI-powered advertising solution with webhook sensory cortex",
@@ -97,4 +79,3 @@
     "@rollup/rollup-win32-x64-msvc": "^4.52.5"
   }
 }
->>>>>>> c08b4bdc99057b9b8c01981ab541c60b55ffb6f3
