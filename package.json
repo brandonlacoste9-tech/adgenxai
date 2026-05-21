@@ -1,22 +1,4 @@
 {
-<<<<<<< HEAD
-  "name": "your-project-name",
-  "version": "1.0.0",
-  "description": "Your project description",
-  "main": "index.js",
-  "scripts": {
-    "build": "your-fixed-build-command",
-    "test": "your-test-command"
-  },
-  "dependencies": {
-    "fs-extra": "^10.0.0"
-  },
-  "devDependencies": {},
-  "keywords": [],
-  "author": "Your Name",
-  "license": "ISC"
-}
-=======
   "name": "adgenxai",
   "version": "1.0.0",
   "description": "AI-powered advertising solution with webhook sensory cortex",
@@ -30,16 +12,10 @@
     "test:watch": "vitest",
     "test:ci": "vitest run --coverage --reporter=dot",
     "test:integration": "node tests/integration/postSignedWebhook.js",
-    "test:syntax": "Get-ChildItem -Path . -Include *.js -Recurse | Where-Object { $_.FullName -notmatch 'node_modules' } | ForEach-Object { node -c $_.FullName }",
     "lint": "eslint . --ext .js,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.ts,.tsx --fix",
     "check:corruption": "node scripts/check-corruption.js",
-    "triage:prs": "node scripts/pr-triage.mjs",
-    "setup:agents": "node setup-agents.mjs",
-    "agent:deploy": "github-agent deploy",
-    "agent:health": "github-agent health --detailed",
-    "agent:status": "github-agent status",
-    "agent:monitor": "github-agent monitor --interval 30"
+    "triage:prs": "node scripts/pr-triage.mjs"
   },
   "dependencies": {
     "@netlify/blobs": "^7.0.0",
@@ -52,7 +28,6 @@
     "echarts-for-react": "^3.0.2",
     "express": "^4.18.2",
     "framer-motion": "^11.0.0",
-    "github-agent-cli": "^1.0.1",
     "googleapis": "^131.0.0",
     "ioredis": "^5.3.0",
     "lucide-react": "^0.263.1",
@@ -84,17 +59,7 @@
     "typescript": "^5.5.0",
     "vitest": "^2.1.4"
   },
-  "keywords": [
-    "ai",
-    "advertising",
-    "webhook",
-    "mcp",
-    "sensory-cortex"
-  ],
+  "keywords": ["ai", "advertising", "webhook", "mcp", "sensory-cortex"],
   "author": "brandonlacoste9-tech",
-  "license": "MIT",
-  "optionalDependencies": {
-    "@rollup/rollup-win32-x64-msvc": "^4.52.5"
-  }
+  "license": "MIT"
 }
->>>>>>> c08b4bdc99057b9b8c01981ab541c60b55ffb6f3
