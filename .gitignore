@@ -277,3 +277,5 @@ Thumbs.db
 .vscode/settings.json
 *.log
 >>>>>>> c08b4bdc99057b9b8c01981ab541c60b55ffb6f3
+
+.vercel
