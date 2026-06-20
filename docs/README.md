@@ -64,6 +64,13 @@ This documentation maps David Ondrej's proven Agent-First methodologies to the B
 - Production deployment
 - Troubleshooting guide
 
+**[COLONY_OS_INTEGRATION.md](./COLONY_OS_INTEGRATION.md)** — *Colony readiness plan*
+- Phase-by-phase Colony OS blueprint
+- Token economics + staking tiers
+- API usage for agent registration & tasks
+- Governance + workflow registry overview
+- Ritual mapping for Badge, Metrics, Echo, History
+
 ### 📊 User Guides
 
 **[CREATOR_DASHBOARD.md](./CREATOR_DASHBOARD.md)** — *How to use Creator Studio*
